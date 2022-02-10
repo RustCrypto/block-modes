@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "cbc",
+    "cfb8",
+    "cfb-mode",
+    "ctr",
+    "ige",
+    "ofb",
+    "pcbc",
+]
