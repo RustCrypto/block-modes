@@ -19,7 +19,7 @@
 //!
 //! let key = [0x42; 16];
 //! let iv = [0x24; 16];
-//! let plaintext = b"hello world! this is my plaintext.";
+//! let plaintext = *b"hello world! this is my plaintext.";
 //! let ciphertext = hex!(
 //!     "3357121ebb5a29468bd861467596ce3dc6ba5df50e536a2443b8ee16c2f7cd0869c9"
 //! );
@@ -28,28 +28,28 @@
 //! let mut buf = plaintext.to_vec();
 //! let mut cipher = Aes128Ofb::new(&key.into(), &iv.into());
 //! cipher.apply_keystream(&mut buf);
-//! assert_eq!(buf, &ciphertext[..]);
+//! assert_eq!(buf[..], ciphertext[..]);
 //!
 //! // OFB mode can be used with streaming messages
 //! let mut cipher = Aes128Ofb::new(&key.into(), &iv.into());
 //! for chunk in buf.chunks_mut(3) {
 //!     cipher.apply_keystream(chunk);
 //! }
-//! assert_eq!(buf, &plaintext[..]);
+//! assert_eq!(buf[..], plaintext[..]);
 //!
 //! // encrypt/decrypt from buffer to buffer
 //! // buffer length must be equal to input length
-//! let mut buf1 = vec![0u8; 34];
+//! let mut buf1 = [0u8; 34];
 //! let mut cipher = Aes128Ofb::new(&key.into(), &iv.into());
 //! cipher
-//!     .apply_keystream_b2b(&plaintext[..], &mut buf1)
+//!     .apply_keystream_b2b(&plaintext, &mut buf1)
 //!     .unwrap();
-//! assert_eq!(buf1, &ciphertext[..]);
+//! assert_eq!(buf1[..], ciphertext[..]);
 //!
-//! let mut buf2 = vec![0u8; 34];
+//! let mut buf2 = [0u8; 34];
 //! let mut cipher = Aes128Ofb::new(&key.into(), &iv.into());
 //! cipher.apply_keystream_b2b(&buf1, &mut buf2).unwrap();
-//! assert_eq!(buf2, &plaintext[..]);
+//! assert_eq!(buf2[..], plaintext[..]);
 //! ```
 //!
 //! [1]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_(OFB)
@@ -58,7 +58,7 @@
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg",
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg",
-    html_root_url = "https://docs.rs/ofb/0.6.0"
+    html_root_url = "https://docs.rs/ofb/0.6.1"
 )]
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]

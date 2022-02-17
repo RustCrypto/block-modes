@@ -20,7 +20,7 @@
 //!
 //! let key = [0x42; 16];
 //! let iv = [0x24; 16];
-//! let plaintext = b"hello world! this is my plaintext.";
+//! let plaintext = *b"hello world! this is my plaintext.";
 //! let ciphertext = hex!(
 //!     "33b356ce9184290c4c8facc1c0b1f918d5475aeb75b88c161ca65bdf05c7137ff4b0"
 //! );
@@ -28,24 +28,24 @@
 //! // encrypt/decrypt in-place
 //! let mut buf = plaintext.to_vec();
 //! Aes128Cfb8Enc::new(&key.into(), &iv.into()).encrypt(&mut buf);
-//! assert_eq!(buf, &ciphertext[..]);
+//! assert_eq!(buf[..], ciphertext[..]);
 //!
 //! Aes128Cfb8Dec::new(&key.into(), &iv.into()).decrypt(&mut buf);
-//! assert_eq!(buf, &plaintext[..]);
+//! assert_eq!(buf[..], plaintext[..]);
 //!
 //! // encrypt/decrypt from buffer to buffer
 //! // buffer length must be equal to input length
-//! let mut buf1 = vec![0u8; 34];
+//! let mut buf1 = [0u8; 34];
 //! Aes128Cfb8Enc::new(&key.into(), &iv.into())
-//!     .encrypt_b2b(&plaintext[..], &mut buf1)
+//!     .encrypt_b2b(&plaintext, &mut buf1)
 //!     .unwrap();
-//! assert_eq!(buf1, &ciphertext[..]);
+//! assert_eq!(buf1[..], ciphertext[..]);
 //!
-//! let mut buf2 = vec![0u8; 34];
+//! let mut buf2 = [0u8; 34];
 //! Aes128Cfb8Dec::new(&key.into(), &iv.into())
 //!     .decrypt_b2b(&buf1, &mut buf2)
 //!     .unwrap();
-//! assert_eq!(buf2, &plaintext[..]);
+//! assert_eq!(buf2[..], plaintext[..]);
 //! ```
 //!
 //! [1]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CFB-1,_CFB-8,_CFB-64,_CFB-128,_etc.
@@ -54,7 +54,7 @@
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg",
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg",
-    html_root_url = "https://docs.rs/cfb8/0.8.0"
+    html_root_url = "https://docs.rs/cfb8/0.8.1"
 )]
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
