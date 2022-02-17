@@ -22,6 +22,8 @@ hex-literal = "0.3.3"
 
 [features]
 default = ["block-padding"]
+alloc = ["cipher/alloc"]
+std = ["cipher/std", "alloc"]
 block-padding = ["cipher/block-padding"]
 zeroize = ["cipher/zeroize"]
 

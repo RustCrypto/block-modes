@@ -20,7 +20,7 @@
 //!
 //! let key = [0x42; 16];
 //! let iv = [0x24; 32];
-//! let plaintext = b"hello world! this is my plaintext.";
+//! let plaintext = *b"hello world! this is my plaintext.";
 //! let ciphertext = hex!(
 //!     "e3da005add5f05d45899f64891f7629b"
 //!     "6fcff7d21537fcd3569373d25701a5d1"
@@ -29,9 +29,9 @@
 //!
 //! // encrypt/decrypt in-place
 //! // buffer must be big enough for padded plaintext
-//! let mut buf = vec![0u8; 48];
+//! let mut buf = [0u8; 48];
 //! let pt_len = plaintext.len();
-//! buf[..pt_len].copy_from_slice(&plaintext[..]);
+//! buf[..pt_len].copy_from_slice(&plaintext);
 //! let ct = Aes128IgeEnc::new(&key.into(), &iv.into())
 //!     .encrypt_padded_mut::<Pkcs7>(&mut buf, pt_len)
 //!     .unwrap();
@@ -40,22 +40,50 @@
 //! let pt = Aes128IgeDec::new(&key.into(), &iv.into())
 //!     .decrypt_padded_mut::<Pkcs7>(&mut buf)
 //!     .unwrap();
-//! assert_eq!(pt, &plaintext[..]);
+//! assert_eq!(pt, &plaintext);
 //!
 //! // encrypt/decrypt from buffer to buffer
-//! let mut buf = vec![0u8; 48];
+//! let mut buf = [0u8; 48];
 //! let ct = Aes128IgeEnc::new(&key.into(), &iv.into())
-//!     .encrypt_padded_b2b_mut::<Pkcs7>(&plaintext[..], &mut buf)
+//!     .encrypt_padded_b2b_mut::<Pkcs7>(&plaintext, &mut buf)
 //!     .unwrap();
 //! assert_eq!(ct, &ciphertext[..]);
 //!
-//! let mut buf = vec![0u8; 48];
+//! let mut buf = [0u8; 48];
 //! let pt = Aes128IgeDec::new(&key.into(), &iv.into())
 //!     .decrypt_padded_b2b_mut::<Pkcs7>(&ct, &mut buf)
 //!     .unwrap();
-//! assert_eq!(pt, &plaintext[..]);
+//! assert_eq!(pt, &plaintext);
 //! ```
 //!
+//! With enabled `alloc` (or `std`) feature you also can use allocating
+//! convinience methods:
+//! ```
+//! # #[cfg(not(feature = "alloc"))]
+//! # fn main() { }
+//! # #[cfg(feature = "alloc")]
+//! # fn main() {
+//! # use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, BlockEncryptMut, KeyIvInit};
+//! # use hex_literal::hex;
+//! # type Aes128IgeEnc = ige::Encryptor<aes::Aes128>;
+//! # type Aes128IgeDec = ige::Decryptor<aes::Aes128>;
+//! # let key = [0x42; 16];
+//! # let iv = [0x24; 32];
+//! # let plaintext = *b"hello world! this is my plaintext.";
+//! # let ciphertext = hex!(
+//! #     "e3da005add5f05d45899f64891f7629b"
+//! #     "6fcff7d21537fcd3569373d25701a5d1"
+//! #     "d9e586e4c5b8ac09f2190485a76873c2"
+//! # );
+//! let res = Aes128IgeEnc::new(&key.into(), &iv.into())
+//!     .encrypt_padded_vec_mut::<Pkcs7>(&plaintext);
+//! assert_eq!(res[..], ciphertext[..]);
+//! let res = Aes128IgeDec::new(&key.into(), &iv.into())
+//!     .decrypt_padded_vec_mut::<Pkcs7>(&res)
+//!     .unwrap();
+//! assert_eq!(res[..], plaintext[..]);
+//! # }
+//! ```
 //! [1]: https://www.links.org/files/openssl-ige.pdf
 
 #![no_std]

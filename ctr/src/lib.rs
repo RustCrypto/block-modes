@@ -19,7 +19,7 @@
 //!
 //! let key = [0x42; 16];
 //! let iv = [0x24; 16];
-//! let plaintext = b"hello world! this is my plaintext.";
+//! let plaintext = *b"hello world! this is my plaintext.";
 //! let ciphertext = hex!(
 //!     "3357121ebb5a29468bd861467596ce3da59bdee42dcc0614dea955368d8a5dc0cad4"
 //! );
@@ -28,30 +28,30 @@
 //! let mut buf = plaintext.to_vec();
 //! let mut cipher = Aes128Ctr64LE::new(&key.into(), &iv.into());
 //! cipher.apply_keystream(&mut buf);
-//! assert_eq!(buf, &ciphertext[..]);
+//! assert_eq!(buf[..], ciphertext[..]);
 //!
 //! // CTR mode can be used with streaming messages
 //! let mut cipher = Aes128Ctr64LE::new(&key.into(), &iv.into());
 //! for chunk in buf.chunks_mut(3) {
 //!     cipher.apply_keystream(chunk);
 //! }
-//! assert_eq!(buf, &plaintext[..]);
+//! assert_eq!(buf[..], plaintext[..]);
 //!
 //! // CTR mode supports seeking
 //! cipher.seek(0u32);
 //!
 //! // encrypt/decrypt from buffer to buffer
 //! // buffer length must be equal to input length
-//! let mut buf1 = vec![0u8; 34];
+//! let mut buf1 = [0u8; 34];
 //! cipher
-//!     .apply_keystream_b2b(&plaintext[..], &mut buf1)
+//!     .apply_keystream_b2b(&plaintext, &mut buf1)
 //!     .unwrap();
-//! assert_eq!(buf1, &ciphertext[..]);
+//! assert_eq!(buf1[..], ciphertext[..]);
 //!
-//! let mut buf2 = vec![0u8; 34];
+//! let mut buf2 = [0u8; 34];
 //! cipher.seek(0u32);
 //! cipher.apply_keystream_b2b(&buf1, &mut buf2).unwrap();
-//! assert_eq!(buf2, &plaintext[..]);
+//! assert_eq!(buf2[..], plaintext[..]);
 //! ```
 //!
 //! [1]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CTR

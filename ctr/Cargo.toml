@@ -23,6 +23,8 @@ cipher = { version = "0.4.2", features = ["dev"] }
 hex-literal = "0.3.3"
 
 [features]
+alloc = ["cipher/alloc"]
+std = ["cipher/std", "alloc"]
 block-padding = ["cipher/block-padding"]
 zeroize = ["cipher/zeroize"]
 
