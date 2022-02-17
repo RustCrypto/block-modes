@@ -62,7 +62,7 @@
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg",
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg",
-    html_root_url = "https://docs.rs/pcbc/0.1.0"
+    html_root_url = "https://docs.rs/pcbc/0.1.1"
 )]
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
