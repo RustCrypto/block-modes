@@ -12,6 +12,7 @@
 //!
 //! # Example
 //! ```
+//! # #[cfg(feature = "block-padding")] {
 //! use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 //! use hex_literal::hex;
 //!
@@ -54,15 +55,13 @@
 //!     .decrypt_padded_b2b_mut::<Pkcs7>(&ct, &mut buf)
 //!     .unwrap();
 //! assert_eq!(pt, &plaintext);
+//! # }
 //! ```
 //!
 //! With enabled `alloc` (or `std`) feature you also can use allocating
 //! convinience methods:
 //! ```
-//! # #[cfg(not(feature = "alloc"))]
-//! # fn main() { }
-//! # #[cfg(feature = "alloc")]
-//! # fn main() {
+//! # #[cfg(all(feature = "alloc", feature = "block-padding"))] {
 //! # use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 //! # use hex_literal::hex;
 //! # type Aes128CbcEnc = cbc::Encryptor<aes::Aes128>;
