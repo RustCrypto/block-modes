@@ -40,15 +40,3 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
-
-  benches:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: RustCrypto/actions/cargo-cache@master
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          profile: minimal
-          override: true
-      - run: cargo build --all --benches
