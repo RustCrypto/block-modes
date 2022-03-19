@@ -1,7 +1,7 @@
 use crate::{backend::Closure, CtrFlavor};
 use cipher::{
     crypto_common::{InnerUser, IvSizeUser},
-    AlgorithmName, BlockCipher, BlockEncryptMut, BlockSizeUser, InnerIvInit, Iv, IvState,
+    AlgorithmName, BlockCipher, BlockEncrypt, BlockSizeUser, InnerIvInit, Iv, IvState,
     StreamCipherCore, StreamCipherSeekCore, StreamClosure,
 };
 use core::fmt;
@@ -13,7 +13,7 @@ use cipher::zeroize::ZeroizeOnDrop;
 #[derive(Clone)]
 pub struct CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     cipher: C,
@@ -22,7 +22,7 @@ where
 
 impl<C, F> BlockSizeUser for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     type BlockSize = C::BlockSize;
@@ -30,7 +30,7 @@ where
 
 impl<C, F> StreamCipherCore for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     #[inline]
@@ -41,13 +41,13 @@ where
     #[inline]
     fn process_with_backend(&mut self, f: impl StreamClosure<BlockSize = Self::BlockSize>) {
         let Self { cipher, ctr_nonce } = self;
-        cipher.encrypt_with_backend_mut(Closure::<F, _, _> { ctr_nonce, f });
+        cipher.encrypt_with_backend(Closure::<F, _, _> { ctr_nonce, f });
     }
 }
 
 impl<C, F> StreamCipherSeekCore for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     type Counter = F::Backend;
@@ -65,7 +65,7 @@ where
 
 impl<C, F> InnerUser for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     type Inner = C;
@@ -73,7 +73,7 @@ where
 
 impl<C, F> IvSizeUser for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     type IvSize = C::BlockSize;
@@ -81,7 +81,7 @@ where
 
 impl<C, F> InnerIvInit for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     #[inline]
@@ -95,7 +95,7 @@ where
 
 impl<C, F> IvState for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockEncrypt + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
 {
     #[inline]
@@ -106,7 +106,7 @@ where
 
 impl<C, F> AlgorithmName for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher + AlgorithmName,
+    C: BlockEncrypt + BlockCipher + AlgorithmName,
     F: CtrFlavor<C::BlockSize>,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -120,7 +120,7 @@ where
 
 impl<C, F> fmt::Debug for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher + AlgorithmName,
+    C: BlockEncrypt + BlockCipher + AlgorithmName,
     F: CtrFlavor<C::BlockSize>,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -136,7 +136,7 @@ where
 #[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
 impl<C, F> ZeroizeOnDrop for CtrCore<C, F>
 where
-    C: BlockEncryptMut + BlockCipher + ZeroizeOnDrop,
+    C: BlockEncrypt + BlockCipher + ZeroizeOnDrop,
     F: CtrFlavor<C::BlockSize>,
     F::CtrNonce: ZeroizeOnDrop,
 {
