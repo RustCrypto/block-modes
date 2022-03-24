@@ -30,7 +30,7 @@ dependencies = [
 
 [[package]]
 name = "cbc"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "aes",
  "cipher",
