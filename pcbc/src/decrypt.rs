@@ -174,7 +174,7 @@ where
         let mut t1 = block.clone_in();
         let mut t2 = block.clone_in();
         self.backend.proc_block((&mut t1).into());
-        xor(&mut t1, &self.iv);
+        xor(&mut t1, self.iv);
         xor(&mut t2, &t1);
         *self.iv = t2;
         *block.get_out() = t1;
