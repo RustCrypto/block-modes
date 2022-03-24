@@ -173,7 +173,8 @@ where
     fn proc_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
         let mut t = block.clone_in();
         xor(&mut t, self.iv);
-        self.backend.proc_block((&t, block.get_out()).into());
-        *self.iv = block.get_out().clone();
+        self.backend.proc_block((&mut t).into());
+        *self.iv = t.clone();
+        *block.get_out() = t;
     }
 }

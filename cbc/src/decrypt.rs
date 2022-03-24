@@ -170,22 +170,26 @@ where
 {
     #[inline(always)]
     fn proc_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
-        let enc_block = block.clone_in();
-        self.backend.proc_block(block.reborrow());
-        xor(block.get_out(), self.iv);
-        *self.iv = enc_block;
+        let in_block = block.clone_in();
+        let mut t = block.clone_in();
+        self.backend.proc_block((&mut t).into());
+        xor(&mut t, self.iv);
+        *block.get_out() = t;
+        *self.iv = in_block;
     }
 
     #[inline(always)]
     fn proc_par_blocks(&mut self, mut blocks: InOut<'_, '_, ParBlocks<Self>>) {
-        let t = blocks.clone_in();
-        self.backend.proc_par_blocks(blocks.reborrow());
-        let out = blocks.get_out();
-        let n = out.len();
-        xor(&mut out[0], self.iv);
+        let in_blocks = blocks.clone_in();
+        let mut t = blocks.clone_in();
+
+        self.backend.proc_par_blocks((&mut t).into());
+        let n = t.len();
+        xor(&mut t[0], self.iv);
         for i in 1..n {
-            xor(&mut out[i], &t[i - 1])
+            xor(&mut t[i], &in_blocks[i - 1])
         }
-        *self.iv = t[n - 1].clone();
+        *blocks.get_out() = t;
+        *self.iv = in_blocks[n - 1].clone();
     }
 }
