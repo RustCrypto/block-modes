@@ -171,11 +171,12 @@ where
 {
     #[inline(always)]
     fn proc_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
-        let mut t = block.clone_in();
-        xor(&mut t, self.iv);
-        *self.iv = block.clone_in();
-        let b = (&t, block.get_out()).into();
-        self.backend.proc_block(b);
-        xor(self.iv, block.get_out());
+        let mut t1 = block.clone_in();
+        let mut t2 = block.clone_in();
+        xor(&mut t1, self.iv);
+        self.backend.proc_block((&mut t1).into());
+        xor(&mut t2, &t1);
+        *block.get_out() = t1;
+        *self.iv = t2;
     }
 }
