@@ -4,7 +4,7 @@ use cipher::{
     inout::InOut,
     AlgorithmName, AsyncStreamCipher, Block, BlockBackend, BlockCipher, BlockClosure, BlockDecrypt,
     BlockDecryptMut, BlockEncryptMut, BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocks,
-    ParBlocksSizeUser,
+    ParBlocksSizeUser, Unsigned,
 };
 use core::fmt;
 
@@ -21,7 +21,58 @@ where
     iv: Block<C>,
 }
 
+/// CFB mode buffered decryptor.
+#[derive(Clone)]
+pub struct BufferDecryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher,
+{
+    cipher: C,
+    iv: Block<C>,
+    pos: usize,
+}
+
+impl<C> BufferDecryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher,
+{
+    /// Decrypt a buffer in multiple parts.
+    pub fn decrypt(&mut self, mut data: &mut [u8]) {
+        let bs = C::BlockSize::to_usize();
+        let n = data.len();
+
+        if n < bs - self.pos {
+            xor_set2(data, &mut self.iv[self.pos..self.pos + n]);
+            self.pos += n;
+            return;
+        }
+        let (left, right) = { data }.split_at_mut(bs - self.pos);
+        data = right;
+        let mut iv = self.iv.clone();
+        xor_set2(left, &mut iv[self.pos..]);
+        self.cipher.encrypt_block_mut(&mut iv);
+
+        let mut chunks = data.chunks_exact_mut(bs);
+        for chunk in &mut chunks {
+            xor_set2(chunk, iv.as_mut_slice());
+            self.cipher.encrypt_block_mut(&mut iv);
+        }
+
+        let rem = chunks.into_remainder();
+        xor_set2(rem, iv.as_mut_slice());
+        self.pos = rem.len();
+        self.iv = iv;
+    }
+}
+
 impl<C> BlockSizeUser for Decryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher,
+{
+    type BlockSize = C::BlockSize;
+}
+
+impl<C> BlockSizeUser for BufferDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -47,7 +98,21 @@ where
     type Inner = C;
 }
 
+impl<C> InnerUser for BufferDecryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher,
+{
+    type Inner = C;
+}
+
 impl<C> IvSizeUser for Decryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher,
+{
+    type IvSize = C::BlockSize;
+}
+
+impl<C> IvSizeUser for BufferDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -66,7 +131,31 @@ where
     }
 }
 
+impl<C> InnerIvInit for BufferDecryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher,
+{
+    #[inline]
+    fn inner_iv_init(mut cipher: C, iv: &Iv<Self>) -> Self {
+        let mut iv = iv.clone();
+        cipher.encrypt_block_mut(&mut iv);
+        Self { cipher, iv, pos: 0 }
+    }
+}
+
 impl<C> IvState for Decryptor<C>
+where
+    C: BlockEncryptMut + BlockDecrypt + BlockCipher,
+{
+    #[inline]
+    fn iv_state(&self) -> Iv<Self> {
+        let mut res = self.iv.clone();
+        self.cipher.decrypt_block(&mut res);
+        res
+    }
+}
+
+impl<C> IvState for BufferDecryptor<C>
 where
     C: BlockEncryptMut + BlockDecrypt + BlockCipher,
 {
@@ -89,12 +178,34 @@ where
     }
 }
 
+impl<C> AlgorithmName for BufferDecryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher + AlgorithmName,
+{
+    fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("cfb::BufferDecryptor<")?;
+        <C as AlgorithmName>::write_alg_name(f)?;
+        f.write_str(">")
+    }
+}
+
 impl<C> fmt::Debug for Decryptor<C>
 where
     C: BlockEncryptMut + BlockCipher + AlgorithmName,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("cfb::Decryptor<")?;
+        <C as AlgorithmName>::write_alg_name(f)?;
+        f.write_str("> { ... }")
+    }
+}
+
+impl<C> fmt::Debug for BufferDecryptor<C>
+where
+    C: BlockEncryptMut + BlockCipher + AlgorithmName,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("cfb::BufferDecryptor<")?;
         <C as AlgorithmName>::write_alg_name(f)?;
         f.write_str("> { ... }")
     }
@@ -110,7 +221,19 @@ impl<C: BlockEncryptMut + BlockCipher> Drop for Decryptor<C> {
 
 #[cfg(feature = "zeroize")]
 #[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
+impl<C: BlockEncryptMut + BlockCipher> Drop for BufferDecryptor<C> {
+    fn drop(&mut self) {
+        self.iv.zeroize();
+    }
+}
+
+#[cfg(feature = "zeroize")]
+#[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
 impl<C: BlockEncryptMut + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for Decryptor<C> {}
+
+#[cfg(feature = "zeroize")]
+#[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
+impl<C: BlockEncryptMut + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for BufferDecryptor<C> {}
 
 struct Closure<'a, BS, BC>
 where
@@ -191,5 +314,14 @@ where
             blocks.get(i).xor_in2out(&t[i - 1])
         }
         *self.iv = t[n - 1].clone();
+    }
+}
+
+#[inline(always)]
+fn xor_set2(buf1: &mut [u8], buf2: &mut [u8]) {
+    for (a, b) in buf1.iter_mut().zip(buf2) {
+        let t = *a;
+        *a ^= *b;
+        *b = t;
     }
 }
