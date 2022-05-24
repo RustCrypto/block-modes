@@ -17,7 +17,7 @@ pub struct Decryptor<C>
 where
     C: BlockDecryptMut + BlockCipher,
 {
-    cipher: C,
+    pub cipher: C,
     iv: Block<C>,
 }
 
