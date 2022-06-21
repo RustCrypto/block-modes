@@ -23,7 +23,7 @@ where
 
 /// CFB mode buffered decryptor.
 #[derive(Clone)]
-pub struct BufferDecryptor<C>
+pub struct BufDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -32,7 +32,7 @@ where
     pos: usize,
 }
 
-impl<C> BufferDecryptor<C>
+impl<C> BufDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -63,16 +63,19 @@ where
         self.pos = rem.len();
         self.iv = iv;
     }
+
+    /// Returns the current state (cipher, block and position) of the decryptor.
+    pub fn into_state(self) -> (C, Block<C>, usize) {
+        (self.cipher, self.iv, self.pos)
+    }
+
+    /// Restore from the given state for resumption.
+    pub fn from_state(cipher: C, iv: Block<C>, pos: usize) -> Self {
+        Self { cipher, iv, pos }
+    }
 }
 
 impl<C> BlockSizeUser for Decryptor<C>
-where
-    C: BlockEncryptMut + BlockCipher,
-{
-    type BlockSize = C::BlockSize;
-}
-
-impl<C> BlockSizeUser for BufferDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -98,7 +101,7 @@ where
     type Inner = C;
 }
 
-impl<C> InnerUser for BufferDecryptor<C>
+impl<C> InnerUser for BufDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -112,7 +115,7 @@ where
     type IvSize = C::BlockSize;
 }
 
-impl<C> IvSizeUser for BufferDecryptor<C>
+impl<C> IvSizeUser for BufDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -131,7 +134,7 @@ where
     }
 }
 
-impl<C> InnerIvInit for BufferDecryptor<C>
+impl<C> InnerIvInit for BufDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher,
 {
@@ -155,18 +158,6 @@ where
     }
 }
 
-impl<C> IvState for BufferDecryptor<C>
-where
-    C: BlockEncryptMut + BlockDecrypt + BlockCipher,
-{
-    #[inline]
-    fn iv_state(&self) -> Iv<Self> {
-        let mut res = self.iv.clone();
-        self.cipher.decrypt_block(&mut res);
-        res
-    }
-}
-
 impl<C> AlgorithmName for Decryptor<C>
 where
     C: BlockEncryptMut + BlockCipher + AlgorithmName,
@@ -178,12 +169,12 @@ where
     }
 }
 
-impl<C> AlgorithmName for BufferDecryptor<C>
+impl<C> AlgorithmName for BufDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher + AlgorithmName,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("cfb::BufferDecryptor<")?;
+        f.write_str("cfb::BufDecryptor<")?;
         <C as AlgorithmName>::write_alg_name(f)?;
         f.write_str(">")
     }
@@ -200,12 +191,12 @@ where
     }
 }
 
-impl<C> fmt::Debug for BufferDecryptor<C>
+impl<C> fmt::Debug for BufDecryptor<C>
 where
     C: BlockEncryptMut + BlockCipher + AlgorithmName,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("cfb::BufferDecryptor<")?;
+        f.write_str("cfb::BufDecryptor<")?;
         <C as AlgorithmName>::write_alg_name(f)?;
         f.write_str("> { ... }")
     }
@@ -221,7 +212,7 @@ impl<C: BlockEncryptMut + BlockCipher> Drop for Decryptor<C> {
 
 #[cfg(feature = "zeroize")]
 #[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
-impl<C: BlockEncryptMut + BlockCipher> Drop for BufferDecryptor<C> {
+impl<C: BlockEncryptMut + BlockCipher> Drop for BufDecryptor<C> {
     fn drop(&mut self) {
         self.iv.zeroize();
     }
@@ -233,7 +224,7 @@ impl<C: BlockEncryptMut + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for Decrypt
 
 #[cfg(feature = "zeroize")]
 #[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
-impl<C: BlockEncryptMut + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for BufferDecryptor<C> {}
+impl<C: BlockEncryptMut + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for BufDecryptor<C> {}
 
 struct Closure<'a, BS, BC>
 where

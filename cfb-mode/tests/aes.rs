@@ -1,5 +1,5 @@
 use aes::*;
-use cfb_mode::{BufferDecryptor, BufferEncryptor, Decryptor, Encryptor};
+use cfb_mode::{BufDecryptor, BufEncryptor, Decryptor, Encryptor};
 use cipher::{block_mode_dec_test, block_mode_enc_test, iv_state_test};
 
 iv_state_test!(aes128_cfb_enc_iv_state, Encryptor<Aes128>, encrypt);
@@ -60,8 +60,8 @@ fn aes128_cfb_buffered_test() {
 
     type Enc = Encryptor<Aes128>;
 
-    type BufEnc = BufferEncryptor<Aes128>;
-    type BufDec = BufferDecryptor<Aes128>;
+    type BufEnc = BufEncryptor<Aes128>;
+    type BufDec = BufDecryptor<Aes128>;
 
     let key = [42; 16];
     let iv = [24; 16];
@@ -86,6 +86,28 @@ fn aes128_cfb_buffered_test() {
 
         let mut buf_dec = BufDec::new_from_slices(&key, &iv).unwrap();
         for chunk in ct2.chunks_mut(i) {
+            buf_dec.decrypt(chunk);
+        }
+        assert_eq!(ct2, pt);
+    }
+
+    // buffered with restore
+    for i in 1..100 {
+        let mut buf_enc = BufEnc::new_from_slices(&key, &iv).unwrap();
+        let mut ct2 = pt.clone();
+        for chunk in ct2.chunks_mut(i) {
+            let (cipher, iv, pos) = buf_enc.into_state();
+            buf_enc = BufEnc::from_state(cipher, iv, pos);
+
+            buf_enc.encrypt(chunk);
+        }
+        assert_eq!(ct2, ct);
+
+        let mut buf_dec = BufDec::new_from_slices(&key, &iv).unwrap();
+        for chunk in ct2.chunks_mut(i) {
+            let (cipher, iv, pos) = buf_dec.into_state();
+            buf_dec = BufDec::from_state(cipher, iv, pos);
+
             buf_dec.decrypt(chunk);
         }
         assert_eq!(ct2, pt);
