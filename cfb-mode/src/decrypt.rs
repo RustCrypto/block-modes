@@ -71,7 +71,11 @@ where
 
     /// Restore from the given state for resumption.
     pub fn from_state(cipher: C, iv: &Block<C>, pos: usize) -> Self {
-        Self { cipher, iv: iv.clone(), pos }
+        Self {
+            cipher,
+            iv: iv.clone(),
+            pos,
+        }
     }
 }
 
