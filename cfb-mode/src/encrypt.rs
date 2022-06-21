@@ -65,14 +65,14 @@ where
         self.iv = iv;
     }
 
-    /// Returns the current state (cipher, block and position) of the decryptor.
-    pub fn into_state(self) -> (C, Block<C>, usize) {
-        (self.cipher, self.iv, self.pos)
+    /// Returns the current state (block and position) of the decryptor.
+    pub fn get_state(&self) -> (&Block<C>, usize) {
+        (&self.iv, self.pos)
     }
 
     /// Restore from the given state for resumption.
-    pub fn from_state(cipher: C, iv: Block<C>, pos: usize) -> Self {
-        Self { cipher, iv, pos }
+    pub fn from_state(cipher: C, iv: &Block<C>, pos: usize) -> Self {
+          Self { cipher, iv: iv.clone(), pos }
     }
 }
 
