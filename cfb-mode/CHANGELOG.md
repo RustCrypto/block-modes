@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.8.2 (2022-09-13)
 ### Added
-- `BufferEncryptor` and `BufferDecryptor` types ([#18])
+- `BufferEncryptor` and `BufferDecryptor` types ([#19])
 
-[#18]: https://github.com/RustCrypto/block-modes/pull/18
+[#19]: https://github.com/RustCrypto/block-modes/pull/19
 
 ## 0.8.1 (2022-02-17)
 ### Fixed
