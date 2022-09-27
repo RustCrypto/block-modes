@@ -9,7 +9,7 @@ use core::fmt;
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::ZeroizeOnDrop;
 
-/// Generic CTR block mode isntance.
+/// Generic CTR block mode instance.
 #[derive(Clone)]
 pub struct CtrCore<C, F>
 where
