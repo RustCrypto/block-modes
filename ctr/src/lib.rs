@@ -37,7 +37,7 @@
 //! }
 //! assert_eq!(buf[..], plaintext[..]);
 //!
-//! // CTR mode supports seeking
+//! // CTR mode supports seeking. The parameter is zero-based _bytes_ counter (not _blocks_).
 //! cipher.seek(0u32);
 //!
 //! // encrypt/decrypt from buffer to buffer
