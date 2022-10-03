@@ -59,7 +59,7 @@
 //! ```
 //!
 //! With enabled `alloc` (or `std`) feature you also can use allocating
-//! convinience methods:
+//! convenience methods:
 //! ```
 //! # #[cfg(all(feature = "alloc", feature = "block-padding"))] {
 //! # use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, BlockEncryptMut, KeyIvInit};
