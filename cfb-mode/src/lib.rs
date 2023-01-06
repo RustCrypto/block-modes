@@ -59,9 +59,14 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs, rust_2018_idioms)]
 
+pub use cipher;
+
+mod buf_decrypt;
+mod buf_encrypt;
 mod decrypt;
 mod encrypt;
 
-pub use cipher;
-pub use decrypt::{BufDecryptor, Decryptor};
-pub use encrypt::{BufEncryptor, Encryptor};
+pub use buf_decrypt::BufDecryptor;
+pub use buf_encrypt::BufEncryptor;
+pub use decrypt::Decryptor;
+pub use encrypt::Encryptor;
