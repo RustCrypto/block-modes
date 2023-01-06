@@ -38,11 +38,7 @@ where
 {
     fn decrypt_with_backend_mut(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
         let Self { cipher, iv, _pd } = self;
-        cipher.encrypt_with_backend_mut(Closure {
-            iv,
-            f,
-            _pd: _pd.clone(),
-        })
+        cipher.encrypt_with_backend_mut(Closure { iv, f, _pd: *_pd })
     }
 }
 
@@ -222,7 +218,7 @@ where
         let mbs = MBS::USIZE;
         if mbs == cbs {
             let mut t = block.clone_in();
-            block.xor_in2out(GenericArray::from_slice(&self.iv));
+            block.xor_in2out(GenericArray::from_slice(self.iv));
             let block = GenericArray::from_mut_slice(&mut t);
             self.backend.proc_block(block.into());
             *self.iv = block.clone();

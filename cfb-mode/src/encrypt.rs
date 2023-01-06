@@ -38,11 +38,7 @@ where
 {
     fn encrypt_with_backend_mut(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
         let Self { cipher, iv, _pd } = self;
-        cipher.encrypt_with_backend_mut(Closure {
-            iv,
-            f,
-            _pd: _pd.clone(),
-        })
+        cipher.encrypt_with_backend_mut(Closure { iv, f, _pd: *_pd })
     }
 }
 
@@ -232,7 +228,7 @@ where
             for i in 0..mid {
                 self.iv[i] = self.iv[i + mbs];
             }
-            self.iv[mid..].copy_from_slice(&ct);
+            self.iv[mid..].copy_from_slice(ct);
         }
     }
 }
