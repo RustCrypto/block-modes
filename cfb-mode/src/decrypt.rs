@@ -3,7 +3,7 @@ use cipher::{
     crypto_common::{InnerUser, IvSizeUser},
     generic_array::{ArrayLength, GenericArray},
     inout::InOut,
-    AlgorithmName, AsyncStreamCipher, Block, BlockBackend, BlockCipher, BlockClosure, BlockDecrypt,
+    AlgorithmName, AsyncStreamCipher, Block, BlockBackend, BlockCipher, BlockClosure,
     BlockDecryptMut, BlockEncryptMut, BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocksSizeUser,
 };
 use core::{fmt, marker::PhantomData};
@@ -71,12 +71,10 @@ where
     MBS: ArrayLength<u8>,
 {
     #[inline]
-    fn inner_iv_init(mut cipher: C, iv: &Iv<Self>) -> Self {
-        let mut iv = iv.clone();
-        cipher.encrypt_block_mut(&mut iv);
+    fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
         Self {
             cipher,
-            iv,
+            iv: iv.clone(),
             _pd: PhantomData,
         }
     }
@@ -84,14 +82,12 @@ where
 
 impl<C, MBS> IvState for Decryptor<C, MBS>
 where
-    C: BlockEncryptMut + BlockDecrypt + BlockCipher,
+    C: BlockEncryptMut + BlockCipher,
     MBS: ArrayLength<u8>,
 {
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
-        let mut res = self.iv.clone();
-        self.cipher.decrypt_block(&mut res);
-        res
+        self.iv.clone()
     }
 }
 
@@ -216,24 +212,15 @@ where
     fn proc_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
         let cbs = CBS::USIZE;
         let mbs = MBS::USIZE;
-        if mbs == cbs {
-            let mut t = block.clone_in();
-            block.xor_in2out(GenericArray::from_slice(self.iv));
-            let block = GenericArray::from_mut_slice(&mut t);
-            self.backend.proc_block(block.into());
-            *self.iv = block.clone();
-        } else {
-            let mut t = self.iv.clone();
-            self.backend.proc_block((&mut t).into());
-            let ct = block.clone_in();
-            block.xor_in2out(GenericArray::from_slice(&t[..mbs]));
 
-            let mid = cbs - mbs;
-            for i in 0..mid {
-                self.iv[i] = self.iv[i + 1];
-            }
-            self.iv[mid..].copy_from_slice(&ct);
-        }
+        let mut iv_cpy = self.iv.clone();
+
+        let mid = cbs - mbs;
+        self.iv[..mid].copy_from_slice(&iv_cpy[mbs..]);
+        self.iv[mid..].copy_from_slice(block.get_in());
+
+        self.backend.proc_block((&mut iv_cpy).into());
+        block.xor_in2out(GenericArray::from_slice(&iv_cpy[..mbs]));
     }
 
     // See comment in `ParBlocksSizeUser` impl
