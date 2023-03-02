@@ -9,6 +9,8 @@
 //!
 //! This crate does not ensure ciphertexts are authentic! Thus ciphertext integrity
 //! is not verified, which can lead to serious vulnerabilities!
+//! [AEADs][https://github.com/RustCrypto/AEADs] provide simple authenticated encryption,
+//! which is much less error-prone than manual integrity verification.
 //!
 //! # Example
 //! ```

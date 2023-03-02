@@ -13,6 +13,8 @@ block ciphers.
 Crates in this repository do not ensure ciphertexts are authentic
 (i.e. by using a MAC to verify ciphertext integrity), which can lead to
 serious vulnerabilities if used incorrectly!
+[AEADs][aead-link] provide simple authenticated encryption, which is much
+less error-prone than manual integrity verification.
 
 **USE AT YOUR OWN RISK!**
 
@@ -55,6 +57,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
 [hazmat-image]: https://img.shields.io/badge/crypto-hazmat%E2%9A%A0-red.svg
 [hazmat-link]: https://github.com/RustCrypto/meta/blob/master/HAZMAT.md
+[aead-link]: https://github.com/RustCrypto/AEADs
 [msrv-1.56]: https://img.shields.io/badge/rustc-1.56.0+-blue.svg
 
 [//]: # (crates)
