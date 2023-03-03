@@ -14,6 +14,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "belt-block"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a1be3fcfd5950762b6ac3f929b7ac65f31b35afee94e17f6fcadd58ee47abee"
+dependencies = [
+ "cipher",
+]
+
+[[package]]
 name = "blobby"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -42,6 +51,7 @@ name = "cfb-mode"
 version = "0.8.2"
 dependencies = [
  "aes",
+ "belt-block",
  "cipher",
  "hex-literal",
 ]
@@ -149,9 +159,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.132"
+version = "0.2.139"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8371e4e5341c3a96db127eb2465ac681ced4c433e01dd0e938adbef26ba93ba5"
+checksum = "201de327520df007757c1f0adce6e827fe8562fbc28bfd9c15571c66ca1f5f79"
 
 [[package]]
 name = "magma"
@@ -182,9 +192,9 @@ dependencies = [
 
 [[package]]
 name = "typenum"
-version = "1.15.0"
+version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcf81ac59edc17cc8697ff311e8f5ef2d99fcbd9817b34cec66f90b6c3dfd987"
+checksum = "497961ef93d974e23eb6f433eb5fe1b7930b659f06d12dec6fc44a8f554c0bba"
 
 [[package]]
 name = "version_check"
