@@ -10,7 +10,7 @@ on:
 
 defaults:
   run:
-    working-directory: ctr
+    working-directory: belt-ctr
 
 env:
   CARGO_INCREMENTAL: 0
