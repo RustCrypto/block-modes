@@ -23,6 +23,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "belt-ctr"
+version = "0.1.0"
+dependencies = [
+ "belt-block",
+ "cipher",
+ "hex-literal",
+]
+
+[[package]]
 name = "blobby"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
