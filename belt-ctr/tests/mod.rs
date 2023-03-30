@@ -1,7 +1,6 @@
+use belt_ctr::BeltCtr;
 use cipher::{KeyIvInit, StreamCipher};
 use hex_literal::hex;
-use belt_ctr::BeltCtr;
-use belt_ctr::flavor::ctr128::Ctr128;
 
 #[test]
 fn belt_ctr_a7() {

@@ -49,15 +49,15 @@
 /// Flavors for LE and BE U128
 pub mod flavor;
 
-use belt_block::BeltBlock;
 use crate::flavor::CtrFlavor;
+use belt_block::BeltBlock;
 
+use crate::flavor::ctr128::Ctr128;
 use cipher::{
     crypto_common::InnerUser, generic_array::GenericArray, inout::InOutBuf, BlockCipher,
     BlockEncrypt, BlockEncryptMut, BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState,
     StreamCipher, StreamCipherError,
 };
-use crate::flavor::ctr128::Ctr128;
 
 /// BelT CTR Mode
 pub struct BeltCtr<F = Ctr128, C = BeltBlock>
