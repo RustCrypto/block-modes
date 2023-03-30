@@ -16,6 +16,7 @@ categories = ["cryptography", "no-std"]
 
 [dependencies]
 cipher = "0.4.4"
+belt-block = "0.1.1"
 
 [dev-dependencies]
 hex-literal = "0.3.4"

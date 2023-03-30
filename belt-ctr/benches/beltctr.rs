@@ -2,7 +2,7 @@
 extern crate test;
 
 use belt_block::BeltBlock;
-use belt_ctr::flavors::ctr128::Ctr128LE;
+use belt_ctr::flavor::ctr128::Ctr128LE;
 
 cipher::stream_cipher_bench!(
     belt_ctr::BeltCtr<BeltBlock, Ctr128LE>;

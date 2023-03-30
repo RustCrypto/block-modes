@@ -15,7 +15,7 @@
 //! use cipher::{KeyIvInit, StreamCipher};
 //! use hex_literal::hex;
 //! use belt_ctr::BeltCtr;
-//! use belt_ctr::flavors::ctr128::Ctr128LE;
+//! use belt_ctr::flavor::ctr128::Ctr128LE;
 //!
 //! type BeltCtrT = BeltCtr<BeltBlock, Ctr128LE>;
 //!
@@ -37,7 +37,7 @@
 //!
 //! [1]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
 
-#![no_std]
+// #![no_std]
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg",
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"
@@ -47,18 +47,20 @@
 #![warn(missing_docs, rust_2018_idioms)]
 
 /// Flavors for LE and BE U128
-pub mod flavors;
+pub mod flavor;
 
-use crate::flavors::CtrFlavor;
+use belt_block::BeltBlock;
+use crate::flavor::CtrFlavor;
 
 use cipher::{
     crypto_common::InnerUser, generic_array::GenericArray, inout::InOutBuf, BlockCipher,
     BlockEncrypt, BlockEncryptMut, BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState,
     StreamCipher, StreamCipherError,
 };
+use crate::flavor::ctr128::Ctr128;
 
 /// BelT CTR Mode
-pub struct BeltCtr<C, F>
+pub struct BeltCtr<F = Ctr128, C = BeltBlock>
 where
     C: BlockEncryptMut + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
@@ -67,10 +69,10 @@ where
     f: F::CtrNonce,
 }
 
-impl<C, F> BeltCtr<C, F>
+impl<F, C> BeltCtr<F, C>
 where
     C: BlockEncryptMut + BlockCipher + BlockEncrypt,
-    F: CtrFlavor<C::BlockSize>,
+    F: CtrFlavor<C::BlockSize, Backend = u128>,
 {
     fn gen_block(&mut self) -> GenericArray<u8, C::BlockSize> {
         let mut nonce = F::next_block(&mut self.f);
@@ -78,15 +80,15 @@ where
         nonce
     }
 
-    fn gen_init_block(&mut self) -> GenericArray<u8, C::BlockSize> {
-        let mut nonce = F::next_block(&mut self.f);
-        self.cipher.encrypt_block(&mut nonce);
-        F::increment(&mut nonce);
-        nonce
+    fn init_ctr(&mut self) {
+        F::reset(&mut self.f);
+        let ctr = self.gen_block();
+        let ctr = u128::from_le_bytes(ctr.as_slice().try_into().unwrap()).wrapping_add(1);
+        F::set_from_backend(&mut self.f, ctr);
     }
 }
 
-impl<C, F> StreamCipher for BeltCtr<C, F>
+impl<F, C> StreamCipher for BeltCtr<F, C>
 where
     C: BlockEncryptMut + BlockCipher + BlockEncrypt,
     F: CtrFlavor<C::BlockSize, Backend = u128>,
@@ -95,12 +97,13 @@ where
         &mut self,
         data: InOutBuf<'_, '_, u8>,
     ) -> Result<(), StreamCipherError> {
-        self.f = F::from_nonce(&self.gen_init_block());
+        self.init_ctr();
 
         let (blocks, mut leftover) = data.into_chunks();
 
         for mut block in blocks {
-            block.xor_in2out(&self.gen_block());
+            let s = &self.gen_block();
+            block.xor_in2out(s);
         }
 
         let n = leftover.len();
@@ -111,7 +114,7 @@ where
     }
 }
 
-impl<C, F> BlockSizeUser for BeltCtr<C, F>
+impl<F, C> BlockSizeUser for BeltCtr<F, C>
 where
     C: BlockEncryptMut + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
@@ -119,7 +122,7 @@ where
     type BlockSize = C::BlockSize;
 }
 
-impl<C, F> IvSizeUser for BeltCtr<C, F>
+impl<F, C> IvSizeUser for BeltCtr<F, C>
 where
     C: BlockEncryptMut + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
@@ -127,7 +130,7 @@ where
     type IvSize = C::BlockSize;
 }
 
-impl<C, F> InnerUser for BeltCtr<C, F>
+impl<F, C> InnerUser for BeltCtr<F, C>
 where
     C: BlockEncryptMut + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
@@ -135,7 +138,7 @@ where
     type Inner = C;
 }
 
-impl<C, F> IvState for BeltCtr<C, F>
+impl<F, C> IvState for BeltCtr<F, C>
 where
     C: BlockEncryptMut + BlockCipher,
     F: CtrFlavor<C::BlockSize>,
@@ -146,7 +149,7 @@ where
     }
 }
 
-impl<C, F> InnerIvInit for BeltCtr<C, F>
+impl<F, C> InnerIvInit for BeltCtr<F, C>
 where
     C: BlockEncryptMut + BlockCipher,
     F: CtrFlavor<C::BlockSize>,

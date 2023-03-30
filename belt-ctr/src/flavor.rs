@@ -32,6 +32,6 @@ pub trait CtrFlavor<B: ArrayLength<u8>> {
     /// Convert to a backend value
     fn as_backend(cn: &Self::CtrNonce) -> Self::Backend;
 
-    /// Increment s by 1
-    fn increment(block: &mut GenericArray<u8, B>);
+    /// Generate initial `s` value from `nonce`.
+    fn reset(cn: &mut Self::CtrNonce);
 }
