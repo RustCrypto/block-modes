@@ -37,7 +37,7 @@
 //!
 //! [1]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
 
-// #![no_std]
+#![no_std]
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg",
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"
