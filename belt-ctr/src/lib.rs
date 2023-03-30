@@ -15,9 +15,6 @@
 //! use cipher::{KeyIvInit, StreamCipher};
 //! use hex_literal::hex;
 //! use belt_ctr::BeltCtr;
-//! use belt_ctr::flavor::ctr128::Ctr128LE;
-//!
-//! type BeltCtrT = BeltCtr<BeltBlock, Ctr128LE>;
 //!
 //! let key = [0x42; 32];
 //! let iv = [0x24; 16];
@@ -28,7 +25,7 @@
 //!
 //! // encrypt in-place
 //! let mut buf = plaintext.to_vec();
-//! let mut cipher = BeltCtrT::new_from_slices(&key, &iv).unwrap();
+//! let mut cipher: BeltCtr = BeltCtr::new_from_slices(&key, &iv).unwrap();
 //! cipher.apply_keystream(&mut buf);
 //! println!("{:02X?}", buf);
 //! assert_eq!(buf[..], ciphertext[..]);
