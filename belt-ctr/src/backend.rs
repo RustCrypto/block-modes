@@ -25,28 +25,26 @@ where
     type ParBlocksSize = B::ParBlocksSize;
 }
 
-#[inline(always)]
-fn next_block(s: &mut u128) -> GenericArray<u8, U16> {
-    *s = s.wrapping_add(1);
-    s.to_le_bytes().into()
-}
-
 impl<'a, B> StreamBackend for Backend<'a, B>
 where
     B: BlockBackend<BlockSize = U16>,
 {
     #[inline(always)]
     fn gen_ks_block(&mut self, block: &mut Block<Self>) {
-        let tmp = next_block(self.s);
+        *self.s = self.s.wrapping_add(1);
+        let tmp = self.s.to_le_bytes().into();
         self.backend.proc_block((&tmp, block).into());
     }
 
     #[inline(always)]
     fn gen_par_ks_blocks(&mut self, blocks: &mut ParBlocks<Self>) {
         let mut tmp = ParBlocks::<Self>::default();
+        let mut s = *self.s;
         for block in tmp.iter_mut() {
-            *block = next_block(self.s);
+            s = s.wrapping_add(1);
+            *block = s.to_le_bytes().into();
         }
+        *self.s = s;
         self.backend.proc_par_blocks((&tmp, blocks).into());
     }
 }
