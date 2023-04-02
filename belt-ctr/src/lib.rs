@@ -12,8 +12,8 @@ pub use cipher;
 
 use belt_block::BeltBlock;
 use cipher::{
-    consts::U16, crypto_common::InnerUser, generic_array::GenericArray, BlockEncrypt,
-    BlockSizeUser, InnerIvInit, Iv, IvSizeUser, StreamCipherCore, StreamCipherCoreWrapper,
+    consts::U16, crypto_common::InnerUser, generic_array::GenericArray, BlockDecrypt, BlockEncrypt,
+    BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState, StreamCipherCore, StreamCipherCoreWrapper,
     StreamCipherSeekCore, StreamClosure,
 };
 
@@ -97,5 +97,16 @@ where
             s,
             s_init: s,
         }
+    }
+}
+
+impl<C> IvState for BeltCtrCore<C>
+where
+    C: BlockEncrypt + BlockDecrypt + BlockSizeUser<BlockSize = U16>,
+{
+    fn iv_state(&self) -> Iv<Self> {
+        let mut t = self.s.to_le_bytes().into();
+        self.cipher.decrypt_block(&mut t);
+        t
     }
 }
