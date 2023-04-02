@@ -19,7 +19,7 @@ is not verified, which can lead to serious vulnerabilities!
 which is much less error-prone than manual integrity verification.
 
 # Example
-```
+```rust
 use hex_literal::hex;
 use belt_ctr::{BeltCtr, cipher::{KeyIvInit, StreamCipher, StreamCipherSeek}};
 
@@ -86,6 +86,6 @@ dual licensed as above, without any additional terms or conditions.
 
 [//]: # (general links)
 
-[cipher]: https://docs.rs/cipher/
+[`cipher`]: https://docs.rs/cipher/
 [`belt-ctr`]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
 [AEADs]: https://github.com/RustCrypto/AEADs
