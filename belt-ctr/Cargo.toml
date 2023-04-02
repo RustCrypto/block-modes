@@ -1,7 +1,7 @@
 [package]
 name = "belt-ctr"
 version = "0.1.0"
-description = "CTR block mode for BelT"
+description = "CTR block mode of operation specified by the BelT standard"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
@@ -9,19 +9,17 @@ rust-version = "1.56"
 readme = "README.md"
 documentation = "https://docs.rs/belt-ctr"
 repository = "https://github.com/RustCrypto/block-modes"
-keywords = ["crypto", "block-mode", "stream-cipher", "ciphers", "belt-ctr"]
+keywords = ["crypto", "block-mode", "stream-cipher", "ciphers", "belt"]
 categories = ["cryptography", "no-std"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-cipher = "0.4.4"
-belt-block = "0.1.1"
+cipher = "0.4"
+belt-block = "0.1"
 
 [dev-dependencies]
-hex-literal = "0.3.4"
-belt-block = "0.1.1"
-cipher = { version = "0.4.4", features = ["dev"] }
+hex-literal = "0.4"
+belt-block = "0.1"
+cipher = { version = "0.4", features = ["dev"] }
 
 [features]
 alloc = ["cipher/alloc"]
