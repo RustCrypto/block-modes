@@ -1,6 +1,6 @@
 use cipher::{
-    consts::U16, generic_array::GenericArray, Block, BlockBackend, BlockClosure, BlockSizeUser,
-    ParBlocks, ParBlocksSizeUser, StreamBackend, StreamClosure,
+    consts::U16, Block, BlockBackend, BlockClosure, BlockSizeUser, ParBlocks, ParBlocksSizeUser,
+    StreamBackend, StreamClosure,
 };
 
 struct Backend<'a, B>
