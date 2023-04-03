@@ -5,8 +5,7 @@
 ![Apache2/MIT licensed][license-image]
 [![HAZMAT][hazmat-image]][hazmat-link]
 
-Collection of [block modes] written in pure Rust generic over
-block ciphers.
+Collection of [block modes] written in pure Rust generic over block ciphers.
 
 ## ⚠️ Security Warning: [Hazmat!][hazmat-link]
 
@@ -22,6 +21,7 @@ less error-prone than manual integrity verification.
 
 | Name | Crate name | crates.io |  Docs  | MSRV |
 |------|------------|-----------|--------|------|
+| [BelT CTR] | [`belt-ctr`] |  [![crates.io](https://img.shields.io/crates/v/belt-ctr.svg)](https://crates.io/crates/belt-ctr) | [![Documentation](https://docs.rs/belt-ctr/badge.svg)](https://docs.rs/belt-ctr) |  ![MSRV 1.57][msrv-1.57] |
 | [Cipher Block Chaining][CBC] | [`cbc`] | [![crates.io](https://img.shields.io/crates/v/cbc.svg)](https://crates.io/crates/cbc) | [![Documentation](https://docs.rs/cbc/badge.svg)](https://docs.rs/cbc) |  ![MSRV 1.56][msrv-1.56] |
 | [8-bit Cipher Feedback][CFB-8] | [`cfb8`] | [![crates.io](https://img.shields.io/crates/v/cfb8.svg)](https://crates.io/crates/cfb8) | [![Documentation](https://docs.rs/cfb8/badge.svg)](https://docs.rs/cfb8) |  ![MSRV 1.56][msrv-1.56] |
 | [Full-block Cipher Feedback][CFB] | [`cfb-mode`] | [![crates.io](https://img.shields.io/crates/v/cfb-mode.svg)](https://crates.io/crates/cfb-mode) | [![Documentation](https://docs.rs/cfb-mode/badge.svg)](https://docs.rs/cfb-mode) |  ![MSRV 1.56][msrv-1.56] |
@@ -59,9 +59,11 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [hazmat-link]: https://github.com/RustCrypto/meta/blob/master/HAZMAT.md
 [aead-link]: https://github.com/RustCrypto/AEADs
 [msrv-1.56]: https://img.shields.io/badge/rustc-1.56.0+-blue.svg
+[msrv-1.57]: https://img.shields.io/badge/rustc-1.57.0+-blue.svg
 
 [//]: # (crates)
 
+[`belt-ctr`]: ./belt-ctr
 [`cbc`]: ./cbc
 [`cfb8`]: ./cfb8
 [`cfb-mode`]: ./cfb-mode
@@ -74,6 +76,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [//]: # (links)
 
 [block modes]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+[BelT CTR]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
 [CBC]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)
 [CFB-8]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CFB-1,_CFB-8,_CFB-64,_CFB-128,_etc.
 [CFB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Full-block_CFB
