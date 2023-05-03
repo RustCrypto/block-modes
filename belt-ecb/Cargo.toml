@@ -12,8 +12,6 @@ repository = "https://github.com/RustCrypto/block-modes"
 keywords = ["crypto", "block-mode", "ciphers", "belt"]
 categories = ["cryptography", "no-std"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 cipher = "0.4"
 belt-block = "0.1"
