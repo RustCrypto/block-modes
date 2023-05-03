@@ -3,8 +3,8 @@ use cipher::consts::U1;
 use cipher::crypto_common::InnerInit;
 use cipher::inout::InOut;
 use cipher::{
-    crypto_common::InnerUser, AlgorithmName, generic_array::ArrayLength, Block, BlockBackend, BlockCipher,
-    BlockClosure, BlockEncryptMut, BlockSizeUser, ParBlocksSizeUser, Unsigned,
+    crypto_common::InnerUser, generic_array::ArrayLength, AlgorithmName, Block, BlockBackend,
+    BlockCipher, BlockClosure, BlockEncryptMut, BlockSizeUser, ParBlocksSizeUser, Unsigned,
 };
 use core::fmt;
 
