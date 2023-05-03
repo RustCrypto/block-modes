@@ -8,7 +8,7 @@ use cipher::{
 use core::fmt;
 
 #[cfg(feature = "zeroize")]
-use cipher::zeroize::{ZeroizeOnDrop};
+use cipher::zeroize::ZeroizeOnDrop;
 
 /// ECB mode buffered decryptor.
 #[derive(Clone)]
