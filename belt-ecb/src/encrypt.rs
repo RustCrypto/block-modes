@@ -30,7 +30,6 @@ where
         let len = data.len();
         let n = len / bs;
 
-
         {
             let mut chunks = data.chunks_exact_mut(bs);
             for chunk in chunks.by_ref() {
