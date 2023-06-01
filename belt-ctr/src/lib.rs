@@ -6,7 +6,7 @@
 )]
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![warn(missing_docs, rust_2018_idioms)]
+#![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
 pub use cipher;
 
@@ -16,6 +16,7 @@ use cipher::{
     BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState, StreamCipherCore, StreamCipherCoreWrapper,
     StreamCipherSeekCore, StreamClosure,
 };
+use core::fmt;
 
 mod backend;
 
@@ -32,6 +33,12 @@ where
     s_init: u128,
 }
 
+impl<C: BlockEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("BeltCtrCore { ... }")
+    }
+}
 impl<C> StreamCipherCore for BeltCtrCore<C>
 where
     C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,

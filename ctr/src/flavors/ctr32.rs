@@ -4,6 +4,7 @@ use cipher::{
     generic_array::{ArrayLength, GenericArray},
     typenum::{PartialDiv, PartialQuot, Unsigned, U4},
 };
+use core::fmt;
 
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
@@ -18,6 +19,13 @@ pub struct CtrNonce32<N: ArrayLength<u32>> {
     nonce: GenericArray<u32, N>,
 }
 
+impl<N: ArrayLength<u32>> fmt::Debug for CtrNonce32<N> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("CtrNonce32 { ... }")
+    }
+}
+
 #[cfg(feature = "zeroize")]
 impl<N: ArrayLength<u32>> Drop for CtrNonce32<N> {
     fn drop(&mut self) {
@@ -30,6 +38,7 @@ impl<N: ArrayLength<u32>> Drop for CtrNonce32<N> {
 impl<N: ArrayLength<u32>> ZeroizeOnDrop for CtrNonce32<N> {}
 
 /// 32-bit big endian counter flavor.
+#[derive(Debug)]
 pub enum Ctr32BE {}
 
 impl<B> CtrFlavor<B> for Ctr32BE
@@ -94,6 +103,7 @@ where
 }
 
 /// 32-bit big endian counter flavor.
+#[derive(Debug)]
 pub enum Ctr32LE {}
 
 impl<B> CtrFlavor<B> for Ctr32LE
