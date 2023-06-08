@@ -33,12 +33,6 @@ where
     s_init: u128,
 }
 
-impl<C: BlockEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("BeltCtrCore { ... }")
-    }
-}
 impl<C> StreamCipherCore for BeltCtrCore<C>
 where
     C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
@@ -115,5 +109,12 @@ where
         let mut t = self.s.to_le_bytes().into();
         self.cipher.decrypt_block(&mut t);
         t
+    }
+}
+
+impl<C: BlockEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("BeltCtrCore { ... }")
     }
 }
