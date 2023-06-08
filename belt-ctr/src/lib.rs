@@ -6,16 +6,17 @@
 )]
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![warn(missing_docs, rust_2018_idioms)]
+#![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
 pub use cipher;
 
 use belt_block::BeltBlock;
 use cipher::{
-    consts::U16, crypto_common::InnerUser, generic_array::GenericArray, BlockDecrypt, BlockEncrypt,
-    BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState, StreamCipherCore, StreamCipherCoreWrapper,
-    StreamCipherSeekCore, StreamClosure,
+    consts::U16, crypto_common::InnerUser, generic_array::GenericArray, AlgorithmName,
+    BlockDecrypt, BlockEncrypt, BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState,
+    StreamCipherCore, StreamCipherCoreWrapper, StreamCipherSeekCore, StreamClosure,
 };
+use core::fmt;
 
 mod backend;
 
@@ -108,5 +109,23 @@ where
         let mut t = self.s.to_le_bytes().into();
         self.cipher.decrypt_block(&mut t);
         t
+    }
+}
+
+impl<C> AlgorithmName for BeltCtrCore<C>
+where
+    C: BlockEncrypt + BlockDecrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
+{
+    fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("BeltCtr<")?;
+        <C as AlgorithmName>::write_alg_name(f)?;
+        f.write_str(">")
+    }
+}
+
+impl<C: BlockEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("BeltCtrCore { ... }")
     }
 }
