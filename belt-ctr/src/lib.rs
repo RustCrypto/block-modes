@@ -12,9 +12,9 @@ pub use cipher;
 
 use belt_block::BeltBlock;
 use cipher::{
-    consts::U16, crypto_common::InnerUser, generic_array::GenericArray, BlockDecrypt, BlockEncrypt,
-    BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState, StreamCipherCore, StreamCipherCoreWrapper,
-    StreamCipherSeekCore, StreamClosure,
+    consts::U16, crypto_common::InnerUser, generic_array::GenericArray, AlgorithmName,
+    BlockDecrypt, BlockEncrypt, BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState,
+    StreamCipherCore, StreamCipherCoreWrapper, StreamCipherSeekCore, StreamClosure,
 };
 use core::fmt;
 
@@ -109,6 +109,17 @@ where
         let mut t = self.s.to_le_bytes().into();
         self.cipher.decrypt_block(&mut t);
         t
+    }
+}
+
+impl<C> AlgorithmName for Encryptor<C>
+where
+    C: BlockEncrypt + BlockDecrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
+{
+    fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("BeltCtr<")?;
+        <C as AlgorithmName>::write_alg_name(f)?;
+        f.write_str(">")
     }
 }
 
