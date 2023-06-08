@@ -112,7 +112,7 @@ where
     }
 }
 
-impl<C> AlgorithmName for Encryptor<C>
+impl<C> AlgorithmName for BeltCtrCore<C>
 where
     C: BlockEncrypt + BlockDecrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
 {
