@@ -102,7 +102,7 @@ where
     }
 }
 
-/// 128-bit big endian counter flavor.
+/// 128-bit little endian counter flavor.
 #[derive(Debug)]
 pub enum Ctr128LE {}
 

@@ -102,7 +102,7 @@ where
     }
 }
 
-/// 64-bit big endian counter flavor.
+/// 64-bit little endian counter flavor.
 #[derive(Debug)]
 pub enum Ctr64LE {}
 
