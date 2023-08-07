@@ -39,11 +39,11 @@ fn aes128_cfb_async_test() {
         *b = (i % 11) as u8;
     }
     let enc = Enc::new_from_slices(&key, &iv).unwrap();
-    let mut ct = pt.clone();
+    let mut ct = pt;
     enc.encrypt(&mut ct);
     for i in 1..100 {
         let enc = Enc::new_from_slices(&key, &iv).unwrap();
-        let mut t = pt.clone();
+        let mut t = pt;
         let t = &mut t[..i];
         enc.encrypt(t);
         assert_eq!(t, &ct[..i]);
@@ -72,13 +72,13 @@ fn aes128_cfb_buffered_test() {
 
     // unbuffered
     let enc = Enc::new_from_slices(&key, &iv).unwrap();
-    let mut ct = pt.clone();
+    let mut ct = pt;
     enc.encrypt(&mut ct);
 
     // buffered
     for i in 1..100 {
         let mut buf_enc = BufEnc::new_from_slices(&key, &iv).unwrap();
-        let mut ct2 = pt.clone();
+        let mut ct2 = pt;
         for chunk in ct2.chunks_mut(i) {
             buf_enc.encrypt(chunk);
         }
@@ -94,7 +94,7 @@ fn aes128_cfb_buffered_test() {
     // buffered with restore
     for i in 1..100 {
         let mut buf_enc = BufEnc::new_from_slices(&key, &iv).unwrap();
-        let mut ct2 = pt.clone();
+        let mut ct2 = pt;
         for chunk in ct2.chunks_mut(i) {
             let (iv, pos) = buf_enc.get_state();
             let cipher = Aes128::new_from_slice(&key).unwrap();
