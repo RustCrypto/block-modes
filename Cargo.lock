@@ -52,7 +52,7 @@ version = "0.1.2"
 dependencies = [
  "aes",
  "cipher",
- "hex-literal 0.3.4",
+ "hex-literal 0.4.1",
 ]
 
 [[package]]
