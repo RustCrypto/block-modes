@@ -43,15 +43,15 @@ dual licensed as above, without any additional terms or conditions.
 
 [//]: # (badges)
 
-[crate-image]: https://img.shields.io/crates/v/cfb.svg
-[crate-link]: https://crates.io/crates/cfb
-[docs-image]: https://docs.rs/cfb/badge.svg
-[docs-link]: https://docs.rs/cfb/
+[crate-image]: https://img.shields.io/crates/v/cfb8.svg
+[crate-link]: https://crates.io/crates/cfb8
+[docs-image]: https://docs.rs/cfb8/badge.svg
+[docs-link]: https://docs.rs/cfb8/
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
 [rustc-image]: https://img.shields.io/badge/rustc-1.56+-blue.svg
 [chat-image]: https://img.shields.io/badge/zulip-join_chat-blue.svg
 [chat-link]: https://rustcrypto.zulipchat.com/#narrow/stream/308460-block-modes
-[build-image]: https://github.com/RustCrypto/block-modes/workflows/cfb/badge.svg?branch=master&event=push
+[build-image]: https://github.com/RustCrypto/block-modes/workflows/cfb8/badge.svg?branch=master&event=push
 [build-link]: https://github.com/RustCrypto/block-modes/actions?query=workflow%3Acfb+branch%3Amaster
 
 [//]: # (general links)
