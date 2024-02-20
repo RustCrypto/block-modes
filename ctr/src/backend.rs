@@ -1,7 +1,7 @@
 use crate::CtrFlavor;
 use cipher::{
-    generic_array::ArrayLength, Block, BlockBackend, BlockClosure, BlockSizeUser, ParBlocks,
-    ParBlocksSizeUser, StreamBackend, StreamClosure,
+    array::ArraySize, crypto_common::BlockSizes, Block, BlockBackend, BlockClosure, BlockSizeUser,
+    ParBlocks, ParBlocksSizeUser, StreamBackend, StreamClosure,
 };
 
 struct Backend<'a, F, B>
@@ -53,7 +53,7 @@ where
 pub(crate) struct Closure<'a, F, BS, SC>
 where
     F: CtrFlavor<BS>,
-    BS: ArrayLength<u8>,
+    BS: ArraySize,
     SC: StreamClosure<BlockSize = BS>,
 {
     pub(crate) ctr_nonce: &'a mut F::CtrNonce,
@@ -63,7 +63,7 @@ where
 impl<'a, F, BS, SC> BlockSizeUser for Closure<'a, F, BS, SC>
 where
     F: CtrFlavor<BS>,
-    BS: ArrayLength<u8>,
+    BS: BlockSizes,
     SC: StreamClosure<BlockSize = BS>,
 {
     type BlockSize = BS;
@@ -72,7 +72,7 @@ where
 impl<'a, F, BS, SC> BlockClosure for Closure<'a, F, BS, SC>
 where
     F: CtrFlavor<BS>,
-    BS: ArrayLength<u8>,
+    BS: BlockSizes,
     SC: StreamClosure<BlockSize = BS>,
 {
     #[inline(always)]
