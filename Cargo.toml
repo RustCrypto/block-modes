@@ -11,13 +11,9 @@ members = [
 ]
 
 [patch.crates-io]
-# https://github.com/RustCrypto/block-ciphers/pull/411
-aes        = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.3" }
-belt-block = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.3" }
-kuznyechik = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.3" }
-magma      = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.3" }
-
-# Unreleased, but merged:
-# - https://github.com/RustCrypto/traits/pull/1511
-# - https://github.com/RustCrypto/traits/pull/1512
-cipher     = { git = "https://github.com/RustCrypto/traits.git" }
+# please re-enable the minimal-versions when you remove those patches.
+# https://github.com/RustCrypto/block-ciphers/pull/413
+aes        = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.4" }
+belt-block = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.4" }
+kuznyechik = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.4" }
+magma      = { git = "https://github.com/baloo/block-ciphers.git", branch = "baloo/bump-cipher/0.5.0-pre.4" }

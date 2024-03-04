@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "aes"
 version = "0.9.0-pre"
-source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.3#bbc6d549f5abff8ce5301abf1f97d9c494ada85c"
+source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.4#bb94e5e71f5320fcaab727ad0c503cca5190da4c"
 dependencies = [
  "cfg-if",
  "cipher",
@@ -15,7 +15,7 @@ dependencies = [
 [[package]]
 name = "belt-block"
 version = "0.2.0-pre"
-source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.3#bbc6d549f5abff8ce5301abf1f97d9c494ada85c"
+source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.4#bb94e5e71f5320fcaab727ad0c503cca5190da4c"
 dependencies = [
  "cipher",
 ]
@@ -80,8 +80,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "cipher"
-version = "0.5.0-pre.3"
-source = "git+https://github.com/RustCrypto/traits.git#cce3b05861fe851b3ab2c57d8c14cfa27fee814e"
+version = "0.5.0-pre.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "84fba98785cecd0e308818a87c817576a40f99d8bab6405bf422bacd3efb6c1f"
 dependencies = [
  "blobby",
  "crypto-common",
@@ -174,7 +175,7 @@ dependencies = [
 [[package]]
 name = "kuznyechik"
 version = "0.9.0-pre"
-source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.3#bbc6d549f5abff8ce5301abf1f97d9c494ada85c"
+source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.4#bb94e5e71f5320fcaab727ad0c503cca5190da4c"
 dependencies = [
  "cipher",
 ]
@@ -188,7 +189,7 @@ checksum = "9c198f91728a82281a64e1f4f9eeb25d82cb32a5de251c6bd1b5154d63a8e7bd"
 [[package]]
 name = "magma"
 version = "0.10.0-pre"
-source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.3#bbc6d549f5abff8ce5301abf1f97d9c494ada85c"
+source = "git+https://github.com/baloo/block-ciphers.git?branch=baloo/bump-cipher/0.5.0-pre.4#bb94e5e71f5320fcaab727ad0c503cca5190da4c"
 dependencies = [
  "cipher",
 ]
