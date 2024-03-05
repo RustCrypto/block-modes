@@ -1,7 +1,7 @@
 //! CTR mode flavors
 
 use cipher::{
-    generic_array::{ArrayLength, GenericArray},
+    array::{Array, ArraySize},
     Counter,
 };
 
@@ -14,7 +14,7 @@ pub use ctr32::{Ctr32BE, Ctr32LE};
 pub use ctr64::{Ctr64BE, Ctr64LE};
 
 /// Trait implemented by different CTR flavors.
-pub trait CtrFlavor<B: ArrayLength<u8>> {
+pub trait CtrFlavor<B: ArraySize> {
     /// Inner representation of nonce.
     type CtrNonce: Clone;
     /// Backend numeric type
@@ -28,13 +28,13 @@ pub trait CtrFlavor<B: ArrayLength<u8>> {
     fn remaining(cn: &Self::CtrNonce) -> Option<usize>;
 
     /// Generate block for given `nonce` and current counter value.
-    fn next_block(cn: &mut Self::CtrNonce) -> GenericArray<u8, B>;
+    fn next_block(cn: &mut Self::CtrNonce) -> Array<u8, B>;
 
     /// Generate block for given `nonce` and current counter value.
-    fn current_block(cn: &Self::CtrNonce) -> GenericArray<u8, B>;
+    fn current_block(cn: &Self::CtrNonce) -> Array<u8, B>;
 
     /// Initialize from bytes.
-    fn from_nonce(block: &GenericArray<u8, B>) -> Self::CtrNonce;
+    fn from_nonce(block: &Array<u8, B>) -> Self::CtrNonce;
 
     /// Convert from a backend value
     fn set_from_backend(cn: &mut Self::CtrNonce, v: Self::Backend);

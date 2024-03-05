@@ -1,8 +1,7 @@
 //! Counter Mode with a 32-bit little endian counter
 
 use cipher::{
-    consts::U16, generic_array::GenericArray, KeyIvInit, StreamCipher, StreamCipherSeek,
-    StreamCipherSeekCore,
+    array::Array, consts::U16, KeyIvInit, StreamCipher, StreamCipherSeek, StreamCipherSeekCore,
 };
 use hex_literal::hex;
 
@@ -13,7 +12,7 @@ const NONCE1: &[u8; 16] = &hex!("11111111111111111111111111111111");
 const NONCE2: &[u8; 16] = &hex!("FEFFFFFF222222222222222222222222");
 
 /// Compute nonce as used by AES-GCM-SIV
-fn nonce(bytes: &[u8; 16]) -> GenericArray<u8, U16> {
+fn nonce(bytes: &[u8; 16]) -> Array<u8, U16> {
     let mut n = *bytes;
     n[15] |= 0x80;
     n.into()

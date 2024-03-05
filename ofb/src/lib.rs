@@ -71,9 +71,9 @@ mod backend;
 
 use cipher::{
     crypto_common::{InnerUser, IvSizeUser},
-    AlgorithmName, Block, BlockCipher, BlockClosure, BlockDecryptMut, BlockEncryptMut,
-    BlockSizeUser, InnerIvInit, Iv, IvState, StreamCipherCore, StreamCipherCoreWrapper,
-    StreamClosure,
+    AlgorithmName, Block, BlockCipher, BlockCipherEncrypt, BlockClosure, BlockModeDecrypt,
+    BlockModeEncrypt, BlockSizeUser, InnerIvInit, Iv, IvState, StreamCipherCore,
+    StreamCipherCoreWrapper, StreamClosure,
 };
 use core::fmt;
 
@@ -87,7 +87,7 @@ pub type Ofb<C> = StreamCipherCoreWrapper<OfbCore<C>>;
 #[derive(Clone)]
 pub struct OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     cipher: C,
     iv: Block<C>,
@@ -95,28 +95,28 @@ where
 
 impl<C> BlockSizeUser for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     type BlockSize = C::BlockSize;
 }
 
 impl<C> InnerUser for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     type Inner = C;
 }
 
 impl<C> IvSizeUser for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     type IvSize = C::BlockSize;
 }
 
 impl<C> InnerIvInit for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     #[inline]
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
@@ -129,7 +129,7 @@ where
 
 impl<C> IvState for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
@@ -139,7 +139,7 @@ where
 
 impl<C> StreamCipherCore for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     fn remaining_blocks(&self) -> Option<usize> {
         None
@@ -147,35 +147,35 @@ where
 
     fn process_with_backend(&mut self, f: impl StreamClosure<BlockSize = Self::BlockSize>) {
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend_mut(backend::Closure1 { iv, f });
+        cipher.encrypt_with_backend(backend::Closure1 { iv, f });
     }
 }
 
-impl<C> BlockEncryptMut for OfbCore<C>
+impl<C> BlockModeEncrypt for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     #[inline]
-    fn encrypt_with_backend_mut(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
+    fn encrypt_with_backend(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend_mut(backend::Closure2 { iv, f })
+        cipher.encrypt_with_backend(backend::Closure2 { iv, f })
     }
 }
 
-impl<C> BlockDecryptMut for OfbCore<C>
+impl<C> BlockModeDecrypt for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher,
+    C: BlockCipherEncrypt + BlockCipher,
 {
     #[inline]
-    fn decrypt_with_backend_mut(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
+    fn decrypt_with_backend(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend_mut(backend::Closure2 { iv, f })
+        cipher.encrypt_with_backend(backend::Closure2 { iv, f })
     }
 }
 
 impl<C> AlgorithmName for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher + AlgorithmName,
+    C: BlockCipherEncrypt + BlockCipher + AlgorithmName,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("Ofb<")?;
@@ -186,7 +186,7 @@ where
 
 impl<C> fmt::Debug for OfbCore<C>
 where
-    C: BlockEncryptMut + BlockCipher + AlgorithmName,
+    C: BlockCipherEncrypt + BlockCipher + AlgorithmName,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("OfbCore<")?;
@@ -197,7 +197,7 @@ where
 
 #[cfg(feature = "zeroize")]
 #[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
-impl<C: BlockEncryptMut + BlockCipher> Drop for OfbCore<C> {
+impl<C: BlockCipherEncrypt + BlockCipher> Drop for OfbCore<C> {
     fn drop(&mut self) {
         self.iv.zeroize();
     }
@@ -205,4 +205,4 @@ impl<C: BlockEncryptMut + BlockCipher> Drop for OfbCore<C> {
 
 #[cfg(feature = "zeroize")]
 #[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
-impl<C: BlockEncryptMut + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for OfbCore<C> {}
+impl<C: BlockCipherEncrypt + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for OfbCore<C> {}

@@ -1,11 +1,11 @@
 [package]
 name = "cfb-mode"
-version = "0.8.2"
+version = "0.9.0-pre"
 description = "Cipher Feedback (CFB) block cipher mode of operation"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.65"
 readme = "README.md"
 documentation = "https://docs.rs/cfb-mode"
 repository = "https://github.com/RustCrypto/block-modes"
@@ -13,12 +13,12 @@ keywords = ["crypto", "block-mode", "stream-cipher", "ciphers"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = "0.4.2"
+cipher = "=0.5.0-pre.4"
 
 [dev-dependencies]
-aes = "0.8"
-belt-block = "0.1"
-cipher = { version = "0.4.2", features = ["dev"] }
+aes = "=0.9.0-pre"
+belt-block = "=0.2.0-pre"
+cipher = { version = "=0.5.0-pre.4", features = ["dev"] }
 hex-literal = "0.3"
 
 [features]

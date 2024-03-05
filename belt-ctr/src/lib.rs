@@ -12,9 +12,9 @@ pub use cipher;
 
 use belt_block::BeltBlock;
 use cipher::{
-    consts::U16, crypto_common::InnerUser, generic_array::GenericArray, AlgorithmName,
-    BlockDecrypt, BlockEncrypt, BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState,
-    StreamCipherCore, StreamCipherCoreWrapper, StreamCipherSeekCore, StreamClosure,
+    array::Array, consts::U16, crypto_common::InnerUser, AlgorithmName, BlockCipherDecrypt,
+    BlockCipherEncrypt, BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState, StreamCipherCore,
+    StreamCipherCoreWrapper, StreamCipherSeekCore, StreamClosure,
 };
 use core::fmt;
 
@@ -26,7 +26,7 @@ pub type BeltCtr<C = BeltBlock> = StreamCipherCoreWrapper<BeltCtrCore<C>>;
 /// Block-level BelT CTR
 pub struct BeltCtrCore<C = BeltBlock>
 where
-    C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     cipher: C,
     s: u128,
@@ -35,7 +35,7 @@ where
 
 impl<C> StreamCipherCore for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     fn remaining_blocks(&self) -> Option<usize> {
         let used = self.s.wrapping_sub(self.s_init);
@@ -50,7 +50,7 @@ where
 
 impl<C> StreamCipherSeekCore for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     type Counter = u128;
 
@@ -65,32 +65,32 @@ where
 
 impl<C> BlockSizeUser for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     type BlockSize = C::BlockSize;
 }
 
 impl<C> IvSizeUser for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     type IvSize = C::BlockSize;
 }
 
 impl<C> InnerUser for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     type Inner = C;
 }
 
 impl<C> InnerIvInit for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     #[inline]
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
-        let mut t = GenericArray::default();
+        let mut t = Array::default();
         cipher.encrypt_block_b2b(iv, &mut t);
         let s = u128::from_le_bytes(t.into());
         Self {
@@ -103,7 +103,7 @@ where
 
 impl<C> IvState for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockDecrypt + BlockSizeUser<BlockSize = U16>,
+    C: BlockCipherEncrypt + BlockCipherDecrypt + BlockSizeUser<BlockSize = U16>,
 {
     fn iv_state(&self) -> Iv<Self> {
         let mut t = self.s.to_le_bytes().into();
@@ -114,7 +114,7 @@ where
 
 impl<C> AlgorithmName for BeltCtrCore<C>
 where
-    C: BlockEncrypt + BlockDecrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
+    C: BlockCipherEncrypt + BlockCipherDecrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("BeltCtr<")?;
@@ -123,7 +123,7 @@ where
     }
 }
 
-impl<C: BlockEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
+impl<C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("BeltCtrCore { ... }")
