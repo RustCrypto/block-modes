@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "belt-ctr",
+    "belt-ecb",
     "cbc",
     "cfb8",
     "cfb-mode",

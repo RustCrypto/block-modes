@@ -21,6 +21,7 @@ less error-prone than manual integrity verification.
 
 | Name | Crate name | crates.io |  Docs  | MSRV |
 |------|------------|-----------|--------|------|
+| [BelT ECB] | [`belt-ecb`] |  [![crates.io](https://img.shields.io/crates/v/belt-ecb.svg)](https://crates.io/crates/belt-ecb) | [![Documentation](https://docs.rs/belt-ecb/badge.svg)](https://docs.rs/belt-ecb) |  ![MSRV 1.57][msrv-1.57] |
 | [BelT CTR] | [`belt-ctr`] |  [![crates.io](https://img.shields.io/crates/v/belt-ctr.svg)](https://crates.io/crates/belt-ctr) | [![Documentation](https://docs.rs/belt-ctr/badge.svg)](https://docs.rs/belt-ctr) |  ![MSRV 1.57][msrv-1.57] |
 | [Cipher Block Chaining][CBC] | [`cbc`] | [![crates.io](https://img.shields.io/crates/v/cbc.svg)](https://crates.io/crates/cbc) | [![Documentation](https://docs.rs/cbc/badge.svg)](https://docs.rs/cbc) |  ![MSRV 1.56][msrv-1.56] |
 | [8-bit Cipher Feedback][CFB-8] | [`cfb8`] | [![crates.io](https://img.shields.io/crates/v/cfb8.svg)](https://crates.io/crates/cfb8) | [![Documentation](https://docs.rs/cfb8/badge.svg)](https://docs.rs/cfb8) |  ![MSRV 1.56][msrv-1.56] |
@@ -77,6 +78,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 
 [block modes]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
 [BelT CTR]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
+[BelT ECB]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
 [CBC]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)
 [CFB-8]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CFB-1,_CFB-8,_CFB-64,_CFB-128,_etc.
 [CFB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Full-block_CFB
