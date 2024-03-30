@@ -8,7 +8,7 @@ edition = "2021"
 rust-version = "1.65"
 readme = "README.md"
 documentation = "https://docs.rs/pcbc"
-repository = "https://github.com/RustCrypto/block-ciphers"
+repository = "https://github.com/RustCrypto/block-modes"
 keywords = ["crypto", "block-mode", "ciphers"]
 categories = ["cryptography", "no-std"]
 
