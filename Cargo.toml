@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "belt-ctr",
+    "belt-ecb",
     "cbc",
     "cfb8",
     "cfb-mode",
