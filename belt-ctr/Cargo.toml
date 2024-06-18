@@ -14,11 +14,11 @@ categories = ["cryptography", "no-std"]
 
 [dependencies]
 cipher = "=0.5.0-pre.4"
-belt-block = "=0.2.0-pre"
+belt-block = "=0.2.0-pre.0"
 
 [dev-dependencies]
 hex-literal = "0.4"
-belt-block = "=0.2.0-pre"
+belt-block = "=0.2.0-pre.0"
 cipher = { version = "=0.5.0-pre.4", features = ["dev"] }
 
 [features]
