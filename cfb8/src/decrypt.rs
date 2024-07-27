@@ -174,6 +174,7 @@ where
         let mut t = self.iv.clone();
         self.backend.proc_block((&mut t).into());
         let r = block.get(0).clone_in();
+        #[allow(deprecated)]
         block.xor_in2out(Array::from_slice(&t[..1]));
         let n = self.iv.len();
         for i in 0..n - 1 {

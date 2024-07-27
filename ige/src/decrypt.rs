@@ -71,6 +71,7 @@ where
     IgeIvSize<C>: ArraySize,
 {
     #[inline]
+    #[allow(deprecated)] // clone_from_slice
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
         let (y, x) = iv.split_at(C::BlockSize::to_usize());
         Self {

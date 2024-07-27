@@ -73,6 +73,7 @@ where
     #[inline]
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
         let (y, x) = iv.split_at(C::BlockSize::to_usize());
+        #[allow(deprecated)] // clone_from_slice
         Self {
             cipher,
             x: Array::clone_from_slice(x),
