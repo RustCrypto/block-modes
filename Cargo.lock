@@ -48,7 +48,7 @@ dependencies = [
 
 [[package]]
 name = "cbc"
-version = "0.2.0-pre.0"
+version = "0.2.0-pre.1"
 dependencies = [
  "aes",
  "cipher",

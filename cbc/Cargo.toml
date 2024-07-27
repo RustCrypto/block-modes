@@ -1,6 +1,6 @@
 [package]
 name = "cbc"
-version = "0.2.0-pre.0"
+version = "0.2.0-pre.1"
 description = "Cipher Block Chaining (CBC) block cipher mode of operation"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
