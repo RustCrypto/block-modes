@@ -172,6 +172,7 @@ where
     fn proc_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
         let mut t = self.iv.clone();
         self.backend.proc_block((&mut t).into());
+        #[allow(deprecated)]
         block.xor_in2out(Array::from_slice(&t[..1]));
         let r = block.get_out()[0];
         let n = self.iv.len();
