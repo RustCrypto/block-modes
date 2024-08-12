@@ -6,9 +6,6 @@ use cipher::{
 };
 use core::fmt;
 
-#[cfg(feature = "zeroize")]
-use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
-
 type ChunkSize = U4;
 type Chunks<B> = PartialQuot<B, ChunkSize>;
 const CS: usize = ChunkSize::USIZE;
@@ -30,6 +27,7 @@ impl<N: ArraySize> Drop for CtrNonce32<N> {
     fn drop(&mut self) {
         #[cfg(feature = "zeroize")]
         {
+            use cipher::zeroize::Zeroize;
             self.ctr.zeroize();
             self.nonce.zeroize();
         }
@@ -37,7 +35,7 @@ impl<N: ArraySize> Drop for CtrNonce32<N> {
 }
 
 #[cfg(feature = "zeroize")]
-impl<N: ArraySize> ZeroizeOnDrop for CtrNonce32<N> {}
+impl<N: ArraySize> cipher::zeroize::ZeroizeOnDrop for CtrNonce32<N> {}
 
 /// 32-bit big endian counter flavor.
 #[derive(Debug)]
