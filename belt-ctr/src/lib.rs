@@ -19,6 +19,9 @@ use cipher::{
 };
 use core::fmt;
 
+#[cfg(feature = "zeroize")]
+use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
+
 /// Byte-level BelT CTR
 pub type BeltCtr<C = BeltBlock> = StreamCipherCoreWrapper<BeltCtrCore<C>>;
 
@@ -130,7 +133,7 @@ where
 
 impl<C> AlgorithmName for BeltCtrCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipherDecrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("BeltCtr<")?;
@@ -139,11 +142,35 @@ where
     }
 }
 
-impl<C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
+impl<C> fmt::Debug for BeltCtrCore<C>
+where
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
+{
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("BeltCtrCore { ... }")
+        f.write_str("BeltCtr<")?;
+        <C as AlgorithmName>::write_alg_name(f)?;
+        f.write_str("> { ... }")
     }
+}
+
+impl<C: BlockCipherEncrypt> Drop for BeltCtrCore<C>
+where
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
+{
+    fn drop(&mut self) {
+        #[cfg(feature = "zeroize")]
+        {
+            self.s.zeroize();
+            self.s_init.zeroize();
+        }
+    }
+}
+
+#[cfg(feature = "zeroize")]
+impl<C> ZeroizeOnDrop for BeltCtrCore<C> where
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + ZeroizeOnDrop
+{
 }
 
 struct Backend<'a, B: BlockCipherEncBackend<BlockSize = U16>> {
