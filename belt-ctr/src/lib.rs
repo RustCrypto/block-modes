@@ -14,8 +14,8 @@ use belt_block::BeltBlock;
 use cipher::{
     array::Array, consts::U16, crypto_common::InnerUser, AlgorithmName, Block, BlockCipherDecrypt,
     BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, InOut,
-    InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks, ParBlocksSizeUser, StreamBackend,
-    StreamCipherCore, StreamCipherCoreWrapper, StreamCipherSeekCore, StreamClosure,
+    InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks, ParBlocksSizeUser, StreamCipherBackend,
+    StreamCipherClosure, StreamCipherCore, StreamCipherCoreWrapper, StreamCipherSeekCore,
 };
 use core::fmt;
 
@@ -41,17 +41,17 @@ where
         (u128::MAX - used).try_into().ok()
     }
 
-    fn process_with_backend(&mut self, f: impl StreamClosure<BlockSize = Self::BlockSize>) {
-        struct Closure<'a, C: StreamClosure<BlockSize = U16>> {
+    fn process_with_backend(&mut self, f: impl StreamCipherClosure<BlockSize = Self::BlockSize>) {
+        struct Closure<'a, C: StreamCipherClosure<BlockSize = U16>> {
             s: &'a mut u128,
             f: C,
         }
 
-        impl<'a, C: StreamClosure<BlockSize = U16>> BlockSizeUser for Closure<'a, C> {
+        impl<'a, C: StreamCipherClosure<BlockSize = U16>> BlockSizeUser for Closure<'a, C> {
             type BlockSize = U16;
         }
 
-        impl<'a, C: StreamClosure<BlockSize = U16>> BlockCipherEncClosure for Closure<'a, C> {
+        impl<'a, C: StreamCipherClosure<BlockSize = U16>> BlockCipherEncClosure for Closure<'a, C> {
             #[inline(always)]
             fn call<B: BlockCipherEncBackend<BlockSize = U16>>(self, cipher_backend: &B) {
                 let Self { s, f } = self;
@@ -159,7 +159,7 @@ impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> ParBlocksSizeUser for Backen
     type ParBlocksSize = B::ParBlocksSize;
 }
 
-impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> StreamBackend for Backend<'a, B> {
+impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> StreamCipherBackend for Backend<'a, B> {
     #[inline(always)]
     fn gen_ks_block(&mut self, block: &mut Block<Self>) {
         *self.s = self.s.wrapping_add(1);

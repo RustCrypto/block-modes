@@ -71,7 +71,8 @@ use cipher::{
     AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockModeEncBackend,
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvState,
-    ParBlocksSizeUser, StreamBackend, StreamCipherCore, StreamCipherCoreWrapper, StreamClosure,
+    ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
+    StreamCipherCoreWrapper,
 };
 use core::fmt;
 
@@ -145,11 +146,11 @@ where
         None
     }
 
-    fn process_with_backend(&mut self, f: impl StreamClosure<BlockSize = Self::BlockSize>) {
+    fn process_with_backend(&mut self, f: impl StreamCipherClosure<BlockSize = Self::BlockSize>) {
         pub(crate) struct Closure<'a, BS, SC>
         where
             BS: BlockSizes,
-            SC: StreamClosure<BlockSize = BS>,
+            SC: StreamCipherClosure<BlockSize = BS>,
         {
             pub(crate) iv: &'a mut Array<u8, BS>,
             pub(crate) f: SC,
@@ -158,7 +159,7 @@ where
         impl<'a, BS, SC> BlockSizeUser for Closure<'a, BS, SC>
         where
             BS: BlockSizes,
-            SC: StreamClosure<BlockSize = BS>,
+            SC: StreamCipherClosure<BlockSize = BS>,
         {
             type BlockSize = BS;
         }
@@ -166,7 +167,7 @@ where
         impl<'a, BS, SC> BlockCipherEncClosure for Closure<'a, BS, SC>
         where
             BS: BlockSizes,
-            SC: StreamClosure<BlockSize = BS>,
+            SC: StreamCipherClosure<BlockSize = BS>,
         {
             #[inline(always)]
             fn call<B: BlockCipherEncBackend<BlockSize = Self::BlockSize>>(self, backend: &B) {
@@ -317,7 +318,7 @@ where
     type ParBlocksSize = U1;
 }
 
-impl<'a, BS, BK> StreamBackend for Backend<'a, BS, BK>
+impl<'a, BS, BK> StreamCipherBackend for Backend<'a, BS, BK>
 where
     BS: BlockSizes,
     BK: BlockCipherEncBackend<BlockSize = BS>,

@@ -2,7 +2,7 @@
 
 use cipher::{
     array::{Array, ArraySize},
-    Counter,
+    StreamCipherCounter,
 };
 
 mod ctr128;
@@ -18,7 +18,7 @@ pub trait CtrFlavor<B: ArraySize> {
     /// Inner representation of nonce.
     type CtrNonce: Clone;
     /// Backend numeric type
-    type Backend: Counter;
+    type Backend: StreamCipherCounter;
     /// Flavor name
     const NAME: &'static str;
 
