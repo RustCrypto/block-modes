@@ -34,8 +34,40 @@ where
     C: BlockCipherDecrypt,
 {
     fn decrypt_with_backend(&mut self, f: impl BlockModeDecClosure<BlockSize = Self::BlockSize>) {
+        struct Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeDecClosure<BlockSize = BS>,
+        {
+            iv: &'a mut Array<u8, BS>,
+            f: BC,
+        }
+
+        impl<'a, BS, BC> BlockSizeUser for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeDecClosure<BlockSize = BS>,
+        {
+            type BlockSize = BS;
+        }
+
+        impl<'a, BS, BC> BlockCipherDecClosure for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeDecClosure<BlockSize = BS>,
+        {
+            #[inline(always)]
+            fn call<B: BlockCipherDecBackend<BlockSize = Self::BlockSize>>(
+                self,
+                cipher_backend: &B,
+            ) {
+                let Self { iv, f } = self;
+                f.call(&mut Backend { iv, cipher_backend });
+            }
+        }
+
         let Self { cipher, iv } = self;
-        cipher.decrypt_with_backend(ClosurePassedToCipher { iv, f })
+        cipher.decrypt_with_backend(Closure { iv, f })
     }
 }
 
@@ -107,35 +139,6 @@ impl<C: BlockCipherDecrypt> Drop for Decryptor<C> {
 
 #[cfg(feature = "zeroize")]
 impl<C: BlockCipherDecrypt + ZeroizeOnDrop> ZeroizeOnDrop for Decryptor<C> {}
-
-struct ClosurePassedToCipher<'a, BS, BC>
-where
-    BS: BlockSizes,
-    BC: BlockModeDecClosure<BlockSize = BS>,
-{
-    iv: &'a mut Array<u8, BS>,
-    f: BC,
-}
-
-impl<'a, BS, BC> BlockSizeUser for ClosurePassedToCipher<'a, BS, BC>
-where
-    BS: BlockSizes,
-    BC: BlockModeDecClosure<BlockSize = BS>,
-{
-    type BlockSize = BS;
-}
-
-impl<'a, BS, BC> BlockCipherDecClosure for ClosurePassedToCipher<'a, BS, BC>
-where
-    BS: BlockSizes,
-    BC: BlockModeDecClosure<BlockSize = BS>,
-{
-    #[inline(always)]
-    fn call<B: BlockCipherDecBackend<BlockSize = Self::BlockSize>>(self, cipher_backend: &B) {
-        let Self { iv, f } = self;
-        f.call(&mut Backend { iv, cipher_backend });
-    }
-}
 
 struct Backend<'a, BS, BK>
 where
