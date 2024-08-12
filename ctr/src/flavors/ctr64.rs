@@ -26,11 +26,13 @@ impl<N: ArraySize> fmt::Debug for CtrNonce64<N> {
     }
 }
 
-#[cfg(feature = "zeroize")]
 impl<N: ArraySize> Drop for CtrNonce64<N> {
     fn drop(&mut self) {
-        self.ctr.zeroize();
-        self.nonce.zeroize();
+        #[cfg(feature = "zeroize")]
+        {
+            self.ctr.zeroize();
+            self.nonce.zeroize();
+        }
     }
 }
 
@@ -52,7 +54,7 @@ where
 
     #[inline]
     fn remaining(cn: &Self::CtrNonce) -> Option<usize> {
-        (core::u64::MAX - cn.ctr).try_into().ok()
+        (u64::MAX - cn.ctr).try_into().ok()
     }
 
     #[inline(always)]
@@ -117,7 +119,7 @@ where
 
     #[inline]
     fn remaining(cn: &Self::CtrNonce) -> Option<usize> {
-        (core::u64::MAX - cn.ctr).try_into().ok()
+        (u64::MAX - cn.ctr).try_into().ok()
     }
 
     #[inline(always)]

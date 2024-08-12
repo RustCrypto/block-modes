@@ -67,10 +67,8 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
-pub mod flavors;
-
-mod backend;
 mod ctr_core;
+pub mod flavors;
 
 pub use cipher;
 pub use flavors::CtrFlavor;

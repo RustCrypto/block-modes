@@ -4,8 +4,9 @@ use cipher::{
     crypto_common::{BlockSizes, InnerUser, IvSizeUser},
     inout::InOut,
     typenum::{Unsigned, U1},
-    AlgorithmName, Block, BlockBackend, BlockCipher, BlockCipherEncrypt, BlockClosure,
-    BlockModeEncrypt, BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocksSizeUser,
+    AlgorithmName, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
+    BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InnerIvInit, Iv,
+    IvState, ParBlocksSizeUser,
 };
 use core::{fmt, ops::Add};
 
@@ -16,7 +17,7 @@ use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 #[derive(Clone)]
 pub struct Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
@@ -27,11 +28,48 @@ where
 
 impl<C> BlockModeEncrypt for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
-    fn encrypt_with_backend(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
+    fn encrypt_with_backend(&mut self, f: impl BlockModeEncClosure<BlockSize = Self::BlockSize>) {
+        struct Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeEncClosure<BlockSize = BS>,
+        {
+            x: &'a mut Array<u8, BS>,
+            y: &'a mut Array<u8, BS>,
+            f: BC,
+        }
+
+        impl<'a, BS, BC> BlockSizeUser for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeEncClosure<BlockSize = BS>,
+        {
+            type BlockSize = BS;
+        }
+
+        impl<'a, BS, BC> BlockCipherEncClosure for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeEncClosure<BlockSize = BS>,
+        {
+            #[inline(always)]
+            fn call<B: BlockCipherEncBackend<BlockSize = Self::BlockSize>>(
+                self,
+                cipher_backend: &B,
+            ) {
+                let Self { x, y, f } = self;
+                f.call(&mut Backend {
+                    x,
+                    y,
+                    cipher_backend,
+                });
+            }
+        }
+
         let Self { cipher, x, y } = self;
         cipher.encrypt_with_backend(Closure { x, y, f })
     }
@@ -39,7 +77,7 @@ where
 
 impl<C> BlockSizeUser for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
@@ -48,7 +86,7 @@ where
 
 impl<C> InnerUser for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
@@ -57,7 +95,7 @@ where
 
 impl<C> IvSizeUser for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
@@ -66,25 +104,22 @@ where
 
 impl<C> InnerIvInit for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
     #[inline]
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
-        let (y, x) = iv.split_at(C::BlockSize::to_usize());
-        #[allow(deprecated)] // clone_from_slice
-        Self {
-            cipher,
-            x: Array::clone_from_slice(x),
-            y: Array::clone_from_slice(y),
-        }
+        let n = C::BlockSize::USIZE;
+        let y = iv[..n].try_into().unwrap();
+        let x = iv[n..].try_into().unwrap();
+        Self { cipher, x, y }
     }
 }
 
 impl<C> IvState for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
@@ -96,7 +131,7 @@ where
 
 impl<C> AlgorithmName for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher + AlgorithmName,
+    C: BlockCipherEncrypt + AlgorithmName,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
@@ -109,7 +144,7 @@ where
 
 impl<C> fmt::Debug for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher + AlgorithmName,
+    C: BlockCipherEncrypt + AlgorithmName,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
@@ -120,74 +155,44 @@ where
     }
 }
 
-#[cfg(feature = "zeroize")]
-#[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
 impl<C> Drop for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
     fn drop(&mut self) {
-        self.x.zeroize();
-        self.y.zeroize();
+        #[cfg(feature = "zeroize")]
+        {
+            self.x.zeroize();
+            self.y.zeroize();
+        }
     }
 }
 
 #[cfg(feature = "zeroize")]
-#[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
 impl<C> ZeroizeOnDrop for Encryptor<C>
 where
-    C: BlockCipherEncrypt + BlockCipher + ZeroizeOnDrop,
+    C: BlockCipherEncrypt + ZeroizeOnDrop,
     C::BlockSize: Add,
     IgeIvSize<C>: ArraySize,
 {
-}
-
-struct Closure<'a, BS, BC>
-where
-    BS: BlockSizes,
-    BC: BlockClosure<BlockSize = BS>,
-{
-    x: &'a mut Array<u8, BS>,
-    y: &'a mut Array<u8, BS>,
-    f: BC,
-}
-
-impl<'a, BS, BC> BlockSizeUser for Closure<'a, BS, BC>
-where
-    BS: BlockSizes,
-    BC: BlockClosure<BlockSize = BS>,
-{
-    type BlockSize = BS;
-}
-
-impl<'a, BS, BC> BlockClosure for Closure<'a, BS, BC>
-where
-    BS: BlockSizes,
-    BC: BlockClosure<BlockSize = BS>,
-{
-    #[inline(always)]
-    fn call<B: BlockBackend<BlockSize = Self::BlockSize>>(self, backend: &mut B) {
-        let Self { x, y, f } = self;
-        f.call(&mut Backend { x, y, backend });
-    }
 }
 
 struct Backend<'a, BS, BK>
 where
     BS: BlockSizes,
-    BK: BlockBackend<BlockSize = BS>,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     x: &'a mut Array<u8, BS>,
     y: &'a mut Array<u8, BS>,
-    backend: &'a mut BK,
+    cipher_backend: &'a BK,
 }
 
 impl<'a, BS, BK> BlockSizeUser for Backend<'a, BS, BK>
 where
     BS: BlockSizes,
-    BK: BlockBackend<BlockSize = BS>,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type BlockSize = BS;
 }
@@ -195,22 +200,22 @@ where
 impl<'a, BS, BK> ParBlocksSizeUser for Backend<'a, BS, BK>
 where
     BS: BlockSizes,
-    BK: BlockBackend<BlockSize = BS>,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type ParBlocksSize = U1;
 }
 
-impl<'a, BS, BK> BlockBackend for Backend<'a, BS, BK>
+impl<'a, BS, BK> BlockModeEncBackend for Backend<'a, BS, BK>
 where
     BS: BlockSizes,
-    BK: BlockBackend<BlockSize = BS>,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     #[inline(always)]
-    fn proc_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
+    fn encrypt_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
         let new_x = block.clone_in();
         let mut t = new_x.clone();
         xor(&mut t, self.y);
-        self.backend.proc_block((&mut t).into());
+        self.cipher_backend.encrypt_block((&mut t).into());
         xor(&mut t, self.x);
         *block.get_out() = t.clone();
         *self.x = new_x;

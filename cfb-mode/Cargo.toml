@@ -13,12 +13,12 @@ keywords = ["crypto", "block-mode", "stream-cipher", "ciphers"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = "=0.5.0-pre.6"
+cipher = "=0.5.0-pre.7"
 
 [dev-dependencies]
 aes = "=0.9.0-pre.1"
 belt-block = "=0.2.0-pre.1"
-cipher = { version = "=0.5.0-pre.6", features = ["dev"] }
+cipher = { version = "=0.5.0-pre.7", features = ["dev"] }
 hex-literal = "0.4"
 
 [features]
