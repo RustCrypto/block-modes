@@ -4,11 +4,3 @@ members = ["belt-ctr", "cbc", "cfb8", "cfb-mode", "ctr", "ige", "ofb", "pcbc"]
 
 [profile.dev]
 opt-level = 2
-
-[patch.crates-io]
-cipher = { git = "https://github.com/RustCrypto/traits", branch = "block_backends" }
-
-aes = { git = "https://github.com/RustCrypto/block-ciphers", branch = "cipher_new" }
-belt-block = { git = "https://github.com/RustCrypto/block-ciphers", branch = "cipher_new" }
-kuznyechik = { git = "https://github.com/RustCrypto/block-ciphers", branch = "cipher_new" }
-magma = { git = "https://github.com/RustCrypto/block-ciphers", branch = "cipher_new" }
