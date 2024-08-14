@@ -64,13 +64,11 @@
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"
 )]
 #![forbid(unsafe_code)]
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
-pub mod flavors;
-
-mod backend;
 mod ctr_core;
+pub mod flavors;
 
 pub use cipher;
 pub use flavors::CtrFlavor;

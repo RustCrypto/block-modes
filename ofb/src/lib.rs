@@ -62,20 +62,21 @@
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"
 )]
 #![forbid(unsafe_code)]
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
-pub use cipher;
-
-mod backend;
-
 use cipher::{
-    crypto_common::{InnerUser, IvSizeUser},
-    AlgorithmName, Block, BlockCipher, BlockCipherEncrypt, BlockClosure, BlockModeDecrypt,
-    BlockModeEncrypt, BlockSizeUser, InnerIvInit, Iv, IvState, StreamCipherCore,
-    StreamCipherCoreWrapper, StreamClosure,
+    consts::U1,
+    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
+    AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
+    BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockModeEncBackend,
+    BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvState,
+    ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
+    StreamCipherCoreWrapper,
 };
 use core::fmt;
+
+pub use cipher;
 
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
@@ -87,7 +88,7 @@ pub type Ofb<C> = StreamCipherCoreWrapper<OfbCore<C>>;
 #[derive(Clone)]
 pub struct OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     cipher: C,
     iv: Block<C>,
@@ -95,28 +96,28 @@ where
 
 impl<C> BlockSizeUser for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     type BlockSize = C::BlockSize;
 }
 
 impl<C> InnerUser for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     type Inner = C;
 }
 
 impl<C> IvSizeUser for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     type IvSize = C::BlockSize;
 }
 
 impl<C> InnerIvInit for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     #[inline]
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
@@ -129,7 +130,7 @@ where
 
 impl<C> IvState for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
@@ -139,43 +140,130 @@ where
 
 impl<C> StreamCipherCore for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     fn remaining_blocks(&self) -> Option<usize> {
         None
     }
 
-    fn process_with_backend(&mut self, f: impl StreamClosure<BlockSize = Self::BlockSize>) {
+    fn process_with_backend(&mut self, f: impl StreamCipherClosure<BlockSize = Self::BlockSize>) {
+        pub(crate) struct Closure<'a, BS, SC>
+        where
+            BS: BlockSizes,
+            SC: StreamCipherClosure<BlockSize = BS>,
+        {
+            pub(crate) iv: &'a mut Array<u8, BS>,
+            pub(crate) f: SC,
+        }
+
+        impl<'a, BS, SC> BlockSizeUser for Closure<'a, BS, SC>
+        where
+            BS: BlockSizes,
+            SC: StreamCipherClosure<BlockSize = BS>,
+        {
+            type BlockSize = BS;
+        }
+
+        impl<'a, BS, SC> BlockCipherEncClosure for Closure<'a, BS, SC>
+        where
+            BS: BlockSizes,
+            SC: StreamCipherClosure<BlockSize = BS>,
+        {
+            #[inline(always)]
+            fn call<B: BlockCipherEncBackend<BlockSize = Self::BlockSize>>(self, backend: &B) {
+                let Self { iv, f } = self;
+                f.call(&mut Backend { iv, backend });
+            }
+        }
+
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend(backend::Closure1 { iv, f });
+        cipher.encrypt_with_backend(Closure { iv, f });
     }
 }
 
 impl<C> BlockModeEncrypt for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     #[inline]
-    fn encrypt_with_backend(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
+    fn encrypt_with_backend(&mut self, f: impl BlockModeEncClosure<BlockSize = Self::BlockSize>) {
+        pub(crate) struct Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeEncClosure<BlockSize = BS>,
+        {
+            pub(crate) iv: &'a mut Array<u8, BS>,
+            pub(crate) f: BC,
+        }
+
+        impl<'a, BS, BC> BlockSizeUser for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeEncClosure<BlockSize = BS>,
+        {
+            type BlockSize = BS;
+        }
+
+        impl<'a, BS, BC> BlockCipherEncClosure for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeEncClosure<BlockSize = BS>,
+        {
+            #[inline(always)]
+            fn call<B: BlockCipherEncBackend<BlockSize = Self::BlockSize>>(self, backend: &B) {
+                let Self { iv, f } = self;
+                f.call(&mut Backend { iv, backend });
+            }
+        }
+
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend(backend::Closure2 { iv, f })
+        cipher.encrypt_with_backend(Closure { iv, f })
     }
 }
 
 impl<C> BlockModeDecrypt for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher,
+    C: BlockCipherEncrypt,
 {
     #[inline]
-    fn decrypt_with_backend(&mut self, f: impl BlockClosure<BlockSize = Self::BlockSize>) {
+    fn decrypt_with_backend(&mut self, f: impl BlockModeDecClosure<BlockSize = Self::BlockSize>) {
+        pub(crate) struct Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeDecClosure<BlockSize = BS>,
+        {
+            pub(crate) iv: &'a mut Array<u8, BS>,
+            pub(crate) f: BC,
+        }
+
+        impl<'a, BS, BC> BlockSizeUser for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeDecClosure<BlockSize = BS>,
+        {
+            type BlockSize = BS;
+        }
+
+        impl<'a, BS, BC> BlockCipherEncClosure for Closure<'a, BS, BC>
+        where
+            BS: BlockSizes,
+            BC: BlockModeDecClosure<BlockSize = BS>,
+        {
+            #[inline(always)]
+            fn call<B: BlockCipherEncBackend<BlockSize = Self::BlockSize>>(self, backend: &B) {
+                let Self { iv, f } = self;
+                f.call(&mut Backend { iv, backend });
+            }
+        }
+
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend(backend::Closure2 { iv, f })
+        cipher.encrypt_with_backend(Closure { iv, f })
     }
 }
 
 impl<C> AlgorithmName for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher + AlgorithmName,
+    C: BlockCipherEncrypt + AlgorithmName,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("Ofb<")?;
@@ -186,7 +274,7 @@ where
 
 impl<C> fmt::Debug for OfbCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipher + AlgorithmName,
+    C: BlockCipherEncrypt + AlgorithmName,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("OfbCore<")?;
@@ -195,14 +283,73 @@ where
     }
 }
 
-#[cfg(feature = "zeroize")]
-#[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
-impl<C: BlockCipherEncrypt + BlockCipher> Drop for OfbCore<C> {
+impl<C: BlockCipherEncrypt> Drop for OfbCore<C> {
     fn drop(&mut self) {
+        #[cfg(feature = "zeroize")]
         self.iv.zeroize();
     }
 }
 
 #[cfg(feature = "zeroize")]
-#[cfg_attr(docsrs, doc(cfg(feature = "zeroize")))]
-impl<C: BlockCipherEncrypt + BlockCipher + ZeroizeOnDrop> ZeroizeOnDrop for OfbCore<C> {}
+impl<C: BlockCipherEncrypt + ZeroizeOnDrop> ZeroizeOnDrop for OfbCore<C> {}
+
+pub(crate) struct Backend<'a, BS, BK>
+where
+    BS: BlockSizes,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
+{
+    pub iv: &'a mut Array<u8, BS>,
+    pub backend: &'a BK,
+}
+
+impl<'a, BS, BK> BlockSizeUser for Backend<'a, BS, BK>
+where
+    BS: BlockSizes,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
+{
+    type BlockSize = BS;
+}
+
+impl<'a, BS, BK> ParBlocksSizeUser for Backend<'a, BS, BK>
+where
+    BS: BlockSizes,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
+{
+    type ParBlocksSize = U1;
+}
+
+impl<'a, BS, BK> StreamCipherBackend for Backend<'a, BS, BK>
+where
+    BS: BlockSizes,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
+{
+    #[inline(always)]
+    fn gen_ks_block(&mut self, block: &mut Block<Self>) {
+        self.backend.encrypt_block(self.iv.into());
+        *block = self.iv.clone();
+    }
+}
+
+impl<'a, BS, BK> BlockModeEncBackend for Backend<'a, BS, BK>
+where
+    BS: BlockSizes,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
+{
+    #[inline(always)]
+    fn encrypt_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
+        self.backend.encrypt_block(self.iv.into());
+        block.xor_in2out(self.iv);
+    }
+}
+
+impl<'a, BS, BK> BlockModeDecBackend for Backend<'a, BS, BK>
+where
+    BS: BlockSizes,
+    BK: BlockCipherEncBackend<BlockSize = BS>,
+{
+    #[inline(always)]
+    fn decrypt_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
+        self.backend.encrypt_block(self.iv.into());
+        block.xor_in2out(self.iv);
+    }
+}

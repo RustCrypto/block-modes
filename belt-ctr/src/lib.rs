@@ -5,20 +5,22 @@
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"
 )]
 #![forbid(unsafe_code)]
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
 pub use cipher;
 
 use belt_block::BeltBlock;
 use cipher::{
-    array::Array, consts::U16, crypto_common::InnerUser, AlgorithmName, BlockCipherDecrypt,
-    BlockCipherEncrypt, BlockSizeUser, InnerIvInit, Iv, IvSizeUser, IvState, StreamCipherCore,
-    StreamCipherCoreWrapper, StreamCipherSeekCore, StreamClosure,
+    array::Array, consts::U16, crypto_common::InnerUser, AlgorithmName, Block, BlockCipherDecrypt,
+    BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, InOut,
+    InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks, ParBlocksSizeUser, StreamCipherBackend,
+    StreamCipherClosure, StreamCipherCore, StreamCipherCoreWrapper, StreamCipherSeekCore,
 };
 use core::fmt;
 
-mod backend;
+#[cfg(feature = "zeroize")]
+use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// Byte-level BelT CTR
 pub type BeltCtr<C = BeltBlock> = StreamCipherCoreWrapper<BeltCtrCore<C>>;
@@ -42,9 +44,26 @@ where
         (u128::MAX - used).try_into().ok()
     }
 
-    fn process_with_backend(&mut self, f: impl StreamClosure<BlockSize = Self::BlockSize>) {
+    fn process_with_backend(&mut self, f: impl StreamCipherClosure<BlockSize = Self::BlockSize>) {
+        struct Closure<'a, C: StreamCipherClosure<BlockSize = U16>> {
+            s: &'a mut u128,
+            f: C,
+        }
+
+        impl<'a, C: StreamCipherClosure<BlockSize = U16>> BlockSizeUser for Closure<'a, C> {
+            type BlockSize = U16;
+        }
+
+        impl<'a, C: StreamCipherClosure<BlockSize = U16>> BlockCipherEncClosure for Closure<'a, C> {
+            #[inline(always)]
+            fn call<B: BlockCipherEncBackend<BlockSize = U16>>(self, cipher_backend: &B) {
+                let Self { s, f } = self;
+                f.call(&mut Backend { s, cipher_backend })
+            }
+        }
+
         let Self { cipher, s, .. } = self;
-        cipher.encrypt_with_backend(backend::Closure { s, f });
+        cipher.encrypt_with_backend(Closure { s, f });
     }
 }
 
@@ -114,7 +133,7 @@ where
 
 impl<C> AlgorithmName for BeltCtrCore<C>
 where
-    C: BlockCipherEncrypt + BlockCipherDecrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("BeltCtr<")?;
@@ -123,9 +142,68 @@ where
     }
 }
 
-impl<C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>> fmt::Debug for BeltCtrCore<C> {
+impl<C> fmt::Debug for BeltCtrCore<C>
+where
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
+{
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("BeltCtrCore { ... }")
+        f.write_str("BeltCtr<")?;
+        <C as AlgorithmName>::write_alg_name(f)?;
+        f.write_str("> { ... }")
+    }
+}
+
+impl<C: BlockCipherEncrypt> Drop for BeltCtrCore<C>
+where
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
+{
+    fn drop(&mut self) {
+        #[cfg(feature = "zeroize")]
+        {
+            self.s.zeroize();
+            self.s_init.zeroize();
+        }
+    }
+}
+
+#[cfg(feature = "zeroize")]
+impl<C> ZeroizeOnDrop for BeltCtrCore<C> where
+    C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + ZeroizeOnDrop
+{
+}
+
+struct Backend<'a, B: BlockCipherEncBackend<BlockSize = U16>> {
+    s: &'a mut u128,
+    cipher_backend: &'a B,
+}
+
+impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> BlockSizeUser for Backend<'a, B> {
+    type BlockSize = B::BlockSize;
+}
+
+impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> ParBlocksSizeUser for Backend<'a, B> {
+    type ParBlocksSize = B::ParBlocksSize;
+}
+
+impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> StreamCipherBackend for Backend<'a, B> {
+    #[inline(always)]
+    fn gen_ks_block(&mut self, block: &mut Block<Self>) {
+        *self.s = self.s.wrapping_add(1);
+        let tmp = self.s.to_le_bytes().into();
+        self.cipher_backend.encrypt_block((&tmp, block).into());
+    }
+
+    #[inline(always)]
+    fn gen_par_ks_blocks(&mut self, blocks: &mut ParBlocks<Self>) {
+        let mut tmp = ParBlocks::<Self>::default();
+        let mut s = *self.s;
+        for block in tmp.iter_mut() {
+            s = s.wrapping_add(1);
+            *block = s.to_le_bytes().into();
+        }
+        *self.s = s;
+        let io_blocks = InOut::from((&tmp, blocks));
+        self.cipher_backend.encrypt_par_blocks(io_blocks);
     }
 }

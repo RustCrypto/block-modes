@@ -6,9 +6,6 @@ use cipher::{
 };
 use core::fmt;
 
-#[cfg(feature = "zeroize")]
-use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
-
 type ChunkSize = U4;
 type Chunks<B> = PartialQuot<B, ChunkSize>;
 const CS: usize = ChunkSize::USIZE;
@@ -26,16 +23,19 @@ impl<N: ArraySize> fmt::Debug for CtrNonce32<N> {
     }
 }
 
-#[cfg(feature = "zeroize")]
 impl<N: ArraySize> Drop for CtrNonce32<N> {
     fn drop(&mut self) {
-        self.ctr.zeroize();
-        self.nonce.zeroize();
+        #[cfg(feature = "zeroize")]
+        {
+            use cipher::zeroize::Zeroize;
+            self.ctr.zeroize();
+            self.nonce.zeroize();
+        }
     }
 }
 
 #[cfg(feature = "zeroize")]
-impl<N: ArraySize> ZeroizeOnDrop for CtrNonce32<N> {}
+impl<N: ArraySize> cipher::zeroize::ZeroizeOnDrop for CtrNonce32<N> {}
 
 /// 32-bit big endian counter flavor.
 #[derive(Debug)]
@@ -52,7 +52,7 @@ where
 
     #[inline]
     fn remaining(cn: &Self::CtrNonce) -> Option<usize> {
-        (core::u32::MAX - cn.ctr).try_into().ok()
+        (u32::MAX - cn.ctr).try_into().ok()
     }
 
     #[inline(always)]
@@ -117,7 +117,7 @@ where
 
     #[inline]
     fn remaining(cn: &Self::CtrNonce) -> Option<usize> {
-        (core::u32::MAX - cn.ctr).try_into().ok()
+        (u32::MAX - cn.ctr).try_into().ok()
     }
 
     #[inline(always)]
