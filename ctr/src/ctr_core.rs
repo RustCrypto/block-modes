@@ -51,7 +51,7 @@ where
             f: SC,
         }
 
-        impl<'a, F, BS, SC> BlockSizeUser for Closure<'a, F, BS, SC>
+        impl<F, BS, SC> BlockSizeUser for Closure<'_, F, BS, SC>
         where
             BS: BlockSizes,
             F: CtrFlavor<BS>,
@@ -60,7 +60,7 @@ where
             type BlockSize = BS;
         }
 
-        impl<'a, F, BS, SC> BlockCipherEncClosure for Closure<'a, F, BS, SC>
+        impl<F, BS, SC> BlockCipherEncClosure for Closure<'_, F, BS, SC>
         where
             BS: BlockSizes,
             F: CtrFlavor<BS>,
@@ -197,7 +197,7 @@ where
     backend: &'a B,
 }
 
-impl<'a, F, B> BlockSizeUser for Backend<'a, F, B>
+impl<F, B> BlockSizeUser for Backend<'_, F, B>
 where
     F: CtrFlavor<B::BlockSize>,
     B: BlockCipherEncBackend,
@@ -205,7 +205,7 @@ where
     type BlockSize = B::BlockSize;
 }
 
-impl<'a, F, B> ParBlocksSizeUser for Backend<'a, F, B>
+impl<F, B> ParBlocksSizeUser for Backend<'_, F, B>
 where
     F: CtrFlavor<B::BlockSize>,
     B: BlockCipherEncBackend,
@@ -213,7 +213,7 @@ where
     type ParBlocksSize = B::ParBlocksSize;
 }
 
-impl<'a, F, B> StreamCipherBackend for Backend<'a, F, B>
+impl<F, B> StreamCipherBackend for Backend<'_, F, B>
 where
     F: CtrFlavor<B::BlockSize>,
     B: BlockCipherEncBackend,
