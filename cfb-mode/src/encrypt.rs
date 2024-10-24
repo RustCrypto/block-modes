@@ -48,7 +48,7 @@ where
             f: BC,
         }
 
-        impl<'a, BS, BC> BlockSizeUser for Closure<'a, BS, BC>
+        impl<BS, BC> BlockSizeUser for Closure<'_, BS, BC>
         where
             BS: BlockSizes,
             BC: BlockModeEncClosure<BlockSize = BS>,
@@ -56,7 +56,7 @@ where
             type BlockSize = BS;
         }
 
-        impl<'a, BS, BC> BlockCipherEncClosure for Closure<'a, BS, BC>
+        impl<BS, BC> BlockCipherEncClosure for Closure<'_, BS, BC>
         where
             BS: BlockSizes,
             BC: BlockModeEncClosure<BlockSize = BS>,
@@ -157,7 +157,7 @@ where
     cipher_backend: &'a BK,
 }
 
-impl<'a, BS, BK> BlockSizeUser for CbcEncryptBackend<'a, BS, BK>
+impl<BS, BK> BlockSizeUser for CbcEncryptBackend<'_, BS, BK>
 where
     BS: BlockSizes,
     BK: BlockCipherEncBackend<BlockSize = BS>,
@@ -165,7 +165,7 @@ where
     type BlockSize = BS;
 }
 
-impl<'a, BS, BK> ParBlocksSizeUser for CbcEncryptBackend<'a, BS, BK>
+impl<BS, BK> ParBlocksSizeUser for CbcEncryptBackend<'_, BS, BK>
 where
     BS: BlockSizes,
     BK: BlockCipherEncBackend<BlockSize = BS>,
@@ -173,7 +173,7 @@ where
     type ParBlocksSize = U1;
 }
 
-impl<'a, BS, BK> BlockModeEncBackend for CbcEncryptBackend<'a, BS, BK>
+impl<BS, BK> BlockModeEncBackend for CbcEncryptBackend<'_, BS, BK>
 where
     BS: BlockSizes,
     BK: BlockCipherEncBackend<BlockSize = BS>,

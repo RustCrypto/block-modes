@@ -50,11 +50,11 @@ where
             f: C,
         }
 
-        impl<'a, C: StreamCipherClosure<BlockSize = U16>> BlockSizeUser for Closure<'a, C> {
+        impl<C: StreamCipherClosure<BlockSize = U16>> BlockSizeUser for Closure<'_, C> {
             type BlockSize = U16;
         }
 
-        impl<'a, C: StreamCipherClosure<BlockSize = U16>> BlockCipherEncClosure for Closure<'a, C> {
+        impl<C: StreamCipherClosure<BlockSize = U16>> BlockCipherEncClosure for Closure<'_, C> {
             #[inline(always)]
             fn call<B: BlockCipherEncBackend<BlockSize = U16>>(self, cipher_backend: &B) {
                 let Self { s, f } = self;
@@ -178,15 +178,15 @@ struct Backend<'a, B: BlockCipherEncBackend<BlockSize = U16>> {
     cipher_backend: &'a B,
 }
 
-impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> BlockSizeUser for Backend<'a, B> {
+impl<B: BlockCipherEncBackend<BlockSize = U16>> BlockSizeUser for Backend<'_, B> {
     type BlockSize = B::BlockSize;
 }
 
-impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> ParBlocksSizeUser for Backend<'a, B> {
+impl<B: BlockCipherEncBackend<BlockSize = U16>> ParBlocksSizeUser for Backend<'_, B> {
     type ParBlocksSize = B::ParBlocksSize;
 }
 
-impl<'a, B: BlockCipherEncBackend<BlockSize = U16>> StreamCipherBackend for Backend<'a, B> {
+impl<B: BlockCipherEncBackend<BlockSize = U16>> StreamCipherBackend for Backend<'_, B> {
     #[inline(always)]
     fn gen_ks_block(&mut self, block: &mut Block<Self>) {
         *self.s = self.s.wrapping_add(1);
