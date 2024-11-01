@@ -4,6 +4,8 @@ use belt_block::BeltBlock;
 use cts::{Decrypt, Encrypt, KeyInit};
 use hex_literal::hex;
 
+type BeltEcb = cts::EcbCs2<BeltBlock>;
+
 struct TestVector {
     key: &'static [u8; 32],
     pt: &'static [u8],
@@ -82,12 +84,10 @@ fn belt_ecb() {
     let mut buf = [0u8; 48];
     for &TestVector { key, pt, ct } in TEST_VECTORS {
         let buf = &mut buf[..pt.len()];
-        let enc_mode = cts::EcbCs2Enc::<BeltBlock>::new(key.into());
-        enc_mode.encrypt_b2b(pt, buf).unwrap();
+        BeltEcb::new(key.into()).encrypt_b2b(pt, buf).unwrap();
         assert_eq!(buf, ct);
 
-        let dec_mode = cts::EcbCs2Dec::<BeltBlock>::new(key.into());
-        dec_mode.decrypt(buf).unwrap();
+        BeltEcb::new(key.into()).decrypt(buf).unwrap();
         assert_eq!(buf, pt);
     }
 }
