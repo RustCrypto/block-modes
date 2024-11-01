@@ -46,7 +46,7 @@ assert_eq!(buf[..], plaintext[..]);
 
 ## Minimum Supported Rust Version
 
-Rust **1.57** or higher.
+Rust **1.81** or higher.
 
 Minimum supported Rust version can be changed in the future, but it will be
 done with a minor version bump.
@@ -78,7 +78,7 @@ dual licensed as above, without any additional terms or conditions.
 [docs-image]: https://docs.rs/belt-ctr/badge.svg
 [docs-link]: https://docs.rs/belt-ctr/
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
-[rustc-image]: https://img.shields.io/badge/rustc-1.57+-blue.svg
+[rustc-image]: https://img.shields.io/badge/rustc-1.81+-blue.svg
 [chat-image]: https://img.shields.io/badge/zulip-join_chat-blue.svg
 [chat-link]: https://rustcrypto.zulipchat.com/#narrow/stream/308460-block-modes
 [build-image]: https://github.com/RustCrypto/block-modes/workflows/belt-ctr/badge.svg?branch=master&event=push
