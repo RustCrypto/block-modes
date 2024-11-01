@@ -1,5 +1,4 @@
 //! Test vectors from RFC 3962: https://www.rfc-editor.org/rfc/rfc3962
-use aes::Aes128;
 use cipher::{InnerIvInit, KeyInit};
 use cts::{Decrypt, Encrypt};
 use hex_literal::hex;
@@ -80,19 +79,21 @@ static TEST_VECTORS: &[(&[u8], &[u8])] = &[
 
 #[test]
 fn rfc3962() {
-    let cipher = Aes128::new(&KEY.into());
+    let cipher = aes::Aes128::new(&KEY.into());
     let iv = IV.into();
 
     let mut buf = [0u8; 64];
     for &(input, output) in TEST_VECTORS {
         let buf = &mut buf[..input.len()];
 
-        let enc_mode = cts::CbcCs3Enc::inner_iv_init(&cipher, &iv);
-        enc_mode.encrypt_b2b(input, buf).unwrap();
+        cts::CbcCs3::inner_iv_init(&cipher, &iv)
+            .encrypt_b2b(input, buf)
+            .unwrap();
         assert_eq!(buf, output);
 
-        let dec_mode = cts::CbcCs3Dec::inner_iv_init(&cipher, &iv);
-        dec_mode.decrypt_b2b(output, buf).unwrap();
+        cts::CbcCs3::inner_iv_init(&cipher, &iv)
+            .decrypt_b2b(output, buf)
+            .unwrap();
         assert_eq!(buf, input);
     }
 }

@@ -15,6 +15,8 @@ use aes::Aes128;
 use cts::{Decrypt, Encrypt, KeyIvInit};
 use hex_literal::hex;
 
+type Aes128CbcCs3 = cts::CbcCs3<Aes128>;
+
 let key = [0x42; 16];
 let iv = [0x24; 16];
 
@@ -22,12 +24,12 @@ let iv = [0x24; 16];
 let msg = b"Lorem ipsum dolor sit amet";
 let mut buf = [0u8; 26];
 
-let enc_mode = cts::CbcCs3Enc::<Aes128>::new(&key.into(), &iv.into());
-enc_mode.encrypt_b2b(msg, &mut buf).unwrap();
+Aes128CbcCs3::new(&key.into(), &iv.into())
+    .encrypt_b2b(msg, &mut buf).unwrap();
 assert_eq!(buf, hex!("68ec97f172e322fdd38e74fca65cee52658ae2124beb5e4e5315"));
 
-let dec_mode = cts::CbcCs3Dec::<Aes128>::new(&key.into(), &iv.into());
-dec_mode.decrypt(&mut buf).unwrap();
+Aes128CbcCs3::new(&key.into(), &iv.into())
+    .decrypt(&mut buf).unwrap();
 assert_eq!(&buf, msg);
 ```
 
@@ -52,12 +54,12 @@ let iv2 = [0x25; 16];
 let msg2 = b"Lorem ipsum dolor sit";
 let mut buf2 = [0u8; 21];
 
-let enc_mode = cts::CbcCs3Enc::inner_iv_init(&cipher, &iv1.into());
-enc_mode.encrypt_b2b(msg1, &mut buf1).unwrap();
+cts::CbcCs3::inner_iv_init(&cipher, &iv1.into())
+    .encrypt_b2b(msg1, &mut buf1).unwrap();
 assert_eq!(buf1, hex!("68ec97f172e322fdd38e74fca65cee52658ae2124beb5e4e5315"));
 
-let enc_mode = cts::CbcCs3Enc::inner_iv_init(&cipher, &iv2.into());
-enc_mode.encrypt_b2b(msg2, &mut buf2).unwrap();
+cts::CbcCs3::inner_iv_init(&cipher, &iv2.into())
+    .encrypt_b2b(msg2, &mut buf2).unwrap();
 assert_eq!(buf2, hex!("69ebd2059e69c6e416a67351982267a26bf5672934"));
 ```
 

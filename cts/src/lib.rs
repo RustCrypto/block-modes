@@ -12,46 +12,25 @@ pub use cipher;
 
 pub use cipher::{KeyInit, KeyIvInit};
 
-mod cbc_cs1_enc;
-pub use cbc_cs1_enc::CbcCs1Enc;
+mod cbc_cs1;
+mod cbc_cs2;
+mod cbc_cs3;
+mod ecb_cs1;
+mod ecb_cs2;
+mod ecb_cs3;
 
-mod cbc_cs1_dec;
-pub use cbc_cs1_dec::CbcCs1Dec;
-
-mod cbc_cs2_enc;
-pub use cbc_cs2_enc::CbcCs2Enc;
-
-mod cbc_cs2_dec;
-pub use cbc_cs2_dec::CbcCs2Dec;
-
-mod cbc_cs3_enc;
-pub use cbc_cs3_enc::CbcCs3Enc;
-
-mod cbc_cs3_dec;
-pub use cbc_cs3_dec::CbcCs3Dec;
-
-mod ecb_cs1_enc;
-pub use ecb_cs1_enc::EcbCs1Enc;
-
-mod ecb_cs1_dec;
-pub use ecb_cs1_dec::EcbCs1Dec;
-
-mod ecb_cs2_enc;
-pub use ecb_cs2_enc::EcbCs2Enc;
-
-mod ecb_cs2_dec;
-pub use ecb_cs2_dec::EcbCs2Dec;
-
-mod ecb_cs3_enc;
-pub use ecb_cs3_enc::EcbCs3Enc;
-
-mod ecb_cs3_dec;
-pub use ecb_cs3_dec::EcbCs3Dec;
+pub use cbc_cs1::CbcCs1;
+pub use cbc_cs2::CbcCs2;
+pub use cbc_cs3::CbcCs3;
+pub use ecb_cs1::EcbCs1;
+pub use ecb_cs2::EcbCs2;
+pub use ecb_cs3::EcbCs3;
 
 use cipher::{
-    generic_array::{typenum::Unsigned, GenericArray},
+    array::{Array, ArraySize},
     inout::{InOutBuf, NotEqualError},
-    ArrayLength, Block, BlockBackend,
+    typenum::Unsigned,
+    Block, BlockCipherDecBackend, BlockCipherEncBackend,
 };
 
 /// Error which indicates that message is smaller than cipher's block size.
@@ -94,48 +73,48 @@ pub trait Decrypt: Sized {
     }
 }
 
-fn ecb_enc<B: BlockBackend>(cipher: &mut B, mut blocks: InOutBuf<'_, '_, Block<B>>) {
+fn ecb_enc<B: BlockCipherEncBackend>(cipher: &B, mut blocks: InOutBuf<'_, '_, Block<B>>) {
     if B::ParBlocksSize::USIZE > 1 {
         let (par_blocks, rem_blocks) = blocks.into_chunks();
         blocks = rem_blocks;
         for blocks in par_blocks {
-            cipher.proc_par_blocks(blocks);
+            cipher.encrypt_par_blocks(blocks);
         }
     }
     for block in blocks {
-        cipher.proc_block(block);
+        cipher.encrypt_block(block);
     }
 }
 
-fn ecb_dec<B: BlockBackend>(cipher: &mut B, mut blocks: InOutBuf<'_, '_, Block<B>>) {
+fn ecb_dec<B: BlockCipherDecBackend>(cipher: &B, mut blocks: InOutBuf<'_, '_, Block<B>>) {
     if B::ParBlocksSize::USIZE > 1 {
         let (par_blocks, rem_blocks) = blocks.into_chunks();
         blocks = rem_blocks;
         for blocks in par_blocks {
-            cipher.proc_par_blocks(blocks);
+            cipher.decrypt_par_blocks(blocks);
         }
     }
     for block in blocks {
-        cipher.proc_block(block);
+        cipher.decrypt_block(block);
     }
 }
 
-fn cbc_enc<B: BlockBackend>(
-    cipher: &mut B,
+fn cbc_enc<B: BlockCipherEncBackend>(
+    cipher: &B,
     iv: &mut Block<B>,
     mut blocks: InOutBuf<'_, '_, Block<B>>,
 ) {
     for mut block in blocks.reborrow() {
         let mut t = block.clone_in();
         xor(&mut t, iv);
-        cipher.proc_block_inplace(&mut t);
+        cipher.encrypt_block_inplace(&mut t);
         *iv = t.clone();
         *block.get_out() = t;
     }
 }
 
-fn cbc_dec<B: BlockBackend>(
-    cipher: &mut B,
+fn cbc_dec<B: BlockCipherDecBackend>(
+    cipher: &B,
     iv: &mut Block<B>,
     mut blocks: InOutBuf<'_, '_, Block<B>>,
 ) {
@@ -147,7 +126,7 @@ fn cbc_dec<B: BlockBackend>(
             let in_blocks = blocks.clone_in();
             let mut t = blocks.clone_in();
 
-            cipher.proc_par_blocks_inplace(&mut t);
+            cipher.decrypt_par_blocks_inplace(&mut t);
             let n = t.len();
             xor(&mut t[0], iv);
             for i in 1..n {
@@ -161,7 +140,7 @@ fn cbc_dec<B: BlockBackend>(
     for mut block in blocks {
         let in_block = block.clone_in();
         let mut t = block.clone_in();
-        cipher.proc_block_inplace(&mut t);
+        cipher.decrypt_block_inplace(&mut t);
         xor(&mut t, iv);
         *block.get_out() = t;
         *iv = in_block;
@@ -169,7 +148,7 @@ fn cbc_dec<B: BlockBackend>(
 }
 
 #[inline(always)]
-fn xor<N: ArrayLength<u8>>(out: &mut GenericArray<u8, N>, buf: &GenericArray<u8, N>) {
+fn xor<N: ArraySize>(out: &mut Array<u8, N>, buf: &Array<u8, N>) {
     for (a, b) in out.iter_mut().zip(buf) {
         *a ^= *b;
     }
