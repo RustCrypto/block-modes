@@ -20,7 +20,7 @@ less error-prone than manual integrity verification.
 ## Supported algorithms
 
 | Name | Crate name | crates.io |  Docs  | MSRV |
-|------|------------|-----------|--------|------|
+|------|------------|:---------:|:------:|:----:|
 | [BelT CTR] | [`belt-ctr`] |  [![crates.io](https://img.shields.io/crates/v/belt-ctr.svg)](https://crates.io/crates/belt-ctr) | [![Documentation](https://docs.rs/belt-ctr/badge.svg)](https://docs.rs/belt-ctr) |  ![MSRV 1.81][msrv-1.81] |
 | [Cipher Block Chaining][CBC] | [`cbc`] | [![crates.io](https://img.shields.io/crates/v/cbc.svg)](https://crates.io/crates/cbc) | [![Documentation](https://docs.rs/cbc/badge.svg)](https://docs.rs/cbc) |  ![MSRV 1.81][msrv-1.81] |
 | [8-bit Cipher Feedback][CFB-8] | [`cfb8`] | [![crates.io](https://img.shields.io/crates/v/cfb8.svg)](https://crates.io/crates/cfb8) | [![Documentation](https://docs.rs/cfb8/badge.svg)](https://docs.rs/cfb8) |  ![MSRV 1.81][msrv-1.81] |
