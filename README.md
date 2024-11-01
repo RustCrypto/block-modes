@@ -26,6 +26,7 @@ less error-prone than manual integrity verification.
 | [8-bit Cipher Feedback][CFB-8] | [`cfb8`] | [![crates.io](https://img.shields.io/crates/v/cfb8.svg)](https://crates.io/crates/cfb8) | [![Documentation](https://docs.rs/cfb8/badge.svg)](https://docs.rs/cfb8) |  ![MSRV 1.56][msrv-1.56] |
 | [Full-block Cipher Feedback][CFB] | [`cfb-mode`] | [![crates.io](https://img.shields.io/crates/v/cfb-mode.svg)](https://crates.io/crates/cfb-mode) | [![Documentation](https://docs.rs/cfb-mode/badge.svg)](https://docs.rs/cfb-mode) |  ![MSRV 1.56][msrv-1.56] |
 | [Counter][CTR] | [`ctr`] | [![crates.io](https://img.shields.io/crates/v/ctr.svg)](https://crates.io/crates/ctr) | [![Documentation](https://docs.rs/ctr/badge.svg)](https://docs.rs/ctr) |  ![MSRV 1.56][msrv-1.56] |
+| [Ciphertext stealing][CTS] | [`cts`] | [![crates.io](https://img.shields.io/crates/v/cts.svg)](https://crates.io/crates/cts) | [![Documentation](https://docs.rs/cts/badge.svg)](https://docs.rs/cts) |  ![MSRV 1.81][msrv-1.81] |
 | [GOST R 34.13-2015] | [`gost-modes`] | [![crates.io](https://img.shields.io/crates/v/gost-modes.svg)](https://crates.io/crates/gost-modes) | [![Documentation](https://docs.rs/gost-modes/badge.svg)](https://docs.rs/gost-modes) | ![MSRV 1.56][msrv-1.56] |
 | [Infinite Garble Extension][IGE] | [`ige`] | [![crates.io](https://img.shields.io/crates/v/ige.svg)](https://crates.io/crates/ige) | [![Documentation](https://docs.rs/ige/badge.svg)](https://docs.rs/ige) |  ![MSRV 1.56][msrv-1.56] |
 | [Output Feedback][OFB] | [`ofb`] | [![crates.io](https://img.shields.io/crates/v/ofb.svg)](https://crates.io/crates/ofb) | [![Documentation](https://docs.rs/ofb/badge.svg)](https://docs.rs/ofb) |  ![MSRV 1.56][msrv-1.56] |
@@ -60,6 +61,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [aead-link]: https://github.com/RustCrypto/AEADs
 [msrv-1.56]: https://img.shields.io/badge/rustc-1.56.0+-blue.svg
 [msrv-1.57]: https://img.shields.io/badge/rustc-1.57.0+-blue.svg
+[msrv-1.81]: https://img.shields.io/badge/rustc-1.81.0+-blue.svg
 
 [//]: # (crates)
 
@@ -68,6 +70,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [`cfb8`]: ./cfb8
 [`cfb-mode`]: ./cfb-mode
 [`ctr`]: ./ctr
+[`cts`]: ./cts
 [`gost-modes`]: ./gost-modes
 [`ige`]: ./ige
 [`ofb`]: ./ofb
@@ -81,6 +84,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [CFB-8]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CFB-1,_CFB-8,_CFB-64,_CFB-128,_etc.
 [CFB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Full-block_CFB
 [CTR]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR)
+[CTS]: https://en.wikipedia.org/wiki/Ciphertext_stealing
 [GOST R 34.13-2015]: https://tc26.ru/standard/gost/GOST_R_3413-2015.pdf
 [IGE]: https://www.links.org/files/openssl-ige.pdf
 [OFB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_(OFB)
