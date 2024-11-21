@@ -211,6 +211,16 @@ where
     fn encrypt_par_blocks_inplace(&mut self, blocks: &mut ParBlocks<Self>) {
         self.process_par_blocks_inplace(blocks);
     }
+
+    #[inline(always)]
+    fn encrypt_tail_blocks(&mut self, blocks: cipher::InOutBuf<'_, '_, Block<Self>>) {
+        self.process_tail_blocks(blocks);
+    }
+
+    #[inline(always)]
+    fn encrypt_tail_blocks_inplace(&mut self, blocks: &mut [Block<Self>]) {
+        self.process_tail_blocks_inplace(blocks);
+    }
 }
 
 impl<BS, BC> Xts for Backend<'_, BS, BC>

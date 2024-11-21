@@ -1,6 +1,6 @@
 use cipher::{
-    crypto_common::BlockSizes, Array, Block, BlockCipherEncrypt, BlockSizeUser, InOut, ParBlocks,
-    ParBlocksSizeUser,
+    crypto_common::BlockSizes, Array, Block, BlockCipherEncrypt, BlockSizeUser, InOut, InOutBuf,
+    ParBlocks, ParBlocksSizeUser,
 };
 
 use crate::xor;
@@ -93,10 +93,12 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
 
     /// Encrypt/decrypt multiple blocks in parrallel using XTS and update the tweak
     fn process_par_blocks_inplace(&mut self, blocks: &mut ParBlocks<Self>) {
+        let mut iv_array: ParBlocks<Self> = Default::default();
         {
             let iv = self.get_iv_mut();
 
-            for b in blocks.iter_mut() {
+            for (b, i) in blocks.iter_mut().zip(iv_array.iter_mut()) {
+                *i = iv.clone();
                 xor(b, iv);
 
                 let _ = gf_mul(iv);
@@ -104,12 +106,40 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
         }
 
         self.process_par_inplace(blocks);
+
+        for (b, i) in blocks.iter_mut().zip(iv_array.iter_mut()) {
+            xor(b, i);
+        }
     }
 
-    fn process_par_blocks(&mut self, mut block: InOut<'_, '_, ParBlocks<Self>>) {
-        let mut b = block.clone_in();
+    fn process_par_blocks(&mut self, mut blocks: InOut<'_, '_, ParBlocks<Self>>) {
+        let mut b = blocks.clone_in();
         self.process_par_blocks_inplace(&mut b);
 
-        *block.get_out() = b;
+        *blocks.get_out() = b;
+    }
+
+    fn process_tail_blocks_inplace(&mut self, blocks: &mut [Block<Self>]) {
+        for b in blocks {
+            {
+                let iv = self.get_iv_mut();
+                xor(b, iv);
+            }
+
+            self.process_block_inplace(b);
+
+            let iv = self.get_iv_mut();
+            xor(b, iv);
+
+            let _ = gf_mul(iv);
+        }
+    }
+
+    fn process_tail_blocks(&mut self, blocks: InOutBuf<'_, '_, Block<Self>>) {
+        for mut block in blocks {
+            let mut b = block.clone_in();
+            self.process_inplace(&mut b);
+            *block.get_out() = b;
+        }
     }
 }
