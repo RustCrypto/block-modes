@@ -17,7 +17,7 @@ where
     cipher.encrypt_block(iv);
 }
 
-pub fn gf_mul<BS>(tweak: &mut Array<u8, BS>) -> bool
+fn gf_mul<BS>(tweak: &mut Array<u8, BS>) -> bool
 where
     BS: BlockSizes,
 {
@@ -45,6 +45,38 @@ where
     carry == 1
 }
 
+// This is only used once when decrypting with ciphertext stealing
+fn gf_reverse_mul<BS>(tweak: &mut Array<u8, BS>, carry: bool)
+where
+    BS: BlockSizes,
+{
+    if carry {
+        tweak[0] ^= GF_MOD;
+    }
+
+    let mut new_carry = 0;
+
+    for i in BS::to_usize() - 1..=0 {
+        // Save carry from previous byte
+        let old_carry = new_carry;
+
+        // Check if there is a carry for this shift
+        new_carry = tweak[i] & 1;
+
+        // Shift right
+        tweak[i] >>= 1;
+
+        // Carry over bit from last carry
+        tweak[i] |= old_carry << 7;
+    }
+
+    // If there is a carry, we mod by the polynomial
+    if carry {
+        let len = tweak.len();
+        tweak[len - 1] |= 0x80;
+    }
+}
+
 /// Core implementation of XTS mode
 pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
     /// Method to encrypt/decrypt a single block without mode.
@@ -55,6 +87,9 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
 
     /// Gets the IV reference.
     fn get_iv_mut(&mut self) -> &mut Array<u8, Self::BlockSize>;
+
+    /// There is a slight difference regarding the tweak during decryption
+    fn is_decrypt() -> bool;
 
     // Unused but keeping for now just in case
     // fn process(&self, mut block: InOut<'_, '_, Block<Self>>) {
@@ -140,6 +175,59 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
             let mut b = block.clone_in();
             self.process_inplace(&mut b);
             *block.get_out() = b;
+        }
+    }
+
+    fn ciphertext_stealing(&mut self, buffer: &mut [u8]) {
+        let remaining_bytes = buffer.len() - Self::block_size();
+
+        let need_stealing = remaining_bytes > 0;
+
+        {
+            let second_to_last_block: &mut Block<Self> = (&mut buffer[0..Self::block_size()])
+                .try_into()
+                .expect("Not a full block on second to last block!");
+
+            // This is a special case
+            if Self::is_decrypt() && need_stealing {
+                // We fast forward the multiplication here
+
+                let carry = {
+                    let mut iv = self.get_iv_mut();
+                    let carry = gf_mul(&mut iv);
+
+                    xor(second_to_last_block, iv);
+
+                    carry
+                };
+
+                self.process_inplace(second_to_last_block);
+
+                {
+                    let iv = self.get_iv_mut();
+                    xor(second_to_last_block, iv);
+
+                    gf_reverse_mul(iv, carry);
+                }
+            } else {
+                // Process normally
+                self.process_block_inplace(second_to_last_block);
+            }
+        }
+
+        if need_stealing {
+            // We first swap the remaining bytes with the previous block's
+            {
+                let (previous_block, current_block) = buffer.split_at_mut(Self::block_size());
+                previous_block[..remaining_bytes]
+                    .swap_with_slice(&mut current_block[..remaining_bytes]);
+            }
+
+            // We can then decrypt the final block, which is not located at the second to last block
+            let second_to_last_block: &mut Block<Self> = (&mut buffer[0..Self::block_size()])
+                .try_into()
+                .expect("Not a full block on second to last block!");
+            self.process_block_inplace(second_to_last_block);
         }
     }
 }

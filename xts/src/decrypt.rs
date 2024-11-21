@@ -245,4 +245,9 @@ where
     fn get_iv_mut(&mut self) -> &mut Block<Self> {
         self.iv
     }
+
+    #[inline(always)]
+    fn is_decrypt() -> bool {
+        true
+    }
 }
