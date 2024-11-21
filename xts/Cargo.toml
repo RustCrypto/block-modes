@@ -1,0 +1,31 @@
+[package]
+name = "xts"
+version = "0.1.0"
+description = "Xor-Encrypt-Xor Tweaked-codebook with ciphertext Stealing (XTS) block cipher mode of operation"
+authors = ["zer0x64"]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+rust-version = "1.81"
+readme = "README.md"
+documentation = "https://docs.rs/xts"
+repository = "https://github.com/RustCrypto/block-modes"
+keywords = ["crypto", "block-mode", "ciphers"]
+categories = ["cryptography", "no-std"]
+
+[dependencies]
+cipher = "0.4"
+
+[dev-dependencies]
+aes = "0.8"
+cipher = { version = "0.4", features = ["dev"] }
+hex-literal = "0.4"
+
+[features]
+default = []
+alloc = ["cipher/alloc"]
+std = ["cipher/std", "alloc"]
+zeroize = ["cipher/zeroize"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
