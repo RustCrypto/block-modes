@@ -54,5 +54,5 @@ dual licensed as above, without any additional terms or conditions.
 
 [//]: # (general links)
 
-[xts]: https://en.wikipedia.org/wiki/Disk_encryption_theory#XTSDisk_encryption_theory#XTS
+[xts]: https://en.wikipedia.org/wiki/Disk_encryption_theory#XTS
 [cipher-doc]: https://docs.rs/cipher/
