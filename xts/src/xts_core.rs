@@ -1,12 +1,10 @@
 use cipher::{
-    crypto_common::BlockSizes, Array, Block, BlockCipherDecBackend, BlockCipherEncrypt,
-    BlockSizeUser, InOut, InOutBuf, ParBlocks, ParBlocksSizeUser,
+    crypto_common::BlockSizes, Array, Block, BlockCipherEncrypt, BlockSizeUser, InOut, InOutBuf,
+    ParBlocks, ParBlocksSizeUser,
 };
 
+use crate::gf::{gf_mul, gf_reverse_mul};
 use crate::xor;
-
-/// Derived from the polynomial x^128 + x^5 + x + 1
-const GF_MOD: u8 = 0x87;
 
 /// Since the traits does not allow using two engines, this is used to pre-compute the IV.
 pub fn precompute_iv<BS, BC>(cipher: &BC, iv: &Block<BC>) -> Block<BC>
@@ -17,66 +15,6 @@ where
     let mut output = iv.clone();
     cipher.encrypt_block(&mut output);
     output
-}
-
-fn gf_mul<BS>(tweak: &mut Array<u8, BS>) -> bool
-where
-    BS: BlockSizes,
-{
-    let mut carry = 0;
-
-    for i in 0..BS::to_usize() {
-        // Save carry from previous byte
-        let old_carry = carry;
-
-        // Check if there is a carry for this shift
-        carry = (tweak[i] & 0x80) >> 7;
-
-        // Shift left
-        tweak[i] <<= 1;
-
-        // Carry over bit from last carry
-        tweak[i] |= old_carry;
-    }
-
-    // If there is a carry, we mod by the polynomial
-    if carry == 1 {
-        tweak[0] ^= GF_MOD;
-    }
-
-    carry == 1
-}
-
-// This is only used once when decrypting with ciphertext stealing
-fn gf_reverse_mul<BS>(tweak: &mut Array<u8, BS>, carry: bool)
-where
-    BS: BlockSizes,
-{
-    if carry {
-        tweak[0] ^= GF_MOD;
-    }
-
-    let mut new_carry = 0;
-
-    for i in BS::to_usize() - 1..=0 {
-        // Save carry from previous byte
-        let old_carry = new_carry;
-
-        // Check if there is a carry for this shift
-        new_carry = tweak[i] & 1;
-
-        // Shift right
-        tweak[i] >>= 1;
-
-        // Carry over bit from last carry
-        tweak[i] |= old_carry << 7;
-    }
-
-    // If there is a carry, we mod by the polynomial
-    if carry {
-        let len = tweak.len();
-        tweak[len - 1] |= 0x80;
-    }
 }
 
 /// Core implementation of XTS mode

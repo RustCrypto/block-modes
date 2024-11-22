@@ -95,6 +95,7 @@ use cipher::array::{Array, ArraySize};
 
 mod decrypt;
 mod encrypt;
+mod gf;
 mod xts_core;
 
 pub use decrypt::Decryptor;
