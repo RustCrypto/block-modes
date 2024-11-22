@@ -1,12 +1,12 @@
 use crate::xts_core::{precompute_iv, Xts};
 
 use cipher::{
-    crypto_common::{BlockSizes, InnerUser},
-    AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
-    BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit,
-    Iv, IvSizeUser, IvState, KeyInit, ParBlocks, ParBlocksSizeUser,
+    array::ArraySize, consts::B1, crypto_common::BlockSizes, typenum::Double, AlgorithmName, Array,
+    Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockModeEncBackend,
+    BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, Iv, IvSizeUser, IvState, Key,
+    KeyInit, KeyIvInit, KeySizeUser, ParBlocks, ParBlocksSizeUser,
 };
-use core::fmt;
+use core::{fmt, ops::Shl};
 
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
@@ -18,30 +18,56 @@ where
     C: BlockCipherEncrypt,
 {
     cipher: C,
+    tweaker: C,
     iv: Block<C>,
 }
 
 // This would probably be the cleanest way to do it, but it would require a way to multiply a typenum by 2
-// impl<C> KeySizeUser for Encryptor<C> where C: KeySizeUser {
-//     type KeySize = C::KeySize * 2;
-// }
+impl<C, KS> KeySizeUser for Encryptor<C>
+where
+    KS: ArraySize + Shl<B1>,
+    <KS as Shl<B1>>::Output: ArraySize,
+    C: BlockCipherEncrypt + KeySizeUser<KeySize = KS>,
+{
+    type KeySize = Double<KS>;
+}
+
+impl<C> KeyIvInit for Encryptor<C>
+where
+    C: BlockCipherEncrypt + KeySizeUser + KeyInit,
+    Encryptor<C>: KeySizeUser,
+{
+    fn new(key: &Key<Self>, iv: &Iv<Self>) -> Self {
+        // Split the key and call split key constructor
+        let k1 = <&Key<C>>::try_from(&key[..C::key_size()])
+            .expect("Due to trait bounds, k1 should always be half the size of the XTS key");
+        let k2 = <&Key<C>>::try_from(&key[C::key_size()..])
+            .expect("Due to trait bounds, k2 should always be half the size of the XTS key");
+
+        Self::new_from_split_keys(k1, k2, iv)
+    }
+}
 
 impl<C> Encryptor<C>
 where
-    C: BlockCipherEncrypt + KeyInit,
+    C: BlockCipherEncrypt + KeyInit + KeySizeUser,
 {
     /// Create an XTS array and precompute it
-    pub fn new_xts(
-        k1: Array<u8, C::KeySize>,
-        k2: Array<u8, C::KeySize>,
-        mut iv: Block<Self>,
-    ) -> Self {
-        let tweaker = C::new(&k2);
-        precompute_iv(&tweaker, &mut iv);
-
+    pub fn new_from_split_keys(k1: &Key<C>, k2: &Key<C>, iv: &Block<Self>) -> Self {
         let cipher = C::new(&k1);
+        let tweaker = C::new(&k2);
+        let iv = precompute_iv(&tweaker, &iv);
 
-        Self { cipher, iv }
+        Self {
+            cipher,
+            tweaker,
+            iv,
+        }
+    }
+
+    /// Change the IV
+    pub fn reset_iv(&mut self, iv: &Block<Self>) {
+        self.iv = precompute_iv(&self.tweaker, iv)
     }
 }
 
@@ -52,32 +78,11 @@ where
     type BlockSize = C::BlockSize;
 }
 
-// Note: Needs to be removed if we want to override key size
-impl<C> InnerUser for Encryptor<C>
-where
-    C: BlockCipherEncrypt,
-{
-    type Inner = C;
-}
-
 impl<C> IvSizeUser for Encryptor<C>
 where
     C: BlockCipherEncrypt,
 {
     type IvSize = C::BlockSize;
-}
-
-impl<C> InnerIvInit for Encryptor<C>
-where
-    C: BlockCipherEncrypt,
-{
-    #[inline]
-    fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
-        Self {
-            cipher,
-            iv: iv.clone(),
-        }
-    }
 }
 
 impl<C> IvState for Encryptor<C>
@@ -124,7 +129,12 @@ where
             }
         }
 
-        let Self { cipher, iv } = self;
+        // tweaker is only used when setting up IV
+        let Self {
+            cipher,
+            tweaker: _,
+            iv,
+        } = self;
         let f = Closure { iv, f };
         cipher.encrypt_with_backend(f)
     }

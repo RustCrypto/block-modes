@@ -1,6 +1,6 @@
 use cipher::{
-    crypto_common::BlockSizes, Array, Block, BlockCipherEncrypt, BlockSizeUser, InOut, InOutBuf,
-    ParBlocks, ParBlocksSizeUser,
+    crypto_common::BlockSizes, Array, Block, BlockCipherDecBackend, BlockCipherEncrypt,
+    BlockSizeUser, InOut, InOutBuf, ParBlocks, ParBlocksSizeUser,
 };
 
 use crate::xor;
@@ -9,12 +9,14 @@ use crate::xor;
 const GF_MOD: u8 = 0x87;
 
 /// Since the traits does not allow using two engines, this is used to pre-compute the IV.
-pub fn precompute_iv<BS, BC>(cipher: &BC, iv: &mut Array<u8, BS>)
+pub fn precompute_iv<BS, BC>(cipher: &BC, iv: &Block<BC>) -> Block<BC>
 where
     BS: BlockSizes,
     BC: BlockCipherEncrypt<BlockSize = BS>,
 {
-    cipher.encrypt_block(iv);
+    let mut output = iv.clone();
+    cipher.encrypt_block(&mut output);
+    output
 }
 
 fn gf_mul<BS>(tweak: &mut Array<u8, BS>) -> bool
