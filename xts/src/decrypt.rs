@@ -16,18 +16,17 @@ use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// XTS mode decryptor.
 #[derive(Clone)]
-pub struct Decryptor<BS, C, T>
+pub struct Decryptor<C, T>
 where
-    BS: BlockSizes,
-    C: BlockCipherDecrypt<BlockSize = BS>,
-    T: BlockCipherEncrypt<BlockSize = BS>,
+    C: BlockCipherDecrypt,
+    T: BlockCipherEncrypt,
 {
     cipher: C,
     tweaker: T,
     iv: Block<C>,
 }
 
-impl<BS, C, T, KS> KeySizeUser for Decryptor<BS, C, T>
+impl<BS, C, T, KS> KeySizeUser for Decryptor<C, T>
 where
     KS: ArraySize + Shl<B1>,
     <KS as Shl<B1>>::Output: ArraySize,
@@ -38,13 +37,13 @@ where
     type KeySize = Double<KS>;
 }
 
-impl<BS, C, T, KS> KeyIvInit for Decryptor<BS, C, T>
+impl<BS, C, T, KS> KeyIvInit for Decryptor<C, T>
 where
     KS: ArraySize,
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS> + KeySizeUser<KeySize = KS> + KeyInit,
     T: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser<KeySize = KS> + KeyInit,
-    Decryptor<BS, C, T>: KeySizeUser,
+    Decryptor<C, T>: KeySizeUser,
 {
     fn new(key: &Key<Self>, iv: &Iv<Self>) -> Self {
         // Split the key and call split key constructor
@@ -57,7 +56,7 @@ where
     }
 }
 
-impl<BS, C, T> Decryptor<BS, C, T>
+impl<BS, C, T> Decryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS> + KeyInit + KeySizeUser,
@@ -82,7 +81,7 @@ where
     }
 }
 
-impl<BS, C, T> BlockSizeUser for Decryptor<BS, C, T>
+impl<BS, C, T> BlockSizeUser for Decryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -91,7 +90,7 @@ where
     type BlockSize = C::BlockSize;
 }
 
-impl<BS, C, T> BlockModeDecrypt for Decryptor<BS, C, T>
+impl<BS, C, T> BlockModeDecrypt for Decryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -140,7 +139,7 @@ where
     }
 }
 
-impl<BS, C, T> IvSizeUser for Decryptor<BS, C, T>
+impl<BS, C, T> IvSizeUser for Decryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -149,7 +148,7 @@ where
     type IvSize = C::BlockSize;
 }
 
-impl<BS, C, T> IvState for Decryptor<BS, C, T>
+impl<BS, C, T> IvState for Decryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -161,7 +160,7 @@ where
     }
 }
 
-impl<BS, C, T> AlgorithmName for Decryptor<BS, C, T>
+impl<BS, C, T> AlgorithmName for Decryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS> + AlgorithmName,
@@ -176,7 +175,7 @@ where
     }
 }
 
-impl<BS, C, T> fmt::Debug for Decryptor<BS, C, T>
+impl<BS, C, T> fmt::Debug for Decryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS> + AlgorithmName,
@@ -189,11 +188,10 @@ where
     }
 }
 
-impl<BS, C, T> Drop for Decryptor<BS, C, T>
+impl<C, T> Drop for Decryptor<C, T>
 where
-    BS: BlockSizes,
-    C: BlockCipherDecrypt<BlockSize = BS>,
-    T: BlockCipherEncrypt<BlockSize = BS>,
+    C: BlockCipherDecrypt,
+    T: BlockCipherEncrypt,
 {
     fn drop(&mut self) {
         #[cfg(feature = "zeroize")]
