@@ -90,7 +90,7 @@ where
     }
 
     /// Decrypt `inout` buffer.
-    pub fn decrypt_inout(&mut self, mut buf: InOutBuf<'_, '_, u8>) -> Result<()> {
+    pub fn decrypt_inout(&mut self, buf: InOutBuf<'_, '_, u8>) -> Result<()> {
         if buf.len() < BS::USIZE {
             return Err(Error);
         };

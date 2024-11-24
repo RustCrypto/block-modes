@@ -1,11 +1,7 @@
-use cipher::typenum::Unsigned;
-use cipher::BlockCipherDecrypt;
 use cipher::{
     crypto_common::BlockSizes, Array, Block, BlockCipherEncrypt, BlockSizeUser, InOut, InOutBuf,
     ParBlocks, ParBlocksSizeUser,
 };
-
-use crate::{Error, Result};
 
 use crate::gf::{gf_mul, gf_reverse_mul};
 use crate::xor;
