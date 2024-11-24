@@ -101,6 +101,25 @@ mod xts_core;
 pub use decrypt::Decryptor;
 pub use encrypt::Encryptor;
 
+/// Error which indicates that message is smaller than cipher's block size.
+#[derive(Copy, Clone, Debug)]
+pub struct Error;
+
+/// Result type of the crate
+pub type Result<T> = core::result::Result<T, Error>;
+
+/// Encryption functionality of XTS modes.
+pub trait Encrypt: Sized {
+    /// Encrypt buffer in place
+    fn encrypt(self, buf: &mut [u8]) -> Result<()>;
+}
+
+/// Decryption functionality of XTS modes.
+pub trait Decypt: Sized {
+    /// Decrypt buffer in place
+    fn decrypt(self, buf: &mut [u8]) -> Result<()>;
+}
+
 #[inline(always)]
 fn xor<N: ArraySize>(out: &mut Array<u8, N>, buf: &Array<u8, N>) {
     for (a, b) in out.iter_mut().zip(buf) {

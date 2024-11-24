@@ -68,7 +68,7 @@ mod tests {
     use cipher::{consts::U16, Array};
 
     use crate::gf::{gf_mul, gf_reverse_mul};
-    
+
     #[test]
     fn test_gf_mul() {
         let mut input = Array::<u8, U16>::try_from([0x55; 16]).unwrap();
@@ -98,7 +98,7 @@ mod tests {
         let expected_output = [0x55; 16];
 
         gf_reverse_mul(&mut input, false);
-        
+
         assert_eq!(input, expected_output);
     }
 
@@ -110,7 +110,7 @@ mod tests {
         expected_output[15] = 0xd5;
 
         gf_reverse_mul(&mut input, true);
-        
+
         assert_eq!(input, expected_output);
     }
 }

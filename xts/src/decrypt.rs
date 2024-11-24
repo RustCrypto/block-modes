@@ -1,6 +1,6 @@
 use crate::xts_core::{precompute_iv, Xts};
 use cipher::{
-    array::{Array, ArraySize},
+    array::ArraySize,
     consts::B1,
     crypto_common::{BlockSizes, IvSizeUser},
     inout::InOut,
@@ -102,7 +102,7 @@ where
             BS: BlockSizes,
             BC: BlockModeDecClosure<BlockSize = BS>,
         {
-            iv: &'a mut Array<u8, BS>,
+            iv: &'a mut Block<Self>,
             f: BC,
         }
 
@@ -200,14 +200,19 @@ where
 }
 
 #[cfg(feature = "zeroize")]
-impl<C: BlockCipherDecrypt + ZeroizeOnDrop> ZeroizeOnDrop for Decryptor<C> {}
+impl<C, T> ZeroizeOnDrop for Decryptor<C, T>
+where
+    C: BlockCipherDecrypt + ZeroizeOnDrop,
+    T: BlockCipherEncrypt + ZeroizeOnDrop,
+{
+}
 
 struct Backend<'a, BS, BK>
 where
     BS: BlockSizes,
     BK: BlockCipherDecBackend<BlockSize = BS>,
 {
-    iv: &'a mut Array<u8, BS>,
+    iv: &'a mut Block<Self>,
     cipher_backend: &'a BK,
 }
 

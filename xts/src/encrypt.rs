@@ -1,7 +1,7 @@
 use crate::xts_core::{precompute_iv, Xts};
 
 use cipher::{
-    array::ArraySize, consts::B1, crypto_common::BlockSizes, typenum::Double, AlgorithmName, Array,
+    array::ArraySize, consts::B1, crypto_common::BlockSizes, typenum::Double, AlgorithmName,
     Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockModeEncBackend,
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, Iv, IvSizeUser, IvState, Key,
     KeyInit, KeyIvInit, KeySizeUser, ParBlocks, ParBlocksSizeUser,
@@ -105,7 +105,7 @@ where
             BS: BlockSizes,
             BM: BlockModeEncClosure<BlockSize = BS>,
         {
-            iv: &'a mut Array<u8, BS>,
+            iv: &'a mut Block<Self>,
             f: BM,
         }
 
@@ -135,6 +135,7 @@ where
             tweaker: _,
             iv,
         } = self;
+
         let f = Closure { iv, f };
         cipher.encrypt_with_backend(f)
     }
@@ -177,7 +178,7 @@ where
     BS: BlockSizes,
     BC: BlockCipherEncBackend<BlockSize = BS>,
 {
-    iv: &'a mut Array<u8, BS>,
+    iv: &'a mut Block<Self>,
     cipher_backend: &'a BC,
 }
 
