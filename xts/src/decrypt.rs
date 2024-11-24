@@ -15,20 +15,20 @@ use cipher::{
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
-/// XTS mode decryptor
-pub type Decryptor<T> = SplitDecryptor<T, T>;
+/// XTS mode decryptor.
+pub type Decryptor<Cipher> = SplitDecryptor<Cipher, Cipher>;
 
 /// XTS mode decryptor.
-/// This structure allows using different cipher for the cipher itself and the tweak.
+/// This structure allows using different ciphers for the cipher itself and the tweak.
 #[derive(Clone)]
-pub struct SplitDecryptor<C, T>
+pub struct SplitDecryptor<Cipher, Tweaker>
 where
-    C: BlockCipherDecrypt,
-    T: BlockCipherEncrypt,
+    Cipher: BlockCipherDecrypt,
+    Tweaker: BlockCipherEncrypt,
 {
-    cipher: C,
-    tweaker: T,
-    iv: Block<C>,
+    cipher: Cipher,
+    tweaker: Tweaker,
+    iv: Block<Cipher>,
 }
 
 impl<BS, C, T, KS1, KS2> KeySizeUser for SplitDecryptor<C, T>
@@ -71,7 +71,7 @@ where
     C: BlockCipherDecrypt<BlockSize = BS> + KeyInit + KeySizeUser,
     T: BlockCipherEncrypt<BlockSize = BS> + KeyInit + KeySizeUser,
 {
-    /// Create an XTS array and precompute it
+    /// Create an XTS context and precompute the tweak.
     pub fn new_from_split_keys(cipher_key: &Key<C>, tweak_key: &Key<T>, iv: &Block<Self>) -> Self {
         let cipher = C::new(&cipher_key);
         let tweaker = T::new(&tweak_key);
@@ -84,7 +84,7 @@ where
         }
     }
 
-    /// Change the IV/sector number
+    /// Change the IV/sector number.
     pub fn reset_iv(&mut self, iv: &Block<Self>) {
         self.iv = precompute_iv(&self.tweaker, iv)
     }
