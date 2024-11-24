@@ -125,16 +125,31 @@ pub(crate) trait Stealer: BlockSizeUser {
     fn process_block(&self, block: &mut Block<Self>);
 
     /// Gets the IV reference.
+    fn get_iv(&self) -> &Array<u8, Self::BlockSize>;
+
+    /// Gets the IV reference.
     fn get_iv_mut(&mut self) -> &mut Array<u8, Self::BlockSize>;
 
     /// There is a slight difference regarding the tweak during decryption
     fn is_decrypt() -> bool;
 
+    fn process_xts_block(&mut self, block: &mut Block<Self>) {
+        xor(block, &self.get_iv());
+        self.process_block(block);
+        xor(block, &self.get_iv());
+
+        let iv = self.get_iv_mut();
+        gf_mul(iv);
+    }
+
     /// Perform the ciphertext stealing phase
     fn ciphertext_stealing(&mut self, buffer: &mut [u8]) {
         let remaining_bytes = buffer.len() - Self::block_size();
 
-        let second_to_last_block: &mut Block<Self> = (&mut buffer[0..Self::block_size()])
+        // We split the buffer into the two blocks
+        let (second_to_last_block, last_block) = buffer.split_at_mut(Self::block_size());
+
+        let second_to_last_block: &mut Block<Self> = second_to_last_block
             .try_into()
             .expect("Not a full block on second to last block!");
 
@@ -159,20 +174,12 @@ pub(crate) trait Stealer: BlockSizeUser {
             }
         } else {
             // Process normally
-            self.process_block(second_to_last_block);
+            self.process_xts_block(second_to_last_block);
         }
 
         // We first swap the remaining bytes with the previous block's
-        {
-            let (previous_block, current_block) = buffer.split_at_mut(Self::block_size());
-            previous_block[..remaining_bytes]
-                .swap_with_slice(&mut current_block[..remaining_bytes]);
-        }
+        second_to_last_block[..remaining_bytes].swap_with_slice(last_block);
 
-        // We can then decrypt the final block, which is not located at the second to last block
-        let second_to_last_block: &mut Block<Self> = (&mut buffer[0..Self::block_size()])
-            .try_into()
-            .expect("Not a full block on second to last block!");
-        self.process_block(second_to_last_block);
+        self.process_xts_block(second_to_last_block);
     }
 }

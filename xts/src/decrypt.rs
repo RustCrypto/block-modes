@@ -91,27 +91,38 @@ where
 
     /// Decrypt `inout` buffer.
     pub fn decrypt_inout(&mut self, mut buf: InOutBuf<'_, '_, u8>) -> Result<()> {
-        if buf.len() < C::BlockSize::USIZE {
+        if buf.len() < BS::USIZE {
             return Err(Error);
         };
 
-        {
-            let (blocks, _) = buf.reborrow().into_chunks();
+        if buf.len() % BS::USIZE == 0 {
+            // No need for stealing
+            let (blocks, _) = buf.into_chunks();
             self.decrypt_blocks_inout(blocks);
-        }
+        } else {
+            let full_blocks = (buf.len() / BS::USIZE - 1) * BS::USIZE;
 
-        self.ciphertext_stealing(buf.get_out());
+            let (blocks, mut tail) = buf.split_at(full_blocks);
+            let (blocks, _) = blocks.into_chunks();
+            self.decrypt_blocks_inout(blocks);
+
+            for mut b in tail.reborrow() {
+                *b.get_out() = *b.get_in();
+            }
+
+            self.ciphertext_stealing(tail.get_out());
+        }
 
         Ok(())
     }
 
     /// Decrypt data in-place.
-    fn decrypt(&mut self, buf: &mut [u8]) -> Result<()> {
+    pub fn decrypt(&mut self, buf: &mut [u8]) -> Result<()> {
         self.decrypt_inout(buf.into())
     }
 
     /// Decrypt data buffer-to-buffer.
-    fn decrypt_b2b(&mut self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<()> {
+    pub fn decrypt_b2b(&mut self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<()> {
         InOutBuf::new(in_buf, out_buf)
             .map_err(|_| Error)
             .and_then(|buf| self.decrypt_inout(buf))
@@ -186,13 +197,17 @@ where
         self.cipher.decrypt_block(block);
     }
 
+    fn get_iv(&self) -> &Block<Self> {
+        &self.iv
+    }
+
     fn get_iv_mut(&mut self) -> &mut Block<Self> {
         &mut self.iv
     }
 
     #[inline(always)]
     fn is_decrypt() -> bool {
-        false
+        true
     }
 }
 
