@@ -31,6 +31,7 @@ less error-prone than manual integrity verification.
 | [Infinite Garble Extension][IGE] | [`ige`] | [![crates.io](https://img.shields.io/crates/v/ige.svg)](https://crates.io/crates/ige) | [![Documentation](https://docs.rs/ige/badge.svg)](https://docs.rs/ige) |  ![MSRV 1.81][msrv-1.81] |
 | [Output Feedback][OFB] | [`ofb`] | [![crates.io](https://img.shields.io/crates/v/ofb.svg)](https://crates.io/crates/ofb) | [![Documentation](https://docs.rs/ofb/badge.svg)](https://docs.rs/ofb) |  ![MSRV 1.81][msrv-1.81] |
 | [Propagating Cipher Block Chaining][PCBC] | [`pcbc`] | [![crates.io](https://img.shields.io/crates/v/pcbc.svg)](https://crates.io/crates/pcbc) | [![Documentation](https://docs.rs/pcbc/badge.svg)](https://docs.rs/pcbc) |  ![MSRV 1.81][msrv-1.81] |
+| [Xor-Encrypt-Xor Tweaked-codebook with ciphertext Stealing][XTS] | [`xts`] | [![crates.io](https://img.shields.io/crates/v/xts.svg)](https://crates.io/crates/xts) | [![Documentation](https://docs.rs/xts/badge.svg)](https://docs.rs/xts) |  ![MSRV 1.81][msrv-1.81] |
 
 ### Minimum Supported Rust Version (MSRV) Policy
 
@@ -73,6 +74,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [`ige`]: ./ige
 [`ofb`]: ./ofb
 [`pcbc`]: ./pcbc
+[`xts`]: ./xts
 
 [//]: # (links)
 
@@ -87,3 +89,4 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [IGE]: https://www.links.org/files/openssl-ige.pdf
 [OFB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_(OFB)
 [PCBC]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Propagating_cipher_block_chaining_(PCBC)
+[XTS]: https://en.wikipedia.org/wiki/Disk_encryption_theory#XTS
