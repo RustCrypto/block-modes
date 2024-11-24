@@ -1,6 +1,7 @@
 use core::{fmt, ops::Add};
 
-use crate::xts_core::{precompute_iv, Xts};
+use crate::xts_core::{precompute_iv, Stealer, Xts};
+use crate::{Error, Result};
 use cipher::{
     array::ArraySize,
     crypto_common::{BlockSizes, IvSizeUser},
@@ -8,7 +9,7 @@ use cipher::{
     typenum::Sum,
     AlgorithmName, Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt,
     BlockCipherEncrypt, BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser,
-    Iv, IvState, Key, KeyInit, KeyIvInit, KeySizeUser, ParBlocks, ParBlocksSizeUser,
+    InOutBuf, Iv, IvState, Key, KeyInit, KeyIvInit, KeySizeUser, ParBlocks, ParBlocksSizeUser,
 };
 
 #[cfg(feature = "zeroize")]
@@ -87,6 +88,34 @@ where
     pub fn reset_iv(&mut self, iv: &Block<Self>) {
         self.iv = precompute_iv(&self.tweaker, iv)
     }
+
+    /// Decrypt `inout` buffer.
+    pub fn decrypt_inout(&mut self, mut buf: InOutBuf<'_, '_, u8>) -> Result<()> {
+        if buf.len() < C::BlockSize::USIZE {
+            return Err(Error);
+        };
+
+        {
+            let (blocks, _) = buf.reborrow().into_chunks();
+            self.decrypt_blocks_inout(blocks);
+        }
+
+        self.ciphertext_stealing(buf.get_out());
+
+        Ok(())
+    }
+
+    /// Decrypt data in-place.
+    fn decrypt(&mut self, buf: &mut [u8]) -> Result<()> {
+        self.decrypt_inout(buf.into())
+    }
+
+    /// Decrypt data buffer-to-buffer.
+    fn decrypt_b2b(&mut self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<()> {
+        InOutBuf::new(in_buf, out_buf)
+            .map_err(|_| Error)
+            .and_then(|buf| self.decrypt_inout(buf))
+    }
 }
 
 impl<BS, C, T> BlockSizeUser for SplitDecryptor<C, T>
@@ -95,7 +124,7 @@ where
     C: BlockCipherDecrypt<BlockSize = BS>,
     T: BlockCipherEncrypt<BlockSize = BS>,
 {
-    type BlockSize = C::BlockSize;
+    type BlockSize = BS;
 }
 
 impl<BS, C, T> BlockModeDecrypt for SplitDecryptor<C, T>
@@ -147,13 +176,33 @@ where
     }
 }
 
+impl<BS, C, T> Stealer for SplitDecryptor<C, T>
+where
+    BS: BlockSizes,
+    C: BlockCipherDecrypt<BlockSize = BS>,
+    T: BlockCipherEncrypt<BlockSize = BS>,
+{
+    fn process_block(&self, block: &mut Block<Self>) {
+        self.cipher.decrypt_block(block);
+    }
+
+    fn get_iv_mut(&mut self) -> &mut Block<Self> {
+        &mut self.iv
+    }
+
+    #[inline(always)]
+    fn is_decrypt() -> bool {
+        false
+    }
+}
+
 impl<BS, C, T> IvSizeUser for SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
     T: BlockCipherEncrypt<BlockSize = BS>,
 {
-    type IvSize = C::BlockSize;
+    type IvSize = BS;
 }
 
 impl<BS, C, T> IvState for SplitDecryptor<C, T>
@@ -289,10 +338,5 @@ where
 
     fn get_iv_mut(&mut self) -> &mut Block<Self> {
         self.iv
-    }
-
-    #[inline(always)]
-    fn is_decrypt() -> bool {
-        true
     }
 }

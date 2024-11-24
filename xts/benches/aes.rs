@@ -1,7 +1,7 @@
 #![feature(test)]
 extern crate test;
 
-use aes::{ Aes128, Aes256 };
+use aes::{Aes128, Aes256};
 
 cipher::block_encryptor_bench!(
     KeyIv: xts::Encryptor<Aes128>,

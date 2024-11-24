@@ -1,8 +1,10 @@
-use crate::xts_core::{precompute_iv, Xts};
+use crate::xts_core::{precompute_iv, Stealer, Xts};
+use crate::{Error, Result};
 
+use cipher::InOutBuf;
 use cipher::{
-    array::ArraySize, crypto_common::BlockSizes, typenum::Sum, AlgorithmName,
-    Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockModeEncBackend,
+    array::ArraySize, crypto_common::BlockSizes, typenum::Sum, AlgorithmName, Block,
+    BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockModeEncBackend,
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, Iv, IvSizeUser, IvState, Key,
     KeyInit, KeyIvInit, KeySizeUser, ParBlocks, ParBlocksSizeUser,
 };
@@ -85,6 +87,34 @@ where
     pub fn reset_iv(&mut self, iv: &Block<Self>) {
         self.iv = precompute_iv(&self.tweaker, iv)
     }
+
+    /// Encrypt `inout` buffer.
+    pub fn encrypt_inout(&mut self, mut buf: InOutBuf<'_, '_, u8>) -> Result<()> {
+        if buf.len() < C::BlockSize::USIZE {
+            return Err(Error);
+        };
+
+        {
+            let (blocks, _) = buf.reborrow().into_chunks();
+            self.encrypt_blocks_inout(blocks);
+        }
+
+        self.ciphertext_stealing(buf.get_out());
+
+        Ok(())
+    }
+
+    /// Encrypt data in-place.
+    fn encrypt(&mut self, buf: &mut [u8]) -> Result<()> {
+        self.encrypt_inout(buf.into())
+    }
+
+    /// Encrypt data buffer-to-buffer.
+    fn encrypt_b2b(&mut self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<()> {
+        InOutBuf::new(in_buf, out_buf)
+            .map_err(|_| Error)
+            .and_then(|buf| self.encrypt_inout(buf))
+    }
 }
 
 impl<BS, C, T> BlockSizeUser for SplitEncryptor<C, T>
@@ -93,7 +123,7 @@ where
     C: BlockCipherEncrypt<BlockSize = BS>,
     T: BlockCipherEncrypt<BlockSize = BS>,
 {
-    type BlockSize = C::BlockSize;
+    type BlockSize = BS;
 }
 
 impl<BS, C, T> IvSizeUser for SplitEncryptor<C, T>
@@ -165,6 +195,26 @@ where
     }
 }
 
+impl<BS, C, T> Stealer for SplitEncryptor<C, T>
+where
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS>,
+    T: BlockCipherEncrypt<BlockSize = BS>,
+{
+    fn process_block(&self, block: &mut Block<Self>) {
+        self.cipher.encrypt_block(block);
+    }
+
+    fn get_iv_mut(&mut self) -> &mut Block<Self> {
+        &mut self.iv
+    }
+
+    #[inline(always)]
+    fn is_decrypt() -> bool {
+        false
+    }
+}
+
 impl<BS, C, T> AlgorithmName for SplitEncryptor<C, T>
 where
     BS: BlockSizes,
@@ -192,7 +242,7 @@ where
 }
 
 impl<C, T> Drop for SplitEncryptor<C, T>
-where 
+where
     C: BlockCipherEncrypt,
     T: BlockCipherEncrypt,
 {
@@ -280,11 +330,6 @@ where
     }
 
     fn get_iv_mut(&mut self) -> &mut Block<Self> {
-        self.iv
-    }
-
-    #[inline(always)]
-    fn is_decrypt() -> bool {
-        false
+        &mut self.iv
     }
 }

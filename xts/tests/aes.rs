@@ -1,6 +1,6 @@
 use aes::*;
-use xts::{Decryptor, Encryptor};
 use cipher::{block_mode_dec_test, block_mode_enc_test};
+use xts::{Decryptor, Encryptor};
 
 #[test]
 fn manual_test() {

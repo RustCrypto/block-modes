@@ -1,4 +1,5 @@
 use cipher::typenum::Unsigned;
+use cipher::BlockCipherDecrypt;
 use cipher::{
     crypto_common::BlockSizes, Array, Block, BlockCipherEncrypt, BlockSizeUser, InOut, InOutBuf,
     ParBlocks, ParBlocksSizeUser,
@@ -30,9 +31,6 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
 
     /// Gets the IV reference.
     fn get_iv_mut(&mut self) -> &mut Array<u8, Self::BlockSize>;
-
-    /// There is a slight difference regarding the tweak during decryption
-    fn is_decrypt() -> bool;
 
     //Unused but keeping for now just in case
     fn _process(&self, mut block: InOut<'_, '_, Block<Self>>) {
@@ -122,51 +120,17 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
     }
 }
 
-pub trait XtsMode: Xts {
-    fn process_all_in_place(&mut self, buffer: &mut [u8]) -> Result<()> {
-        let block_size = Self::block_size();
-        let par_blocks_size = Self::ParBlocksSize::USIZE;
+pub(crate) trait Stealer: BlockSizeUser {
+    /// Encrypt/Decrypt the block
+    fn process_block(&self, block: &mut Block<Self>);
 
-        if buffer.len() < block_size {
-            return Err(Error);
-        }
+    /// Gets the IV reference.
+    fn get_iv_mut(&mut self) -> &mut Array<u8, Self::BlockSize>;
 
-        let need_stealing = buffer.len() % Self::block_size() == 0;
+    /// There is a slight difference regarding the tweak during decryption
+    fn is_decrypt() -> bool;
 
-        let (buffer, remaining_buffer) = if need_stealing {
-            buffer.split_at_mut((buffer.len() / block_size - 1) * block_size)
-        } else {
-            (buffer, [0u8; 0].as_mut_slice())
-        };
-
-        // Split buffer into blocks
-        let mut blocks = buffer
-            .chunks_exact_mut(block_size)
-            .map(|b| <&mut Block<Self>>::try_from(b).unwrap());
-
-        // Can't figure out how to get parblocks in place here, commenting for now
-        // if par_blocks_size > 1 {
-        //     let mut blocks: alloc::vec::Vec<&mut Block<Self>> = blocks.collect();
-
-        //     let mut par_blocks = blocks.chunks_exact_mut(par_blocks_size);
-        //     for b in par_blocks {
-        //         let mut b = <&mut ParBlocks<Self>>::try_from(*b).unwrap();
-        //     }
-
-        //     self.process_tail_blocks_inplace(tail);
-        // } else {
-        for b in blocks {
-            self.process_block_inplace(b);
-        }
-        //}
-
-        if need_stealing {
-            self.ciphertext_stealing(remaining_buffer);
-        };
-
-        Ok(())
-    }
-
+    /// Perform the ciphertext stealing phase
     fn ciphertext_stealing(&mut self, buffer: &mut [u8]) {
         let remaining_bytes = buffer.len() - Self::block_size();
 
@@ -185,7 +149,7 @@ pub trait XtsMode: Xts {
                 carry
             };
 
-            self.process_inplace(second_to_last_block);
+            self.process_block(second_to_last_block);
 
             {
                 let iv = self.get_iv_mut();
@@ -195,7 +159,7 @@ pub trait XtsMode: Xts {
             }
         } else {
             // Process normally
-            self.process_block_inplace(second_to_last_block);
+            self.process_block(second_to_last_block);
         }
 
         // We first swap the remaining bytes with the previous block's
@@ -209,6 +173,6 @@ pub trait XtsMode: Xts {
         let second_to_last_block: &mut Block<Self> = (&mut buffer[0..Self::block_size()])
             .try_into()
             .expect("Not a full block on second to last block!");
-        self.process_block_inplace(second_to_last_block);
+        self.process_block(second_to_last_block);
     }
 }
