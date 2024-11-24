@@ -58,7 +58,7 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
         let iv = self.get_iv_mut();
         xor(block, iv);
 
-        let _ = gf_mul(iv);
+        gf_mul(iv);
     }
 
     /// Encrypt/decrypt a block using XTS and update the tweak
@@ -79,7 +79,7 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
                 *i = iv.clone();
                 xor(b, iv);
 
-                let _ = gf_mul(iv);
+                gf_mul(iv);
             }
         }
 
@@ -116,7 +116,7 @@ pub trait Xts: ParBlocksSizeUser + BlockSizeUser {
     fn process_tail_blocks(&mut self, blocks: InOutBuf<'_, '_, Block<Self>>) {
         for mut block in blocks {
             let mut b = block.clone_in();
-            self.process_inplace(&mut b);
+            self.process_block_inplace(&mut b);
             *block.get_out() = b;
         }
     }
