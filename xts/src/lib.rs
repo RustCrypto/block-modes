@@ -20,7 +20,7 @@
 //! let key = [0x42u8; 32];
 //! let mut tweak = [0x24u8; 16];
 //! tweak[8..].fill(0);
-//! 
+//!
 //! let plaintext = *b"hello world! this is my plaintext.";
 //! let ciphertext = hex!( // TODO fix this
 //!     "bf970595626410ad91f032cc5fa36bcafb5cfe9c2bfe7e226582ec079a27e8c8521c"
@@ -31,7 +31,7 @@
 //! let pt_len = plaintext.len();
 //! let mut buf = vec![0u8; pt_len];
 //! buf.copy_from_slice(&plaintext);
-//! 
+//!
 //! Aes128XtsEnc::new(&key.into(), &tweak.into())
 //!     .encrypt(&mut buf)
 //!     .unwrap();
@@ -54,32 +54,6 @@
 //!     .unwrap();
 //! assert_eq!(&buf, &plaintext);
 //! ```
-//!
-//! With enabled `alloc` (or `std`) feature you also can use allocating
-//! convenience methods:
-//! NOTE FOR REVIEWER: Aren't we missing a `encrypt_blocks_vec` method or something in the cipher crate?
-//! ```
-//! # use aes::cipher::{BlockModeEncrypt, BlockModeDecrypt, KeyIvInit};
-//! # use hex_literal::hex;
-//! # type Aes128XtsEnc = xts::Encryptor<aes::Aes128>;
-//! # type Aes128XtsDec = xts::Decryptor<aes::Aes128>;
-//! # let key = [0x42; 32];
-//! # let mut tweak = [0x24; 8];
-//! # tweak[8..].fill(0);
-//! 
-//! # let plaintext = *b"hello world! this is my plaintext.";
-//! # let ciphertext = hex!(
-//! #     "bf970595626410ad91f032cc5fa36bcafb5cfe9c2bfe7e226582ec079a27e8c8521c"
-//! # );
-//! // let res = Aes128XtsEnc::new(&key.into(), &tweak.into())
-//! //     .encrypt_blocks_vec(&plaintext);
-//! // assert_eq!(res[..], ciphertext[..]);
-//! // let res = Aes128XtsDec::new(&key.into(), &tweak.into())
-//! //     .decrypt_blocks_vec::<Pkcs7>(&res)
-//! //     .unwrap();
-//! // assert_eq!(res[..], plaintext[..]);
-//! ```
-//!
 //! [1]: https://en.wikipedia.org/wiki/Disk_encryption_theory#XTS
 
 #![no_std]
