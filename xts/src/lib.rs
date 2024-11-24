@@ -11,45 +11,46 @@
 //!
 //! # Example
 //! ```
-//! use aes::cipher::{BlockModeEncrypt, BlockModeDecrypt, KeyIvInit};
+//! use aes::cipher::KeyIvInit;
 //! use hex_literal::hex;
 //!
 //! type Aes128XtsEnc = xts::Encryptor<aes::Aes128>;
 //! type Aes128XtsDec = xts::Decryptor<aes::Aes128>;
 //!
-//! let key = [0x42; 32];
-//! let tweak = [0x24; 16];
+//! let key = [0x42u8; 32];
+//! let mut tweak = [0x24u8; 16];
+//! tweak[8..].fill(0);
+//! 
 //! let plaintext = *b"hello world! this is my plaintext.";
 //! let ciphertext = hex!( // TODO fix this
-//!     "c7fe247ef97b21f07cbdd26cb5d346bf"
-//!     "d27867cb00d9486723e159978fb9a5f9"
-//!     "14cfb228a710de4171e396e7b6cf859e"
+//!     "bf970595626410ad91f032cc5fa36bcafb5cfe9c2bfe7e226582ec079a27e8c8521c"
 //! );
 //!
 //! // encrypt/decrypt in-place
-//! // buffer must be big enough for padded plaintext
+//! // XTS does not need padding, so output is the same length as the buffer
 //! let pt_len = plaintext.len();
-//! let mut buf = [0u8; pt_len];
+//! let mut buf = vec![0u8; pt_len];
 //! buf.copy_from_slice(&plaintext);
+//! 
 //! Aes128XtsEnc::new(&key.into(), &tweak.into())
-//!     .encrypt_blocks(&mut buf)
+//!     .encrypt(&mut buf)
 //!     .unwrap();
 //! assert_eq!(&buf, &ciphertext);
 //!
-//! Aes128XtsDec::new(&key.into(), &iv.into())
-//!     .decrypt_blocks(&mut buf)
+//! Aes128XtsDec::new(&key.into(), &tweak.into())
+//!     .decrypt(&mut buf)
 //!     .unwrap();
 //! assert_eq!(&buf, &plaintext);
 //!
 //! // encrypt/decrypt from buffer to buffer
-//! let mut buf = [0u8; pt_len];
-//! Aes128XtsEnc::new(&key.into(), &iv.into())
-//!     .encrypt_blocks_b2b(&plaintext, &mut buf)
+//! let mut buf = vec![0u8; pt_len];
+//! Aes128XtsEnc::new(&key.into(), &tweak.into())
+//!     .encrypt_b2b(&plaintext, &mut buf)
 //!     .unwrap();
 //! assert_eq!(&buf, &ciphertext);
 //!
-//! let pt = Aes128XtsDec::new(&key.into(), &iv.into())
-//!     .decrypt_blocks_b2b(&ct, &mut buf)
+//! Aes128XtsDec::new(&key.into(), &tweak.into())
+//!     .decrypt_b2b(&ciphertext, &mut buf)
 //!     .unwrap();
 //! assert_eq!(&buf, &plaintext);
 //! ```
@@ -63,21 +64,20 @@
 //! # type Aes128XtsEnc = xts::Encryptor<aes::Aes128>;
 //! # type Aes128XtsDec = xts::Decryptor<aes::Aes128>;
 //! # let key = [0x42; 32];
-//! # let iv = [0x24; 16];
+//! # let mut tweak = [0x24; 8];
+//! # tweak[8..].fill(0);
+//! 
 //! # let plaintext = *b"hello world! this is my plaintext.";
 //! # let ciphertext = hex!(
-//! #     "c7fe247ef97b21f07cbdd26cb5d346bf"
-//! #     "d27867cb00d9486723e159978fb9a5f9"
-//! #     "14cfb228a710de4171e396e7b6cf859e"
+//! #     "bf970595626410ad91f032cc5fa36bcafb5cfe9c2bfe7e226582ec079a27e8c8521c"
 //! # );
-//! // let res = Aes128CbcEnc::new(&key.into(), &iv.into())
+//! // let res = Aes128XtsEnc::new(&key.into(), &tweak.into())
 //! //     .encrypt_blocks_vec(&plaintext);
 //! // assert_eq!(res[..], ciphertext[..]);
-//! // let res = Aes128CbcDec::new(&key.into(), &iv.into())
-//! //     .decrypt_padded_vec::<Pkcs7>(&res)
+//! // let res = Aes128XtsDec::new(&key.into(), &tweak.into())
+//! //     .decrypt_blocks_vec::<Pkcs7>(&res)
 //! //     .unwrap();
 //! // assert_eq!(res[..], plaintext[..]);
-//! # }
 //! ```
 //!
 //! [1]: https://en.wikipedia.org/wiki/Disk_encryption_theory#XTS
