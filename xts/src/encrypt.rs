@@ -1,61 +1,77 @@
 use crate::xts_core::{precompute_iv, Xts};
 
 use cipher::{
-    array::ArraySize, consts::B1, crypto_common::BlockSizes, typenum::Double, AlgorithmName,
+    array::ArraySize, crypto_common::BlockSizes, typenum::Sum, AlgorithmName,
     Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockModeEncBackend,
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, Iv, IvSizeUser, IvState, Key,
     KeyInit, KeyIvInit, KeySizeUser, ParBlocks, ParBlocksSizeUser,
 };
-use core::{fmt, ops::Shl};
+use core::{fmt, ops::Add};
 
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// XTS mode encryptor.
+pub type Encryptor<T> = SplitEncryptor<T, T>;
+
+/// XTS mode encryptor.
+/// This structure allows using different cipher for the cipher itself and the tweak.
 #[derive(Clone)]
-pub struct Encryptor<C>
+pub struct SplitEncryptor<C, T>
 where
     C: BlockCipherEncrypt,
+    T: BlockCipherEncrypt,
 {
     cipher: C,
-    tweaker: C,
+    tweaker: T,
     iv: Block<C>,
 }
 
 // This would probably be the cleanest way to do it, but it would require a way to multiply a typenum by 2
-impl<C, KS> KeySizeUser for Encryptor<C>
+impl<BS, C, T, KS1, KS2> KeySizeUser for SplitEncryptor<C, T>
 where
-    KS: ArraySize + Shl<B1>,
-    <KS as Shl<B1>>::Output: ArraySize,
-    C: BlockCipherEncrypt + KeySizeUser<KeySize = KS>,
+    KS1: ArraySize + Add<KS2>,
+    KS2: ArraySize,
+    <KS1 as Add<KS2>>::Output: ArraySize,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser<KeySize = KS1>,
+    T: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser<KeySize = KS2>,
 {
-    type KeySize = Double<KS>;
+    type KeySize = Sum<KS1, KS2>;
 }
 
-impl<C> KeyIvInit for Encryptor<C>
+impl<BS, C, T> KeyIvInit for SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt + KeySizeUser + KeyInit,
-    Encryptor<C>: KeySizeUser,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser + KeyInit,
+    T: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser + KeyInit,
+    SplitEncryptor<C, T>: KeySizeUser,
 {
+    /// Create a new instance of the cipher and initialize it.
+    /// This assumes a single key, which is a concatenation of the cipher key and the tweak key, in that order.
+    /// To use different key, use `new_from_split_keys`
     fn new(key: &Key<Self>, iv: &Iv<Self>) -> Self {
         // Split the key and call split key constructor
+        // Assumes the key is cipher_key + tweak_key
         let k1 = <&Key<C>>::try_from(&key[..C::key_size()])
             .expect("Due to trait bounds, k1 should always be half the size of the XTS key");
-        let k2 = <&Key<C>>::try_from(&key[C::key_size()..])
+        let k2 = <&Key<T>>::try_from(&key[C::key_size()..])
             .expect("Due to trait bounds, k2 should always be half the size of the XTS key");
 
         Self::new_from_split_keys(k1, k2, iv)
     }
 }
 
-impl<C> Encryptor<C>
+impl<BS, C, T> SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt + KeyInit + KeySizeUser,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS> + KeyInit + KeySizeUser,
+    T: BlockCipherEncrypt<BlockSize = BS> + KeyInit + KeySizeUser,
 {
     /// Create an XTS array and precompute it
-    pub fn new_from_split_keys(k1: &Key<C>, k2: &Key<C>, iv: &Block<Self>) -> Self {
+    pub fn new_from_split_keys(k1: &Key<C>, k2: &Key<T>, iv: &Block<Self>) -> Self {
         let cipher = C::new(&k1);
-        let tweaker = C::new(&k2);
+        let tweaker = T::new(&k2);
         let iv = precompute_iv(&tweaker, &iv);
 
         Self {
@@ -65,29 +81,35 @@ where
         }
     }
 
-    /// Change the IV
+    /// Change the IV/sector number
     pub fn reset_iv(&mut self, iv: &Block<Self>) {
         self.iv = precompute_iv(&self.tweaker, iv)
     }
 }
 
-impl<C> BlockSizeUser for Encryptor<C>
+impl<BS, C, T> BlockSizeUser for SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS>,
+    T: BlockCipherEncrypt<BlockSize = BS>,
 {
     type BlockSize = C::BlockSize;
 }
 
-impl<C> IvSizeUser for Encryptor<C>
+impl<BS, C, T> IvSizeUser for SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS>,
+    T: BlockCipherEncrypt<BlockSize = BS>,
 {
-    type IvSize = C::BlockSize;
+    type IvSize = BS;
 }
 
-impl<C> IvState for Encryptor<C>
+impl<BS, C, T> IvState for SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS>,
+    T: BlockCipherEncrypt<BlockSize = BS>,
 {
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
@@ -95,9 +117,11 @@ where
     }
 }
 
-impl<C> BlockModeEncrypt for Encryptor<C>
+impl<BS, C, T> BlockModeEncrypt for SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS>,
+    T: BlockCipherEncrypt<BlockSize = BS>,
 {
     fn encrypt_with_backend(&mut self, f: impl BlockModeEncClosure<BlockSize = Self::BlockSize>) {
         struct Closure<'a, BS, BM>
@@ -141,29 +165,37 @@ where
     }
 }
 
-impl<C> AlgorithmName for Encryptor<C>
+impl<BS, C, T> AlgorithmName for SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt + AlgorithmName,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS> + AlgorithmName,
+    T: BlockCipherEncrypt<BlockSize = BS> + AlgorithmName,
 {
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("xts::Encryptor<")?;
         <C as AlgorithmName>::write_alg_name(f)?;
+        f.write_str(",")?;
+        <T as AlgorithmName>::write_alg_name(f)?;
         f.write_str(">")
     }
 }
 
-impl<C> fmt::Debug for Encryptor<C>
+impl<BS, C, T> fmt::Debug for SplitEncryptor<C, T>
 where
-    C: BlockCipherEncrypt + AlgorithmName,
+    BS: BlockSizes,
+    C: BlockCipherEncrypt<BlockSize = BS> + AlgorithmName,
+    T: BlockCipherEncrypt<BlockSize = BS> + AlgorithmName,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("xts::Encryptor<")?;
-        <C as AlgorithmName>::write_alg_name(f)?;
-        f.write_str("> { ... }")
+        Self::write_alg_name(f)
     }
 }
 
-impl<C: BlockCipherEncrypt> Drop for Encryptor<C> {
+impl<C, T> Drop for SplitEncryptor<C, T>
+where 
+    C: BlockCipherEncrypt,
+    T: BlockCipherEncrypt,
+{
     fn drop(&mut self) {
         #[cfg(feature = "zeroize")]
         self.iv.zeroize();
@@ -171,7 +203,7 @@ impl<C: BlockCipherEncrypt> Drop for Encryptor<C> {
 }
 
 #[cfg(feature = "zeroize")]
-impl<C: BlockCipherEncrypt + ZeroizeOnDrop> ZeroizeOnDrop for Encryptor<C> {}
+impl<C: BlockCipherEncrypt + ZeroizeOnDrop> ZeroizeOnDrop for SplitEncryptor<C> {}
 
 struct Backend<'a, BS, BC>
 where

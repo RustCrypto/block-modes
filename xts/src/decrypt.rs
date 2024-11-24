@@ -1,22 +1,26 @@
+use core::{fmt, ops::Add};
+
 use crate::xts_core::{precompute_iv, Xts};
 use cipher::{
     array::ArraySize,
-    consts::B1,
     crypto_common::{BlockSizes, IvSizeUser},
     inout::InOut,
-    typenum::Double,
+    typenum::Sum,
     AlgorithmName, Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt,
     BlockCipherEncrypt, BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser,
     Iv, IvState, Key, KeyInit, KeyIvInit, KeySizeUser, ParBlocks, ParBlocksSizeUser,
 };
-use core::{fmt, ops::Shl};
 
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
+/// XTS mode decryptor
+pub type Decryptor<T> = SplitDecryptor<T, T>;
+
 /// XTS mode decryptor.
+/// This structure allows using different cipher for the cipher itself and the tweak.
 #[derive(Clone)]
-pub struct Decryptor<C, T>
+pub struct SplitDecryptor<C, T>
 where
     C: BlockCipherDecrypt,
     T: BlockCipherEncrypt,
@@ -26,46 +30,50 @@ where
     iv: Block<C>,
 }
 
-impl<BS, C, T, KS> KeySizeUser for Decryptor<C, T>
+impl<BS, C, T, KS1, KS2> KeySizeUser for SplitDecryptor<C, T>
 where
-    KS: ArraySize + Shl<B1>,
-    <KS as Shl<B1>>::Output: ArraySize,
+    KS1: ArraySize + Add<KS2>,
+    KS2: ArraySize,
+    <KS1 as Add<KS2>>::Output: ArraySize,
     BS: BlockSizes,
-    C: BlockCipherDecrypt<BlockSize = BS> + KeySizeUser<KeySize = KS>,
-    T: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser<KeySize = KS>,
+    C: BlockCipherDecrypt<BlockSize = BS> + KeySizeUser<KeySize = KS1>,
+    T: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser<KeySize = KS2>,
 {
-    type KeySize = Double<KS>;
+    type KeySize = Sum<KS1, KS2>;
 }
 
-impl<BS, C, T, KS> KeyIvInit for Decryptor<C, T>
+impl<BS, C, T> KeyIvInit for SplitDecryptor<C, T>
 where
-    KS: ArraySize,
     BS: BlockSizes,
-    C: BlockCipherDecrypt<BlockSize = BS> + KeySizeUser<KeySize = KS> + KeyInit,
-    T: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser<KeySize = KS> + KeyInit,
-    Decryptor<C, T>: KeySizeUser,
+    C: BlockCipherDecrypt<BlockSize = BS> + KeySizeUser + KeyInit,
+    T: BlockCipherEncrypt<BlockSize = BS> + KeySizeUser + KeyInit,
+    SplitDecryptor<C, T>: KeySizeUser,
 {
+    /// Create a new instance of the cipher and initialize it.
+    /// This assumes a single key, which is a concatenation of the cipher key and the tweak key, in that order.
+    /// To use different key, use `new_from_split_keys`
     fn new(key: &Key<Self>, iv: &Iv<Self>) -> Self {
         // Split the key and call split key constructor
+        // Assumes the key is cipher_key + tweak_key
         let k1 = <&Key<C>>::try_from(&key[..C::key_size()])
             .expect("Due to trait bounds, k1 should always be half the size of the XTS key");
-        let k2 = <&Key<T>>::try_from(&key[T::key_size()..])
+        let k2 = <&Key<T>>::try_from(&key[C::key_size()..])
             .expect("Due to trait bounds, k2 should always be half the size of the XTS key");
 
         Self::new_from_split_keys(k1, k2, iv)
     }
 }
 
-impl<BS, C, T> Decryptor<C, T>
+impl<BS, C, T> SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS> + KeyInit + KeySizeUser,
     T: BlockCipherEncrypt<BlockSize = BS> + KeyInit + KeySizeUser,
 {
     /// Create an XTS array and precompute it
-    pub fn new_from_split_keys(k1: &Key<C>, k2: &Key<T>, iv: &Block<Self>) -> Self {
-        let cipher = C::new(&k1);
-        let tweaker = T::new(&k2);
+    pub fn new_from_split_keys(cipher_key: &Key<C>, tweak_key: &Key<T>, iv: &Block<Self>) -> Self {
+        let cipher = C::new(&cipher_key);
+        let tweaker = T::new(&tweak_key);
         let iv = precompute_iv(&tweaker, &iv);
 
         Self {
@@ -75,13 +83,13 @@ where
         }
     }
 
-    /// Change the IV
+    /// Change the IV/sector number
     pub fn reset_iv(&mut self, iv: &Block<Self>) {
         self.iv = precompute_iv(&self.tweaker, iv)
     }
 }
 
-impl<BS, C, T> BlockSizeUser for Decryptor<C, T>
+impl<BS, C, T> BlockSizeUser for SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -90,7 +98,7 @@ where
     type BlockSize = C::BlockSize;
 }
 
-impl<BS, C, T> BlockModeDecrypt for Decryptor<C, T>
+impl<BS, C, T> BlockModeDecrypt for SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -139,7 +147,7 @@ where
     }
 }
 
-impl<BS, C, T> IvSizeUser for Decryptor<C, T>
+impl<BS, C, T> IvSizeUser for SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -148,7 +156,7 @@ where
     type IvSize = C::BlockSize;
 }
 
-impl<BS, C, T> IvState for Decryptor<C, T>
+impl<BS, C, T> IvState for SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS>,
@@ -160,7 +168,7 @@ where
     }
 }
 
-impl<BS, C, T> AlgorithmName for Decryptor<C, T>
+impl<BS, C, T> AlgorithmName for SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS> + AlgorithmName,
@@ -175,20 +183,18 @@ where
     }
 }
 
-impl<BS, C, T> fmt::Debug for Decryptor<C, T>
+impl<BS, C, T> fmt::Debug for SplitDecryptor<C, T>
 where
     BS: BlockSizes,
     C: BlockCipherDecrypt<BlockSize = BS> + AlgorithmName,
     T: BlockCipherEncrypt<BlockSize = BS> + AlgorithmName,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("xts::Decryptor<")?;
-        <C as AlgorithmName>::write_alg_name(f)?;
-        f.write_str("> { ... }")
+        Self::write_alg_name(f)
     }
 }
 
-impl<C, T> Drop for Decryptor<C, T>
+impl<C, T> Drop for SplitDecryptor<C, T>
 where
     C: BlockCipherDecrypt,
     T: BlockCipherEncrypt,
@@ -200,7 +206,7 @@ where
 }
 
 #[cfg(feature = "zeroize")]
-impl<C, T> ZeroizeOnDrop for Decryptor<C, T>
+impl<C, T> ZeroizeOnDrop for SplitDecryptor<C, T>
 where
     C: BlockCipherDecrypt + ZeroizeOnDrop,
     T: BlockCipherEncrypt + ZeroizeOnDrop,

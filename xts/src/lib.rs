@@ -98,8 +98,8 @@ mod encrypt;
 mod gf;
 mod xts_core;
 
-pub use decrypt::Decryptor;
-pub use encrypt::Encryptor;
+pub use decrypt::{Decryptor, SplitDecryptor};
+pub use encrypt::{Encryptor, SplitEncryptor};
 
 /// Error which indicates that message is smaller than cipher's block size.
 #[derive(Copy, Clone, Debug)]
