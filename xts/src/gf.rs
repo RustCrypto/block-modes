@@ -3,7 +3,7 @@ use cipher::{crypto_common::BlockSizes, Array};
 /// Derived from the polynomial x^128 + x^5 + x + 1
 const GF_MOD: u8 = 0x87;
 
-pub fn gf_mul<BS>(tweak: &mut Array<u8, BS>) -> bool
+pub fn gf_mul<BS>(tweak: &mut Array<u8, BS>) -> u8
 where
     BS: BlockSizes,
 {
@@ -24,21 +24,17 @@ where
     }
 
     // If there is a carry, we mod by the polynomial
-    if carry == 1 {
-        tweak[0] ^= GF_MOD;
-    }
+    tweak[0] ^= 0u8.wrapping_sub(carry) & GF_MOD;
 
-    carry == 1
+    carry
 }
 
 // This is only used once when decrypting with ciphertext stealing
-pub fn gf_reverse_mul<BS>(tweak: &mut Array<u8, BS>, carry: bool)
+pub fn gf_reverse_mul<BS>(tweak: &mut Array<u8, BS>, carry: u8)
 where
     BS: BlockSizes,
 {
-    if carry {
-        tweak[0] ^= GF_MOD;
-    }
+    tweak[0] ^= 0u8.wrapping_sub(carry) & GF_MOD;
 
     let mut new_carry = 0;
 
@@ -57,10 +53,7 @@ where
     }
 
     // If there is a carry, we mod by the polynomial
-    if carry {
-        let len = tweak.len();
-        tweak[len - 1] |= 0x80;
-    }
+    *tweak.last_mut().expect("tweak should never be empty") |= carry << 7;
 }
 
 #[cfg(test)]
@@ -76,7 +69,7 @@ mod tests {
 
         let carry = gf_mul(&mut input);
 
-        assert!(!carry);
+        assert_eq!(carry, 0);
         assert_eq!(input, expected_output);
     }
 
@@ -88,7 +81,7 @@ mod tests {
 
         let carry = gf_mul(&mut input);
 
-        assert!(carry);
+        assert_eq!(carry, 1);
         assert_eq!(input, expected_output)
     }
 
@@ -97,7 +90,7 @@ mod tests {
         let mut input = Array::<u8, U16>::try_from([0xAA; 16]).unwrap();
         let expected_output = [0x55; 16];
 
-        gf_reverse_mul(&mut input, false);
+        gf_reverse_mul(&mut input, 0);
 
         assert_eq!(input, expected_output);
     }
@@ -109,7 +102,7 @@ mod tests {
         expected_output[0] = 0x16;
         expected_output[15] = 0xd5;
 
-        gf_reverse_mul(&mut input, true);
+        gf_reverse_mul(&mut input, 1);
 
         assert_eq!(input, expected_output);
     }
