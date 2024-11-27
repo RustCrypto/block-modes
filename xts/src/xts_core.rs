@@ -130,9 +130,9 @@ pub(crate) trait Stealer: BlockSizeUser {
     fn is_decrypt() -> bool;
 
     fn process_xts_block(&mut self, block: &mut Block<Self>) {
-        xor(block, &self.get_iv());
+        xor(block, self.get_iv());
         self.process_block(block);
-        xor(block, &self.get_iv());
+        xor(block, self.get_iv());
 
         let iv = self.get_iv_mut();
         gf_mul(iv);
@@ -152,8 +152,8 @@ pub(crate) trait Stealer: BlockSizeUser {
         if Self::is_decrypt() {
             // We fast forward the multiplication here
             let carry = {
-                let mut iv = self.get_iv_mut();
-                let carry = gf_mul(&mut iv);
+                let iv = self.get_iv_mut();
+                let carry = gf_mul(iv);
 
                 xor(second_to_last_block, iv);
 

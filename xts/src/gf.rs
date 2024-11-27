@@ -64,7 +64,7 @@ mod tests {
 
     #[test]
     fn test_gf_mul() {
-        let mut input = Array::<u8, U16>::try_from([0x55; 16]).unwrap();
+        let mut input = Array::<u8, U16>::from([0x55; 16]);
         let expected_output = [0xAA; 16];
 
         let carry = gf_mul(&mut input);
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_gf_mul_overflow() {
-        let mut input = Array::<u8, U16>::try_from([0xAA; 16]).unwrap();
+        let mut input = Array::<u8, U16>::from([0xAA; 16]);
         let mut expected_output = [0x55; 16];
         expected_output[0] = 0xd3;
 
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn test_gf_reverse_mul() {
-        let mut input = Array::<u8, U16>::try_from([0xAA; 16]).unwrap();
+        let mut input = Array::<u8, U16>::from([0xAA; 16]);
         let expected_output = [0x55; 16];
 
         gf_reverse_mul(&mut input, 0);
@@ -97,7 +97,7 @@ mod tests {
 
     #[test]
     fn test_gf_reverse_mul_overflow() {
-        let mut input = Array::<u8, U16>::try_from([0xAA; 16]).unwrap();
+        let mut input = Array::<u8, U16>::from([0xAA; 16]);
         let mut expected_output = [0x55; 16];
         expected_output[0] = 0x16;
         expected_output[15] = 0xd5;

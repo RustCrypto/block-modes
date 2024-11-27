@@ -73,9 +73,9 @@ where
 {
     /// Create an XTS context and precompute the tweak.
     pub fn new_from_split_keys(cipher_key: &Key<C>, tweak_key: &Key<T>, iv: &Block<Self>) -> Self {
-        let cipher = C::new(&cipher_key);
-        let tweaker = T::new(&tweak_key);
-        let iv = precompute_iv(&tweaker, &iv);
+        let cipher = C::new(cipher_key);
+        let tweaker = T::new(tweak_key);
+        let iv = precompute_iv(&tweaker, iv);
 
         Self {
             cipher,
