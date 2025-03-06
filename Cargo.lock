@@ -3,17 +3,6 @@
 version = 3
 
 [[package]]
-name = "aes"
-version = "0.9.0-pre.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e7856582c758ade85d71daf27ec6bcea6c1c73913692b07b8dffea2dc03531c9"
-dependencies = [
- "cfg-if",
- "cipher",
- "cpufeatures",
-]
-
-[[package]]
 name = "belt-block"
 version = "0.2.0-pre.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -47,34 +36,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cbc"
-version = "0.2.0-pre.2"
-dependencies = [
- "aes",
- "cipher",
- "hex-literal",
-]
-
-[[package]]
-name = "cfb-mode"
-version = "0.9.0-pre"
-dependencies = [
- "aes",
- "belt-block",
- "cipher",
- "hex-literal",
-]
-
-[[package]]
-name = "cfb8"
-version = "0.9.0-pre"
-dependencies = [
- "aes",
- "cipher",
- "hex-literal",
-]
-
-[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -93,15 +54,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cpufeatures"
-version = "0.2.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "608697df725056feaccfa42cffdaeeec3fccc4ffc38358ecd19b243e716a78e0"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "crypto-common"
 version = "0.2.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -110,27 +62,6 @@ dependencies = [
  "getrandom",
  "hybrid-array",
  "rand_core",
-]
-
-[[package]]
-name = "ctr"
-version = "0.10.0-pre.2"
-dependencies = [
- "aes",
- "cipher",
- "hex-literal",
- "kuznyechik",
- "magma",
-]
-
-[[package]]
-name = "cts"
-version = "0.6.0"
-dependencies = [
- "aes",
- "belt-block",
- "cipher",
- "hex-literal",
 ]
 
 [[package]]
@@ -160,15 +91,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ige"
-version = "0.2.0-pre"
-dependencies = [
- "aes",
- "cipher",
- "hex-literal",
-]
-
-[[package]]
 name = "inout"
 version = "0.2.0-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -179,47 +101,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "kuznyechik"
-version = "0.9.0-pre.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd136ca56393426d0aeca01643adef06b1f30d667fdebf31f7cf11724cbd9051"
-dependencies = [
- "cfg-if",
- "cipher",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.161"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e9489c2807c139ffd9c1794f4af0ebe86a828db53ecdc7fea2111d0fed085d1"
-
-[[package]]
-name = "magma"
-version = "0.10.0-pre.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9fd466f879a2c01f141f168c4e045a26dca5a60aef79efa8bb96e9c701bb8ea"
-dependencies = [
- "cipher",
-]
-
-[[package]]
-name = "ofb"
-version = "0.7.0-pre"
-dependencies = [
- "aes",
- "cipher",
- "hex-literal",
-]
-
-[[package]]
-name = "pcbc"
-version = "0.2.0-pre"
-dependencies = [
- "aes",
- "cipher",
- "hex-literal",
-]
 
 [[package]]
 name = "rand_core"
