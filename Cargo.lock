@@ -146,6 +146,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ige"
+version = "0.2.0-pre"
+dependencies = [
+ "aes",
+ "cipher",
+ "hex-literal",
+]
+
+[[package]]
 name = "inout"
 version = "0.2.0-rc.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -104,9 +104,9 @@ pub use decrypt::Decryptor;
 pub use encrypt::Encryptor;
 
 use cipher::{
+    BlockSizeUser,
     array::{Array, ArraySize},
     typenum::Sum,
-    BlockSizeUser,
 };
 
 type BlockSize<C> = <C as BlockSizeUser>::BlockSize;
