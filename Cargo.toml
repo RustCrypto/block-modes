@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    #"belt-ctr",
+    "belt-ctr",
     #"cbc",
     #"cts",
     #"cfb8",
@@ -14,3 +14,6 @@ members = [
 
 [profile.dev]
 opt-level = 2
+
+[patch.crates-io]
+belt-block = { git = "https://github.com/RustCrypto/block-ciphers.git" }
