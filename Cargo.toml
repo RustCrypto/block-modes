@@ -9,7 +9,7 @@ members = [
     "ctr",
     "ige",
     "ofb",
-    #"pcbc"
+    "pcbc"
 ]
 
 [profile.dev]
