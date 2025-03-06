@@ -188,6 +188,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ofb"
+version = "0.7.0-pre"
+dependencies = [
+ "aes",
+ "cipher",
+ "hex-literal",
+]
+
+[[package]]
 name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

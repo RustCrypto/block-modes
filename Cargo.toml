@@ -8,7 +8,7 @@ members = [
     "cfb-mode",
     "ctr",
     "ige",
-    #"ofb",
+    "ofb",
     #"pcbc"
 ]
 

@@ -66,13 +66,13 @@
 #![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
 use cipher::{
-    consts::U1,
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
     AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockModeEncBackend,
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvState,
     ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
     StreamCipherCoreWrapper,
+    consts::U1,
+    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
 };
 use core::fmt;
 
