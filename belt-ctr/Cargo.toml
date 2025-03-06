@@ -17,7 +17,7 @@ cipher = "=0.5.0-pre.8"
 belt-block = "=0.2.0-pre.2"
 
 [dev-dependencies]
-hex-literal = "0.4"
+hex-literal = "1"
 belt-block = "=0.2.0-pre.2"
 cipher = { version = "=0.5.0-pre.8", features = ["dev"] }
 
