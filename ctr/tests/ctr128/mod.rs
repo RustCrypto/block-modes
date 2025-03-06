@@ -1,5 +1,5 @@
 use aes::{Aes128, Aes256};
-use ctr::{flavors, Ctr128BE, CtrCore};
+use ctr::{Ctr128BE, CtrCore, flavors};
 
 cipher::stream_cipher_test!(aes128_ctr_core, "aes128-ctr", Ctr128BE<Aes128>);
 cipher::stream_cipher_test!(aes256_ctr_core, "aes256-ctr", Ctr128BE<Aes256>);

@@ -109,6 +109,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ctr"
+version = "0.10.0-pre.2"
+dependencies = [
+ "aes",
+ "cipher",
+ "hex-literal",
+ "kuznyechik",
+ "magma",
+]
+
+[[package]]
 name = "cts"
 version = "0.6.0"
 dependencies = [
@@ -145,10 +156,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "kuznyechik"
+version = "0.9.0-pre.2"
+source = "git+https://github.com/RustCrypto/block-ciphers.git#bb7623cf85b416c8c61d89dd11573e6e7f961720"
+dependencies = [
+ "cfg-if",
+ "cipher",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.170"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "875b3680cb2f8f71bdcf9a30f38d48282f5d3c95cbf9b3fa57269bb5d5c06828"
+
+[[package]]
+name = "magma"
+version = "0.10.0-pre.2"
+source = "git+https://github.com/RustCrypto/block-ciphers.git#bb7623cf85b416c8c61d89dd11573e6e7f961720"
+dependencies = [
+ "cipher",
+]
 
 [[package]]
 name = "typenum"

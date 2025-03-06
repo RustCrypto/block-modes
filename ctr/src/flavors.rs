@@ -1,17 +1,17 @@
 //! CTR mode flavors
 
 use cipher::{
-    array::{Array, ArraySize},
     StreamCipherCounter,
+    array::{Array, ArraySize},
 };
 
 mod ctr128;
 mod ctr32;
 mod ctr64;
 
-pub use ctr128::{Ctr128BE, Ctr128LE};
 pub use ctr32::{Ctr32BE, Ctr32LE};
 pub use ctr64::{Ctr64BE, Ctr64LE};
+pub use ctr128::{Ctr128BE, Ctr128LE};
 
 /// Trait implemented by different CTR flavors.
 pub trait CtrFlavor<B: ArraySize> {

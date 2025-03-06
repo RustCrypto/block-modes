@@ -2,7 +2,7 @@
 use super::CtrFlavor;
 use cipher::{
     array::{Array, ArraySize},
-    typenum::{PartialDiv, PartialQuot, Unsigned, U16},
+    typenum::{PartialDiv, PartialQuot, U16, Unsigned},
 };
 use core::fmt;
 

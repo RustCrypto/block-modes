@@ -1,10 +1,10 @@
 use crate::CtrFlavor;
 use cipher::{
-    array::ArraySize,
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
     AlgorithmName, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocks, ParBlocksSizeUser, StreamCipherBackend,
     StreamCipherClosure, StreamCipherCore, StreamCipherSeekCore,
+    array::ArraySize,
+    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
 };
 use core::fmt;
 
