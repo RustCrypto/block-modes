@@ -3,6 +3,16 @@
 version = 4
 
 [[package]]
+name = "aes"
+version = "0.9.0-pre.2"
+source = "git+https://github.com/RustCrypto/block-ciphers.git#bb7623cf85b416c8c61d89dd11573e6e7f961720"
+dependencies = [
+ "cfg-if",
+ "cipher",
+ "cpufeatures",
+]
+
+[[package]]
 name = "belt-block"
 version = "0.2.0-pre.2"
 source = "git+https://github.com/RustCrypto/block-ciphers.git#bb7623cf85b416c8c61d89dd11573e6e7f961720"
@@ -26,6 +36,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a859067dcb257cb2ae028cb821399b55140b76fb8b2a360e052fe109019db43"
 
 [[package]]
+name = "block-padding"
+version = "0.4.0-rc.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee88d14c41bbae2e333f574a27fc73d96fe1039e5a356c20d06a7f2a34cd8e5a"
+dependencies = [
+ "hybrid-array",
+]
+
+[[package]]
+name = "cbc"
+version = "0.2.0-pre.2"
+dependencies = [
+ "aes",
+ "cipher",
+ "hex-literal",
+]
+
+[[package]]
+name = "cfg-if"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
 name = "cipher"
 version = "0.5.0-pre.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -35,6 +69,15 @@ dependencies = [
  "crypto-common",
  "inout",
  "zeroize",
+]
+
+[[package]]
+name = "cpufeatures"
+version = "0.2.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280"
+dependencies = [
+ "libc",
 ]
 
 [[package]]
@@ -68,8 +111,15 @@ version = "0.2.0-rc.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac5e145e8ade9f74c0a5efc60ccb4e714b0144f7e2220b7ca64254feee71c57f"
 dependencies = [
+ "block-padding",
  "hybrid-array",
 ]
+
+[[package]]
+name = "libc"
+version = "0.2.170"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "875b3680cb2f8f71bdcf9a30f38d48282f5d3c95cbf9b3fa57269bb5d5c06828"
 
 [[package]]
 name = "typenum"
