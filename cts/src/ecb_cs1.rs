@@ -1,12 +1,12 @@
 use core::marker::PhantomData;
 
-use crate::{ecb_dec, ecb_enc, Decrypt, Encrypt, Error};
+use crate::{Decrypt, Encrypt, Error, ecb_dec, ecb_enc};
 use cipher::{
+    Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
+    BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, IvSizeUser,
     crypto_common::{BlockSizes, InnerInit, InnerUser},
     inout::InOutBuf,
     typenum::Unsigned,
-    Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
-    BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, IvSizeUser,
 };
 
 /// The ECB-CS-1 ciphertext stealing mode.

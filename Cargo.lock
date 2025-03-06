@@ -90,6 +90,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cts"
+version = "0.6.0"
+dependencies = [
+ "aes",
+ "belt-block",
+ "cipher",
+ "hex-literal",
+]
+
+[[package]]
 name = "hex-literal"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
