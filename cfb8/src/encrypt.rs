@@ -1,11 +1,11 @@
 use cipher::{
+    AlgorithmName, AsyncStreamCipher, Block, BlockCipherEncBackend, BlockCipherEncClosure,
+    BlockCipherEncrypt, BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser,
+    InnerIvInit, Iv, IvState, ParBlocksSizeUser,
     array::Array,
     consts::U1,
     crypto_common::{BlockSizes, InnerUser, IvSizeUser},
     inout::InOut,
-    AlgorithmName, AsyncStreamCipher, Block, BlockCipherEncBackend, BlockCipherEncClosure,
-    BlockCipherEncrypt, BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser,
-    InnerIvInit, Iv, IvState, ParBlocksSizeUser,
 };
 use core::fmt;
 

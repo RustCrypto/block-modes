@@ -54,6 +54,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cfb8"
+version = "0.9.0-pre"
+dependencies = [
+ "aes",
+ "cipher",
+ "hex-literal",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

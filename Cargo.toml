@@ -4,7 +4,7 @@ members = [
     "belt-ctr",
     "cbc",
     "cts",
-    #"cfb8",
+    "cfb8",
     #"cfb-mode",
     #"ctr",
     #"ige",
