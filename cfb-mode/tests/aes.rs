@@ -1,6 +1,6 @@
 use aes::*;
 use cfb_mode::{BufDecryptor, BufEncryptor, Decryptor, Encryptor};
-use cipher::{block_mode_dec_test, block_mode_enc_test, iv_state_test, KeyInit};
+use cipher::{KeyInit, block_mode_dec_test, block_mode_enc_test, iv_state_test};
 
 iv_state_test!(aes128_cfb_enc_iv_state, Encryptor<Aes128>, encrypt);
 iv_state_test!(aes128_cfb_dec_iv_state, Decryptor<Aes128>, decrypt);

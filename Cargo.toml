@@ -5,7 +5,7 @@ members = [
     "cbc",
     "cts",
     "cfb8",
-    #"cfb-mode",
+    "cfb-mode",
     #"ctr",
     #"ige",
     #"ofb",

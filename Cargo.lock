@@ -54,6 +54,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cfb-mode"
+version = "0.9.0-pre"
+dependencies = [
+ "aes",
+ "belt-block",
+ "cipher",
+ "hex-literal",
+]
+
+[[package]]
 name = "cfb8"
 version = "0.9.0-pre"
 dependencies = [
