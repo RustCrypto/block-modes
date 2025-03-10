@@ -1,10 +1,10 @@
 use cipher::{
-    crypto_common::{BlockSizes, InnerUser},
-    typenum::Unsigned,
     AlgorithmName, Array, AsyncStreamCipher, Block, BlockCipherDecrypt, BlockCipherEncBackend,
     BlockCipherEncClosure, BlockCipherEncrypt, BlockModeDecBackend, BlockModeDecClosure,
     BlockModeDecrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks,
     ParBlocksSizeUser,
+    crypto_common::{BlockSizes, InnerUser},
+    typenum::Unsigned,
 };
 use core::fmt;
 

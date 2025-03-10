@@ -1,6 +1,16 @@
 [workspace]
-resolver = "2"
-members = ["belt-ctr", "cbc", "cts", "cfb8", "cfb-mode", "ctr", "ige", "ofb", "pcbc"]
+resolver = "3"
+members = [
+    "belt-ctr",
+    "cbc",
+    "cts",
+    "cfb8",
+    "cfb-mode",
+    "ctr",
+    "ige",
+    "ofb",
+    "pcbc"
+]
 
 [profile.dev]
 opt-level = 2

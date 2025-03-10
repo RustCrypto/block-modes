@@ -1,7 +1,7 @@
 //! Counter Mode with a 32-bit little endian counter
 
 use cipher::{
-    array::Array, consts::U16, KeyIvInit, StreamCipher, StreamCipherSeek, StreamCipherSeekCore,
+    KeyIvInit, StreamCipher, StreamCipherSeek, StreamCipherSeekCore, array::Array, consts::U16,
 };
 use hex_literal::hex;
 

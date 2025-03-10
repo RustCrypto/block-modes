@@ -63,18 +63,6 @@ cts::CbcCs3::inner_iv_init(&cipher, &iv2.into())
 assert_eq!(buf2, hex!("69ebd2059e69c6e416a67351982267a26bf5672934"));
 ```
 
-## Minimum Supported Rust Version
-
-Rust **1.81** or higher.
-
-Minimum supported Rust version can be changed in the future, but it will be
-done with a minor version bump.
-
-## SemVer Policy
-
-- All on-by-default features of this library are covered by SemVer
-- MSRV is considered exempt from SemVer as noted above
-
 ## License
 
 Licensed under either of:
@@ -97,7 +85,7 @@ dual licensed as above, without any additional terms or conditions.
 [docs-image]: https://docs.rs/cts/badge.svg
 [docs-link]: https://docs.rs/cts/
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
-[rustc-image]: https://img.shields.io/badge/rustc-1.81+-blue.svg
+[rustc-image]: https://img.shields.io/badge/rustc-1.85+-blue.svg
 [chat-image]: https://img.shields.io/badge/zulip-join_chat-blue.svg
 [chat-link]: https://rustcrypto.zulipchat.com/#narrow/stream/308460-block-modes
 [build-image]: https://github.com/RustCrypto/block-modes/workflows/cts/badge.svg?branch=master&event=push

@@ -1,12 +1,12 @@
-use crate::{xor, IgeIvSize};
+use crate::{IgeIvSize, xor};
 use cipher::{
-    array::{Array, ArraySize},
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
-    inout::InOut,
-    typenum::{Unsigned, U1},
     AlgorithmName, Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt,
     BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser, InnerIvInit, Iv,
     IvState, ParBlocksSizeUser,
+    array::{Array, ArraySize},
+    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
+    inout::InOut,
+    typenum::{U1, Unsigned},
 };
 use core::{fmt, ops::Add};
 

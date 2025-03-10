@@ -4,8 +4,8 @@ version = "0.10.0-pre.2"
 description = "CTR block modes of operation"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
-edition = "2021"
-rust-version = "1.81"
+edition = "2024"
+rust-version = "1.85"
 readme = "README.md"
 documentation = "https://docs.rs/ctr"
 repository = "https://github.com/RustCrypto/block-modes"
@@ -13,18 +13,17 @@ keywords = ["crypto", "block-mode", "stream-cipher", "ciphers"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = "=0.5.0-pre.7"
+cipher = "=0.5.0-pre.8"
 
 [dev-dependencies]
-aes = "=0.9.0-pre.2"
-magma = "=0.10.0-pre.2"
-kuznyechik = "=0.9.0-pre.2"
-cipher = { version = "=0.5.0-pre.7", features = ["dev"] }
-hex-literal = "0.4"
+aes = "=0.9.0-pre.3"
+magma = "=0.10.0-pre.3"
+kuznyechik = "=0.9.0-pre.3"
+cipher = { version = "=0.5.0-pre.8", features = ["dev"] }
+hex-literal = "1"
 
 [features]
 alloc = ["cipher/alloc"]
-std = ["cipher/std", "alloc"]
 block-padding = ["cipher/block-padding"]
 zeroize = ["cipher/zeroize"]
 

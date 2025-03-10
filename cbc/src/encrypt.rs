@@ -1,10 +1,10 @@
 use crate::xor;
 use cipher::{
-    consts::U1,
-    crypto_common::{BlockSizes, InnerUser},
     AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit,
     Iv, IvSizeUser, IvState, ParBlocksSizeUser,
+    consts::U1,
+    crypto_common::{BlockSizes, InnerUser},
 };
 use core::fmt;
 

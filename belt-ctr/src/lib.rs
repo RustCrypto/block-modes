@@ -12,10 +12,11 @@ pub use cipher;
 
 use belt_block::BeltBlock;
 use cipher::{
-    array::Array, consts::U16, crypto_common::InnerUser, AlgorithmName, Block, BlockCipherDecrypt,
-    BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, InOut,
-    InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks, ParBlocksSizeUser, StreamCipherBackend,
-    StreamCipherClosure, StreamCipherCore, StreamCipherCoreWrapper, StreamCipherSeekCore,
+    AlgorithmName, Block, BlockCipherDecrypt, BlockCipherEncBackend, BlockCipherEncClosure,
+    BlockCipherEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks,
+    ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
+    StreamCipherCoreWrapper, StreamCipherSeekCore, array::Array, consts::U16,
+    crypto_common::InnerUser,
 };
 use core::fmt;
 

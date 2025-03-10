@@ -1,11 +1,11 @@
-use crate::{cbc_dec, cbc_enc, xor, Decrypt, Encrypt, Error};
+use crate::{Decrypt, Encrypt, Error, cbc_dec, cbc_enc, xor};
 use cipher::{
+    Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
+    BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, InnerIvInit, IvSizeUser,
     array::Array,
     crypto_common::{BlockSizes, InnerUser},
     inout::InOutBuf,
     typenum::Unsigned,
-    Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
-    BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, InnerIvInit, IvSizeUser,
 };
 
 /// The CBC-CS-2 ciphertext stealing mode.

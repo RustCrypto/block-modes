@@ -4,8 +4,8 @@ version = "0.2.0-pre"
 description = "CTR block mode of operation specified by the BelT standard"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
-edition = "2021"
-rust-version = "1.81"
+edition = "2024"
+rust-version = "1.85"
 readme = "README.md"
 documentation = "https://docs.rs/belt-ctr"
 repository = "https://github.com/RustCrypto/block-modes"
@@ -13,17 +13,16 @@ keywords = ["crypto", "block-mode", "stream-cipher", "ciphers", "belt"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = "=0.5.0-pre.7"
-belt-block = "=0.2.0-pre.2"
+cipher = "=0.5.0-pre.8"
+belt-block = "=0.2.0-pre.3"
 
 [dev-dependencies]
-hex-literal = "0.4"
-belt-block = "=0.2.0-pre.2"
-cipher = { version = "=0.5.0-pre.7", features = ["dev"] }
+hex-literal = "1"
+belt-block = "=0.2.0-pre.3"
+cipher = { version = "=0.5.0-pre.8", features = ["dev"] }
 
 [features]
 alloc = ["cipher/alloc"]
-std = ["cipher/std", "alloc"]
 zeroize = ["cipher/zeroize"]
 
 [package.metadata.docs.rs]

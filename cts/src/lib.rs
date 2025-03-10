@@ -27,10 +27,10 @@ pub use ecb_cs2::EcbCs2;
 pub use ecb_cs3::EcbCs3;
 
 use cipher::{
+    Block, BlockCipherDecBackend, BlockCipherEncBackend,
     array::{Array, ArraySize},
     inout::{InOutBuf, NotEqualError},
     typenum::Unsigned,
-    Block, BlockCipherDecBackend, BlockCipherEncBackend,
 };
 
 /// Error which indicates that message is smaller than cipher's block size.

@@ -1,11 +1,11 @@
 use crate::xor;
 use cipher::{
-    array::Array,
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
-    inout::InOut,
     AlgorithmName, Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt,
     BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser, InnerIvInit, Iv,
     IvState, ParBlocks, ParBlocksSizeUser,
+    array::Array,
+    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
+    inout::InOut,
 };
 use core::fmt;
 
