@@ -2,10 +2,10 @@
 
 [![crate][crate-image]][crate-link]
 [![Docs][docs-image]][docs-link]
+[![Build Status][build-image]][build-link]
 ![Apache2/MIT licensed][license-image]
 ![Rust Version][rustc-image]
 [![Project Chat][chat-image]][chat-link]
-[![Build Status][build-image]][build-link]
 
 Generic implementation of the [Cipher Block Chaining][CBC] (CBC) block cipher
 mode of operation.
@@ -31,7 +31,7 @@ dual licensed as above, without any additional terms or conditions.
 
 [//]: # (badges)
 
-[crate-image]: https://img.shields.io/crates/v/cbc.svg
+[crate-image]: https://img.shields.io/crates/v/cbc.svg?logo=rust
 [crate-link]: https://crates.io/crates/cbc
 [docs-image]: https://docs.rs/cbc/badge.svg
 [docs-link]: https://docs.rs/cbc/
@@ -39,8 +39,8 @@ dual licensed as above, without any additional terms or conditions.
 [rustc-image]: https://img.shields.io/badge/rustc-1.85+-blue.svg
 [chat-image]: https://img.shields.io/badge/zulip-join_chat-blue.svg
 [chat-link]: https://rustcrypto.zulipchat.com/#narrow/stream/308460-block-modes
-[build-image]: https://github.com/RustCrypto/block-modes/workflows/cbc/badge.svg?branch=master&event=push
-[build-link]: https://github.com/RustCrypto/block-modes/actions?query=workflow%3Acbc+branch%3Amaster
+[build-image]: https://github.com/RustCrypto/block-modes/actions/workflows/cbc.yaml/badge.svg
+[build-link]: https://github.com/RustCrypto/block-modes/actions/workflows/cbc.yaml
 
 [//]: # (general links)
 

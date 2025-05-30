@@ -3,9 +3,9 @@
 [![crate][crate-image]][crate-link]
 [![Docs][docs-image]][docs-link]
 ![Apache2/MIT licensed][license-image]
+[![Build Status][build-image]][build-link]
 ![Rust Version][rustc-image]
 [![Project Chat][chat-image]][chat-link]
-[![Build Status][build-image]][build-link]
 
 Generic implementation of the [Counter][CTR] (CTR) block cipher mode of operation.
 
@@ -30,7 +30,7 @@ dual licensed as above, without any additional terms or conditions.
 
 [//]: # (badges)
 
-[crate-image]: https://img.shields.io/crates/v/ctr.svg
+[crate-image]: https://img.shields.io/crates/v/ctr.svg?logo=rust
 [crate-link]: https://crates.io/crates/ctr
 [docs-image]: https://docs.rs/ctr/badge.svg
 [docs-link]: https://docs.rs/ctr/
@@ -38,8 +38,8 @@ dual licensed as above, without any additional terms or conditions.
 [rustc-image]: https://img.shields.io/badge/rustc-1.85+-blue.svg
 [chat-image]: https://img.shields.io/badge/zulip-join_chat-blue.svg
 [chat-link]: https://rustcrypto.zulipchat.com/#narrow/stream/308460-block-modes
-[build-image]: https://github.com/RustCrypto/block-modes/workflows/ctr/badge.svg?branch=master&event=push
-[build-link]: https://github.com/RustCrypto/block-modes/actions?query=workflow%3Actr+branch%3Amaster
+[build-image]: https://github.com/RustCrypto/block-modes/actions/workflows/ctr.yaml/badge.svg
+[build-link]: https://github.com/RustCrypto/block-modes/actions/workflows/ctr.yaml
 
 [//]: # (general links)
 
