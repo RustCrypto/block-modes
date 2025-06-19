@@ -5,7 +5,8 @@ use ige::{Decryptor, Encryptor};
 iv_state_test!(aes128_ige_enc_iv_state, Encryptor<Aes128>, encrypt);
 iv_state_test!(aes128_ige_dec_iv_state, Decryptor<Aes128>, decrypt);
 
-// Test vectors from: <https://mgp25.com/AESIGE/>
+// Test vectors from:
+// https://mgp25.com/blog/2015/06/21/AESIGE/#test-vectors
 block_mode_enc_test!(aes128_cbc_enc_test, "aes128", Encryptor<Aes128>);
 block_mode_dec_test!(aes128_cbc_dec_test, "aes128", Decryptor<Aes128>);
 block_mode_enc_test!(aes128enc_cbc_enc_test, "aes128", Encryptor<Aes128Enc>);
