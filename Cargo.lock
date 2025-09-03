@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "aes"
-version = "0.9.0-rc.0"
+version = "0.9.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd4838e4ad37bb032dea137f441d5f71c16c26c068af512e64c5bc13a88cdfc7"
+checksum = "7e713c57c2a2b19159e7be83b9194600d7e8eb3b7c2cd67e671adf47ce189a05"
 dependencies = [
  "cfg-if",
  "cipher",
@@ -15,9 +15,9 @@ dependencies = [
 
 [[package]]
 name = "belt-block"
-version = "0.2.0-rc.0"
+version = "0.2.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9aa0cd4ec3b89021a53caa73cefc5a458cf33b338498e1191916153877bd794"
+checksum = "c4bbddee901eea0f5448cfcc94ea6390d0ee0f3ca8d0308fe34e37553f856640"
 dependencies = [
  "cipher",
 ]
@@ -179,9 +179,9 @@ dependencies = [
 
 [[package]]
 name = "kuznyechik"
-version = "0.9.0-rc.0"
+version = "0.9.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "074a7089016bcddb3b8da42f663296a885f8a31ec57a7b795a92b711999ff5aa"
+checksum = "e39eb5f1f53d41c9341e559c72a732db17619643679116d56ca0af8b34cb8b26"
 dependencies = [
  "cfg-if",
  "cipher",
@@ -195,9 +195,9 @@ checksum = "875b3680cb2f8f71bdcf9a30f38d48282f5d3c95cbf9b3fa57269bb5d5c06828"
 
 [[package]]
 name = "magma"
-version = "0.10.0-rc.0"
+version = "0.10.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d6704a51253dc03b397da9121342836759922371190e5755ccfb21c4db9cef4"
+checksum = "47c60b0343c651857c53e0072315831622d550efeb663a589bbd3fdd83073da0"
 dependencies = [
  "cipher",
 ]
