@@ -14,11 +14,11 @@ categories = ["cryptography", "no-std"]
 
 [dependencies]
 cipher = { version = "0.5.0-rc.1", features = ["stream-wrapper"] }
-belt-block = "0.2.0-rc.0"
+belt-block = "0.2.0-rc.1"
 
 [dev-dependencies]
 hex-literal = "1"
-belt-block = "0.2.0-rc.0"
+belt-block = "0.2.0-rc.1"
 cipher = { version = "0.5.0-rc.1", features = ["dev"] }
 
 [features]
