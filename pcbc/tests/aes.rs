@@ -1,13 +1,9 @@
-// TODO(tarcieri): update tests to support RustCrypto/traits#1916
-// use aes::{Aes128, Aes128Dec, Aes128Enc};
-// use cipher::{block_mode_dec_test, block_mode_enc_test, iv_state_test};
-// use pcbc::{Decryptor, Encryptor};
-//
-// iv_state_test!(aes128_pcbc_enc_iv_state, Encryptor<Aes128>, encrypt);
-// iv_state_test!(aes128_pcbc_dec_iv_state, Decryptor<Aes128>, decrypt);
-//
-// // The test vectors are generated using this implementation.
-// block_mode_enc_test!(aes128_pcbc_enc_test, "aes128", Encryptor<Aes128>);
-// block_mode_dec_test!(aes128_pcbc_dec_test, "aes128", Decryptor<Aes128>);
-// block_mode_enc_test!(aes128enc_pcbc_enc_test, "aes128", Encryptor<Aes128Enc>);
-// block_mode_dec_test!(aes128dec_pcbc_dec_test, "aes128", Decryptor<Aes128Dec>);
+//! Test vectors generated using this crate.
+use aes::{Aes128, Aes128Dec, Aes128Enc};
+use cipher::block_mode_test;
+use pcbc::{Decryptor, Encryptor};
+
+block_mode_test!(aes128_pcbc_enc, "aes128", Encryptor<Aes128>, encrypt);
+block_mode_test!(aes128_pcbc_dec, "aes128", Decryptor<Aes128>, decrypt);
+block_mode_test!(aes128enc_pcbc_enc, "aes128", Encryptor<Aes128Enc>, encrypt);
+block_mode_test!(aes128dec_pcbc_dec, "aes128", Decryptor<Aes128Dec>, decrypt);
