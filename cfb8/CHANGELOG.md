@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.9.0 (UNRELEASED)
 ### Removed 
 - `std` feature ([#76])
+- `Clone` impl ([#91])
 
 ### Changed
 - Bump `cipher` from `0.4` to `0.5` ([#56])
@@ -16,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [#56]: https://github.com/RustCrypto/block-modes/pull/56
 [#75]: https://github.com/RustCrypto/block-modes/pull/76
+[#91]: https://github.com/RustCrypto/block-modes/pull/91
 
 ## 0.8.1 (2022-02-17)
 ### Fixed
