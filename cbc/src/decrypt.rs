@@ -13,7 +13,6 @@ use core::fmt;
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// CBC mode decryptor.
-#[derive(Clone)]
 pub struct Decryptor<C>
 where
     C: BlockCipherDecrypt,

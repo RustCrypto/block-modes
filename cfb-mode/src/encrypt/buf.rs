@@ -9,7 +9,6 @@ use core::fmt;
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// CFB mode buffered encryptor.
-#[derive(Clone)]
 pub struct BufEncryptor<C>
 where
     C: BlockCipherEncrypt,

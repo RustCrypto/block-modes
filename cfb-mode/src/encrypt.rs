@@ -16,7 +16,6 @@ mod buf;
 pub use buf::BufEncryptor;
 
 /// CFB mode encryptor.
-#[derive(Clone)]
 pub struct Encryptor<C>
 where
     C: BlockCipherEncrypt,

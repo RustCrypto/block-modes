@@ -14,7 +14,6 @@ use core::{fmt, ops::Add};
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// IGE mode encryptor.
-#[derive(Clone)]
 pub struct Encryptor<C>
 where
     C: BlockCipherEncrypt,

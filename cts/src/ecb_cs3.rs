@@ -10,7 +10,6 @@ use cipher::{
 };
 
 /// The ECB-CS-3 ciphertext stealing mode.
-#[derive(Clone)]
 pub struct EcbCs3<C: BlockSizeUser> {
     cipher: C,
 }
