@@ -13,7 +13,6 @@ use core::fmt;
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// CFB-8 mode encryptor.
-#[derive(Clone)]
 pub struct Encryptor<C>
 where
     C: BlockCipherEncrypt,

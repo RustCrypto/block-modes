@@ -9,7 +9,6 @@ use cipher::{
 };
 
 /// The CBC-CS-2 ciphertext stealing mode.
-#[derive(Clone)]
 pub struct CbcCs2<C: BlockSizeUser> {
     cipher: C,
     iv: Block<C>,

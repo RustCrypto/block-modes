@@ -9,7 +9,6 @@ use cipher::{
 };
 
 /// The CBC-CS-3 ciphertext stealing mode.
-#[derive(Clone)]
 pub struct CbcCs3<C: BlockSizeUser> {
     cipher: C,
     iv: Block<C>,

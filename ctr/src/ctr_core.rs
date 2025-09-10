@@ -151,20 +151,6 @@ where
     }
 }
 
-impl<C, F> Clone for CtrCore<C, F>
-where
-    C: BlockCipherEncrypt + Clone,
-    F: CtrFlavor<C::BlockSize>,
-{
-    #[inline]
-    fn clone(&self) -> Self {
-        Self {
-            cipher: self.cipher.clone(),
-            ctr_nonce: self.ctr_nonce.clone(),
-        }
-    }
-}
-
 impl<C, F> fmt::Debug for CtrCore<C, F>
 where
     C: BlockCipherEncrypt + AlgorithmName,

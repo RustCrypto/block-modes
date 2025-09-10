@@ -85,7 +85,6 @@ use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 pub type Ofb<C> = StreamCipherCoreWrapper<OfbCore<C>>;
 
 /// Output feedback (OFB) mode.
-#[derive(Clone)]
 pub struct OfbCore<C>
 where
     C: BlockCipherEncrypt,

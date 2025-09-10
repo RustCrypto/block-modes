@@ -12,7 +12,6 @@ use core::fmt;
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// CFB mode decryptor.
-#[derive(Clone)]
 pub struct Decryptor<C>
 where
     C: BlockCipherEncrypt,
@@ -22,7 +21,6 @@ where
 }
 
 /// CFB mode buffered decryptor.
-#[derive(Clone)]
 pub struct BufDecryptor<C>
 where
     C: BlockCipherEncrypt,
