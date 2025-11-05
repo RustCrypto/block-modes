@@ -1,6 +1,6 @@
 [package]
 name = "ofb"
-version = "0.7.0-rc.1"
+version = "0.7.0-rc.2"
 description = "Output Feedback (OFB) block cipher mode of operation"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"

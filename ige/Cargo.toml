@@ -1,6 +1,6 @@
 [package]
 name = "ige"
-version = "0.2.0-rc.1"
+version = "0.2.0-rc.2"
 description = "Infinite Garble Extension (IGE) block cipher mode of operation"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
