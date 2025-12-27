@@ -43,14 +43,12 @@
 //! // buffer length must be equal to input length
 //! let mut buf1 = [0u8; 34];
 //! let mut cipher = Aes128Ofb::new(&key.into(), &iv.into());
-//! cipher
-//!     .apply_keystream_b2b(&plaintext, &mut buf1)
-//!     .unwrap();
+//! cipher.apply_keystream_b2b(&plaintext, &mut buf1);
 //! assert_eq!(buf1[..], ciphertext[..]);
 //!
 //! let mut buf2 = [0u8; 34];
 //! let mut cipher = Aes128Ofb::new(&key.into(), &iv.into());
-//! cipher.apply_keystream_b2b(&buf1, &mut buf2).unwrap();
+//! cipher.apply_keystream_b2b(&buf1, &mut buf2);
 //! assert_eq!(buf2[..], plaintext[..]);
 //! ```
 //!
