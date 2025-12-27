@@ -1,24 +1,35 @@
 name: Security Audit
 on:
   pull_request:
-    paths: Cargo.lock
+    paths:
+      - .github/workflows/security-audit.yml
+      - Cargo.lock
   push:
     branches: master
-    paths: Cargo.lock
+    paths:
+      - .github/workflows/security-audit.yml
+      - Cargo.lock
   schedule:
     - cron: "0 0 * * *"
+
+permissions: # added using https://github.com/step-security/secure-repo
+  contents: read
 
 jobs:
   security_audit:
     name: Security Audit
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+      issues: write
     steps:
       - uses: actions/checkout@v4
       - name: Cache cargo bin
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin
-          key: ${{ runner.os }}-cargo-audit-v0.12.0
-      - uses: actions-rs/audit-check@v1
+          key: ${{ runner.os }}-cargo-audit-v0.22.0
+      - uses: rustsec/audit-check@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
