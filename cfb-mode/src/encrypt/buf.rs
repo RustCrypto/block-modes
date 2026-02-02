@@ -1,7 +1,7 @@
 use super::xor_set1;
 use cipher::{
-    AlgorithmName, Block, BlockCipherEncrypt, InnerIvInit, Iv, IvSizeUser,
-    crypto_common::InnerUser, typenum::Unsigned,
+    AlgorithmName, Block, BlockCipherEncrypt, InnerIvInit, Iv, IvSizeUser, common::InnerUser,
+    typenum::Unsigned,
 };
 use core::fmt;
 

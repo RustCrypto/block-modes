@@ -4,7 +4,7 @@ use crate::{Decrypt, Encrypt, Error, ecb_dec, ecb_enc};
 use cipher::{
     Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
     BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, IvSizeUser,
-    crypto_common::{BlockSizes, InnerInit, InnerUser},
+    common::{BlockSizes, InnerInit, InnerUser},
     inout::InOutBuf,
     typenum::Unsigned,
 };

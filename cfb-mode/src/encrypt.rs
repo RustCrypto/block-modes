@@ -4,8 +4,8 @@ use cipher::{
     BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvSizeUser, IvState,
     ParBlocksSizeUser,
     array::Array,
+    common::{BlockSizes, InnerUser},
     consts::U1,
-    crypto_common::{BlockSizes, InnerUser},
 };
 use core::fmt;
 

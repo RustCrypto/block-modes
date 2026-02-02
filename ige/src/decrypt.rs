@@ -4,7 +4,7 @@ use cipher::{
     BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser, InnerIvInit, Iv,
     IvState, ParBlocksSizeUser,
     array::{Array, ArraySize},
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
+    common::{BlockSizes, InnerUser, IvSizeUser},
     inout::InOut,
     typenum::{U1, Unsigned},
 };

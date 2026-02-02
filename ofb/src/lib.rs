@@ -69,8 +69,8 @@ use cipher::{
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvState,
     ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
     StreamCipherCoreWrapper,
+    common::{BlockSizes, InnerUser, IvSizeUser},
     consts::U1,
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
 };
 use core::fmt;
 

@@ -4,7 +4,7 @@ use cipher::{
     BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocks, ParBlocksSizeUser, StreamCipherBackend,
     StreamCipherClosure, StreamCipherCore, StreamCipherSeekCore,
     array::ArraySize,
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
+    common::{BlockSizes, InnerUser, IvSizeUser},
 };
 use core::fmt;
 
