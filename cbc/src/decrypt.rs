@@ -4,7 +4,7 @@ use cipher::{
     BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser, InnerIvInit, Iv,
     IvState, ParBlocks, ParBlocksSizeUser,
     array::Array,
-    crypto_common::{BlockSizes, InnerUser, IvSizeUser},
+    common::{BlockSizes, InnerUser, IvSizeUser},
     inout::InOut,
 };
 use core::fmt;

@@ -3,7 +3,7 @@ use cipher::{
     Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
     BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, InnerIvInit, IvSizeUser,
     array::Array,
-    crypto_common::{BlockSizes, InnerUser},
+    common::{BlockSizes, InnerUser},
     inout::InOutBuf,
     typenum::Unsigned,
 };

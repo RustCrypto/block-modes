@@ -1,6 +1,6 @@
 [package]
 name = "cfb8"
-version = "0.9.0-rc.2"
+version = "0.9.0-rc.3"
 description = "Cipher Feedback with eight bit feedback (CFB-8) block cipher mode of operation"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
@@ -13,11 +13,11 @@ keywords = ["crypto", "block-mode", "stream-cipher", "ciphers"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = "0.5.0-rc.6"
+cipher = "0.5.0-rc.8"
 
 [dev-dependencies]
-aes = "0.9.0-rc.2"
-cipher = { version = "0.5.0-rc.6", features = ["dev"] }
+aes = "0.9.0-rc.4"
+cipher = { version = "0.5.0-rc.8", features = ["dev"] }
 hex-literal = "1"
 
 [features]

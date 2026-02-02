@@ -3,7 +3,7 @@ use cipher::{
     BlockCipherEncClosure, BlockCipherEncrypt, BlockModeDecBackend, BlockModeDecClosure,
     BlockModeDecrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks,
     ParBlocksSizeUser,
-    crypto_common::{BlockSizes, InnerUser},
+    common::{BlockSizes, InnerUser},
     typenum::Unsigned,
 };
 use core::fmt;

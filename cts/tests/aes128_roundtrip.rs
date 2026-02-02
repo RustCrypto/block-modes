@@ -1,7 +1,7 @@
 use aes::Aes128;
 use cts::{
     Decrypt, Encrypt,
-    cipher::{InnerIvInit, KeyInit, crypto_common::InnerInit},
+    cipher::{InnerIvInit, KeyInit, common::InnerInit},
 };
 
 const KEY: [u8; 16] = [0x42; 16];

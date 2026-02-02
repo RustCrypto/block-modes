@@ -1,6 +1,6 @@
 [package]
 name = "cts"
-version = "0.7.0-rc.2"
+version = "0.7.0-rc.3"
 description = "Generic implementation of the ciphertext stealing block modes of operation"
 authors = ["RustCrypto Developers"]
 license = "MIT OR Apache-2.0"
@@ -13,13 +13,13 @@ keywords = ["crypto", "block-mode", "ciphers"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = "0.5.0-rc.6"
+cipher = "0.5.0-rc.8"
 
 [dev-dependencies]
-cipher = { version = "0.5.0-rc.6", features = ["dev"] }
+cipher = { version = "0.5.0-rc.8", features = ["dev"] }
 hex-literal = "1"
-aes = "0.9.0-rc.2"
-belt-block = "0.2.0-rc.2"
+aes = "0.9.0-rc.4"
+belt-block = "0.2.0-rc.3"
 
 [package.metadata.docs.rs]
 all-features = true

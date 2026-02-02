@@ -3,8 +3,8 @@ use cipher::{
     AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit,
     Iv, IvSizeUser, IvState, ParBlocksSizeUser,
+    common::{BlockSizes, InnerUser},
     consts::U1,
-    crypto_common::{BlockSizes, InnerUser},
 };
 use core::fmt;
 

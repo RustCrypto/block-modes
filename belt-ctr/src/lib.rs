@@ -15,8 +15,7 @@ use cipher::{
     AlgorithmName, Block, BlockCipherDecrypt, BlockCipherEncBackend, BlockCipherEncClosure,
     BlockCipherEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks,
     ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
-    StreamCipherCoreWrapper, StreamCipherSeekCore, array::Array, consts::U16,
-    crypto_common::InnerUser,
+    StreamCipherCoreWrapper, StreamCipherSeekCore, array::Array, common::InnerUser, consts::U16,
 };
 use core::fmt;
 
