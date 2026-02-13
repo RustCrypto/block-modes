@@ -1,17 +1,17 @@
-name: cbc
+name: ige
 
 on:
   pull_request:
     paths:
-      - ".github/workflows/cbc.yaml"
-      - "cbc/**"
+      - ".github/workflows/ige.yml"
+      - "ige/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: cbc
+    working-directory: ige
 
 env:
   CARGO_INCREMENTAL: 0

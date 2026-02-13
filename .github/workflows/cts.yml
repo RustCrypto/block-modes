@@ -1,17 +1,17 @@
-name: ofb
+name: cts
 
 on:
   pull_request:
     paths:
-      - ".github/workflows/ofb.yaml"
-      - "ofb/**"
+      - ".github/workflows/cts.yml"
+      - "cts/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: ofb
+    working-directory: cts
 
 env:
   CARGO_INCREMENTAL: 0

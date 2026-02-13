@@ -1,17 +1,17 @@
-name: pcbc
+name: ofb
 
 on:
   pull_request:
     paths:
-      - ".github/workflows/pcbc.yaml"
-      - "pcbc/**"
+      - ".github/workflows/ofb.yml"
+      - "ofb/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: pcbc
+    working-directory: ofb
 
 env:
   CARGO_INCREMENTAL: 0

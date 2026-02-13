@@ -1,17 +1,17 @@
-name: cfb-mode
+name: pcbc
 
 on:
   pull_request:
     paths:
-      - ".github/workflows/cfb-mode.yaml"
-      - "cfb-mode/**"
+      - ".github/workflows/pcbc.yml"
+      - "pcbc/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: cfb-mode
+    working-directory: pcbc
 
 env:
   CARGO_INCREMENTAL: 0

@@ -1,17 +1,17 @@
-name: cts
+name: cfb-mode
 
 on:
   pull_request:
     paths:
-      - ".github/workflows/cts.yaml"
-      - "cts/**"
+      - ".github/workflows/cfb-mode.yml"
+      - "cfb-mode/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: cts
+    working-directory: cfb-mode
 
 env:
   CARGO_INCREMENTAL: 0

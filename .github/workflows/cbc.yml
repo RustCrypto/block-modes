@@ -1,17 +1,17 @@
-name: cfb8
+name: cbc
 
 on:
   pull_request:
     paths:
-      - ".github/workflows/cfb8.yaml"
-      - "cfb8/**"
+      - ".github/workflows/cbc.yml"
+      - "cbc/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: cfb8
+    working-directory: cbc
 
 env:
   CARGO_INCREMENTAL: 0
