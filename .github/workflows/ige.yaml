@@ -3,6 +3,7 @@ name: ige
 on:
   pull_request:
     paths:
+      - ".github/workflows/ige.yaml"
       - "ige/**"
       - "Cargo.*"
   push:
@@ -37,8 +38,6 @@ jobs:
       - run: cargo build --no-default-features --release --target ${{ matrix.target }}
 
   minimal-versions:
-    # disabled until aes gets published
-    if: false
     uses: RustCrypto/actions/.github/workflows/minimal-versions.yml@master
     with:
         working-directory: ${{ github.workflow }}
