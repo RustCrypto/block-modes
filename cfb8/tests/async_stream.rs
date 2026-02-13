@@ -1,7 +1,7 @@
-//! Tests for the [`AsyncStreamCipher`] methods.
+//! Tests for inherent methods.
 use aes::*;
 use cfb8::{Decryptor, Encryptor};
-use cipher::{AsyncStreamCipher, KeyIvInit};
+use cipher::KeyIvInit;
 
 #[test]
 fn aes128_cfb8_async_test() {
@@ -14,17 +14,17 @@ fn aes128_cfb8_async_test() {
     for (i, b) in pt.iter_mut().enumerate() {
         *b = (i % 11) as u8;
     }
-    let enc = Enc::new_from_slices(&key, &iv).unwrap();
+    let mut enc = Enc::new_from_slices(&key, &iv).unwrap();
     let mut ct = pt;
     enc.encrypt(&mut ct);
     for i in 1..100 {
-        let enc = Enc::new_from_slices(&key, &iv).unwrap();
+        let mut enc = Enc::new_from_slices(&key, &iv).unwrap();
         let mut t = pt;
         let t = &mut t[..i];
         enc.encrypt(t);
         assert_eq!(t, &ct[..i]);
 
-        let dec = Dec::new_from_slices(&key, &iv).unwrap();
+        let mut dec = Dec::new_from_slices(&key, &iv).unwrap();
         dec.decrypt(t);
         assert_eq!(t, &pt[..i]);
     }

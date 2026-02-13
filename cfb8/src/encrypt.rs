@@ -1,11 +1,11 @@
 use cipher::{
-    AlgorithmName, AsyncStreamCipher, Block, BlockCipherEncBackend, BlockCipherEncClosure,
-    BlockCipherEncrypt, BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser,
-    InnerIvInit, Iv, IvState, ParBlocksSizeUser,
+    AlgorithmName, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
+    BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InnerIvInit, Iv,
+    IvState, ParBlocksSizeUser,
     array::Array,
     common::{BlockSizes, InnerUser, IvSizeUser},
     consts::U1,
-    inout::InOut,
+    inout::{InOut, InOutBuf, NotEqualError},
 };
 use core::fmt;
 
@@ -67,7 +67,36 @@ where
     }
 }
 
-impl<C: BlockCipherEncrypt> AsyncStreamCipher for Encryptor<C> {}
+impl<C> Encryptor<C>
+where
+    C: BlockCipherEncrypt,
+{
+    /// Encrypt data using `InOutBuf`.
+    pub fn encrypt_inout(&mut self, data: InOutBuf<'_, '_, u8>) {
+        let (blocks, mut tail) = data.into_chunks();
+        self.encrypt_blocks_inout(blocks);
+        let n = tail.len();
+        if n != 0 {
+            let mut block = Block::<Self>::default();
+            block[..n].copy_from_slice(tail.get_in());
+            self.encrypt_block(&mut block);
+            tail.get_out().copy_from_slice(&block[..n]);
+        }
+    }
+
+    /// Encrypt data in place.
+    pub fn encrypt(&mut self, buf: &mut [u8]) {
+        self.encrypt_inout(buf.into());
+    }
+
+    /// Encrypt data from buffer to buffer.
+    ///
+    /// # Errors
+    /// If `in_buf` and `out_buf` have different lengths.
+    pub fn encrypt_b2b(&mut self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<(), NotEqualError> {
+        InOutBuf::new(in_buf, out_buf).map(|b| self.encrypt_inout(b))
+    }
+}
 
 impl<C> InnerUser for Encryptor<C>
 where

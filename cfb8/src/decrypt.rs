@@ -1,11 +1,11 @@
 use cipher::{
-    AlgorithmName, AsyncStreamCipher, Block, BlockCipherEncBackend, BlockCipherEncClosure,
-    BlockCipherEncrypt, BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser,
-    InnerIvInit, Iv, IvState, ParBlocksSizeUser,
+    AlgorithmName, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
+    BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser, InnerIvInit, Iv,
+    IvState, ParBlocksSizeUser,
     array::Array,
     common::{BlockSizes, InnerUser, IvSizeUser},
     consts::U1,
-    inout::InOut,
+    inout::{InOut, InOutBuf, NotEqualError},
 };
 use core::fmt;
 
@@ -67,7 +67,36 @@ where
     }
 }
 
-impl<C: BlockCipherEncrypt> AsyncStreamCipher for Decryptor<C> {}
+impl<C> Decryptor<C>
+where
+    C: BlockCipherEncrypt,
+{
+    /// Decrypt data using `InOutBuf`.
+    pub fn decrypt_inout(&mut self, data: InOutBuf<'_, '_, u8>) {
+        let (blocks, mut tail) = data.into_chunks();
+        self.decrypt_blocks_inout(blocks);
+        let n = tail.len();
+        if n != 0 {
+            let mut block = Block::<Self>::default();
+            block[..n].copy_from_slice(tail.get_in());
+            self.decrypt_block(&mut block);
+            tail.get_out().copy_from_slice(&block[..n]);
+        }
+    }
+
+    /// Decrypt data in place.
+    pub fn decrypt(&mut self, buf: &mut [u8]) {
+        self.decrypt_inout(buf.into());
+    }
+
+    /// Decrypt data from buffer to buffer.
+    ///
+    /// # Errors
+    /// If `in_buf` and `out_buf` have different lengths.
+    pub fn decrypt_b2b(&mut self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<(), NotEqualError> {
+        InOutBuf::new(in_buf, out_buf).map(|b| self.decrypt_inout(b))
+    }
+}
 
 impl<C> InnerUser for Decryptor<C>
 where

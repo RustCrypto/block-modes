@@ -14,7 +14,7 @@
 //!
 //! # Example
 //! ```
-//! use aes::cipher::{AsyncStreamCipher, KeyIvInit};
+//! use aes::cipher::KeyIvInit;
 //! use hex_literal::hex;
 //!
 //! type Aes128Cfb8Enc = cfb8::Encryptor<aes::Aes128>;
