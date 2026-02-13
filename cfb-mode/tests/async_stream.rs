@@ -1,12 +1,10 @@
 //! Tests for the `AsyncStreamCipher` trait methods
 use aes::*;
 use cfb_mode::{BufDecryptor, BufEncryptor, Decryptor, Encryptor};
-use cipher::KeyInit;
+use cipher::{KeyInit, KeyIvInit};
 
 #[test]
 fn aes128_cfb_async_test() {
-    use cipher::{AsyncStreamCipher, KeyIvInit};
-
     type Enc = Encryptor<Aes128>;
     type Dec = Decryptor<Aes128>;
 
@@ -34,8 +32,6 @@ fn aes128_cfb_async_test() {
 
 #[test]
 fn aes128_cfb_buffered_test() {
-    use cipher::{AsyncStreamCipher, KeyIvInit};
-
     type Enc = Encryptor<Aes128>;
 
     type BufEnc = BufEncryptor<Aes128>;
