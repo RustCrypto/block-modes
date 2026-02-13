@@ -12,7 +12,7 @@ Collection of [block modes] written in pure Rust generic over block ciphers.
 Crates in this repository do not ensure ciphertexts are authentic
 (i.e. by using a MAC to verify ciphertext integrity), which can lead to
 serious vulnerabilities if used incorrectly!
-[AEADs][aead-link] provide simple authenticated encryption, which is much
+[RustCrypto/AEADs] provide simple authenticated encryption, which is much
 less error-prone than manual integrity verification.
 
 **USE AT YOUR OWN RISK!**
@@ -58,7 +58,6 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
 [hazmat-image]: https://img.shields.io/badge/crypto-hazmat%E2%9A%A0-red.svg
 [hazmat-link]: https://github.com/RustCrypto/meta/blob/master/HAZMAT.md
-[aead-link]: https://github.com/RustCrypto/AEADs
 [msrv-1.85]: https://img.shields.io/badge/rustc-1.85.0+-blue.svg
 
 [//]: # (crates)
@@ -77,6 +76,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [//]: # (links)
 
 [block modes]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+[RustCrypto/AEADs]: https://github.com/RustCrypto/AEADs
 [BelT CTR]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
 [CBC]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)
 [CFB-8]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CFB-1,_CFB-8,_CFB-64,_CFB-128,_etc.
