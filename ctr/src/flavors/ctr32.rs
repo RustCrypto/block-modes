@@ -1,4 +1,4 @@
-//! 32-bit counter falvors.
+//! 32-bit counter flavors.
 use super::CtrFlavor;
 use cipher::{
     array::{Array, ArraySize},

@@ -36,7 +36,7 @@ where
     C: BlockCipherEncrypt,
 {
     fn encrypt_with_backend(&mut self, f: impl BlockModeEncClosure<BlockSize = Self::BlockSize>) {
-        /// This closure is used to recieve block cipher backend and create
+        /// This closure is used to receive block cipher backend and create
         /// respective `Backend` based on it.
         struct Closure<'a, BS, BC>
         where
