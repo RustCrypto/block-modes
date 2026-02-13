@@ -211,7 +211,7 @@ where
     /// Decrypt data from buffer to buffer.
     ///
     /// # Errors
-    /// Returns [`NotEqualError`] if provided `in_buf` and `out_buf` have different lengths.
+    /// If `in_buf` and `out_buf` have different lengths.
     pub fn decrypt_b2b(self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<(), NotEqualError> {
         InOutBuf::new(in_buf, out_buf).map(|b| self.decrypt_inout(b))
     }
