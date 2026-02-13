@@ -147,7 +147,7 @@ where
     C: BlockCipherEncrypt,
 {
     fn decrypt_with_backend(&mut self, f: impl BlockModeDecClosure<BlockSize = Self::BlockSize>) {
-        /// This closure is used to recieve block cipher backend and
+        /// This closure is used to receive block cipher backend and
         /// create respective [`CbcDecryptBackend`] based on it.
         struct Closure<'a, BS, BC>
         where
