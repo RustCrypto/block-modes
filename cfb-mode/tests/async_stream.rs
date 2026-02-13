@@ -1,4 +1,4 @@
-//! Tests for the `AsyncStreamCipher` trait methods
+//! Tests for inherent methods
 use aes::*;
 use cfb_mode::{BufDecryptor, BufEncryptor, Decryptor, Encryptor};
 use cipher::{KeyInit, KeyIvInit};

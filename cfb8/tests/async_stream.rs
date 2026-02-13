@@ -1,4 +1,4 @@
-//! Tests for the [`AsyncStreamCipher`] methods.
+//! Tests for inherent methods.
 use aes::*;
 use cfb8::{Decryptor, Encryptor};
 use cipher::KeyIvInit;
