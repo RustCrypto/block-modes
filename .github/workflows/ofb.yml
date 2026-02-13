@@ -1,16 +1,17 @@
-name: ctr
+name: ofb
 
 on:
   pull_request:
     paths:
-      - "ctr/**"
+      - ".github/workflows/ofb.yml"
+      - "ofb/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: ctr
+    working-directory: ofb
 
 env:
   CARGO_INCREMENTAL: 0
@@ -37,8 +38,6 @@ jobs:
       - run: cargo build --no-default-features --release --target ${{ matrix.target }}
 
   minimal-versions:
-    # disabled until aes gets published
-    if: false
     uses: RustCrypto/actions/.github/workflows/minimal-versions.yml@master
     with:
         working-directory: ${{ github.workflow }}

@@ -1,16 +1,17 @@
-name: cfb-mode
+name: cfb8
 
 on:
   pull_request:
     paths:
-      - "cfb-mode/**"
+      - ".github/workflows/cfb8.yml"
+      - "cfb8/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: cfb-mode
+    working-directory: cfb8
 
 env:
   CARGO_INCREMENTAL: 0
@@ -37,8 +38,6 @@ jobs:
       - run: cargo build --no-default-features --release --target ${{ matrix.target }}
 
   minimal-versions:
-    # disabled until aes gets published
-    if: false
     uses: RustCrypto/actions/.github/workflows/minimal-versions.yml@master
     with:
         working-directory: ${{ github.workflow }}

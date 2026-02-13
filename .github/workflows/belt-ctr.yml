@@ -1,16 +1,17 @@
-name: cts
+name: belt-ctr
 
 on:
   pull_request:
     paths:
-      - "cts/**"
+      - ".github/workflows/belt-ctr.yml"
+      - "belt-ctr/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: cts
+    working-directory: belt-ctr
 
 env:
   CARGO_INCREMENTAL: 0
@@ -30,15 +31,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: RustCrypto/actions/cargo-cache@master
-      - uses: dtolnay/rust-toolchain@master
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
-          targets: ${{ matrix.target }}
+          target: ${{ matrix.target }}
+          override: true
+          profile: minimal
       - run: cargo build --no-default-features --release --target ${{ matrix.target }}
 
   minimal-versions:
-    # disabled until belt-block gets published
-    if: false
     uses: RustCrypto/actions/.github/workflows/minimal-versions.yml@master
     with:
         working-directory: ${{ github.workflow }}
@@ -53,8 +54,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: RustCrypto/actions/cargo-cache@master
-      - uses: dtolnay/rust-toolchain@master
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
+          override: true
+          profile: minimal
       - run: cargo test
       - run: cargo test --all-features

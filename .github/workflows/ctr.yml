@@ -1,16 +1,17 @@
-name: ige
+name: ctr
 
 on:
   pull_request:
     paths:
-      - "ige/**"
+      - ".github/workflows/ctr.yml"
+      - "ctr/**"
       - "Cargo.*"
   push:
     branches: master
 
 defaults:
   run:
-    working-directory: ige
+    working-directory: ctr
 
 env:
   CARGO_INCREMENTAL: 0
@@ -37,8 +38,6 @@ jobs:
       - run: cargo build --no-default-features --release --target ${{ matrix.target }}
 
   minimal-versions:
-    # disabled until aes gets published
-    if: false
     uses: RustCrypto/actions/.github/workflows/minimal-versions.yml@master
     with:
         working-directory: ${{ github.workflow }}
