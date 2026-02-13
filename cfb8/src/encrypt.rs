@@ -73,15 +73,10 @@ where
 {
     /// Encrypt data using `InOutBuf`.
     pub fn encrypt_inout(&mut self, data: InOutBuf<'_, '_, u8>) {
-        let (blocks, mut tail) = data.into_chunks();
+        let (blocks, tail) = data.into_chunks();
+        // Block size is equal to 1 byte, so the tail must be always empty
+        assert!(tail.is_empty());
         self.encrypt_blocks_inout(blocks);
-        let n = tail.len();
-        if n != 0 {
-            let mut block = Block::<Self>::default();
-            block[..n].copy_from_slice(tail.get_in());
-            self.encrypt_block(&mut block);
-            tail.get_out().copy_from_slice(&block[..n]);
-        }
     }
 
     /// Encrypt data in place.
