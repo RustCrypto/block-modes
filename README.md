@@ -12,7 +12,7 @@ Collection of [block modes] written in pure Rust generic over block ciphers.
 Crates in this repository do not ensure ciphertexts are authentic
 (i.e. by using a MAC to verify ciphertext integrity), which can lead to
 serious vulnerabilities if used incorrectly!
-[AEADs][aead-link] provide simple authenticated encryption, which is much
+[RustCrypto/AEADs] provide simple authenticated encryption, which is much
 less error-prone than manual integrity verification.
 
 **USE AT YOUR OWN RISK!**
@@ -21,16 +21,16 @@ less error-prone than manual integrity verification.
 
 | Name | Crate name | crates.io |  Docs  | MSRV |
 |------|------------|:---------:|:------:|:----:|
-| [BelT CTR] | [`belt-ctr`] |  [![crates.io](https://img.shields.io/crates/v/belt-ctr.svg)](https://crates.io/crates/belt-ctr) | [![Documentation](https://docs.rs/belt-ctr/badge.svg)](https://docs.rs/belt-ctr) |  ![MSRV 1.81][msrv-1.81] |
-| [Cipher Block Chaining][CBC] | [`cbc`] | [![crates.io](https://img.shields.io/crates/v/cbc.svg)](https://crates.io/crates/cbc) | [![Documentation](https://docs.rs/cbc/badge.svg)](https://docs.rs/cbc) |  ![MSRV 1.81][msrv-1.81] |
-| [8-bit Cipher Feedback][CFB-8] | [`cfb8`] | [![crates.io](https://img.shields.io/crates/v/cfb8.svg)](https://crates.io/crates/cfb8) | [![Documentation](https://docs.rs/cfb8/badge.svg)](https://docs.rs/cfb8) |  ![MSRV 1.81][msrv-1.81] |
-| [Full-block Cipher Feedback][CFB] | [`cfb-mode`] | [![crates.io](https://img.shields.io/crates/v/cfb-mode.svg)](https://crates.io/crates/cfb-mode) | [![Documentation](https://docs.rs/cfb-mode/badge.svg)](https://docs.rs/cfb-mode) |  ![MSRV 1.81][msrv-1.81] |
-| [Counter][CTR] | [`ctr`] | [![crates.io](https://img.shields.io/crates/v/ctr.svg)](https://crates.io/crates/ctr) | [![Documentation](https://docs.rs/ctr/badge.svg)](https://docs.rs/ctr) |  ![MSRV 1.81][msrv-1.81] |
-| [Ciphertext stealing][CTS] | [`cts`] | [![crates.io](https://img.shields.io/crates/v/cts.svg)](https://crates.io/crates/cts) | [![Documentation](https://docs.rs/cts/badge.svg)](https://docs.rs/cts) |  ![MSRV 1.81][msrv-1.81] |
-| [GOST R 34.13-2015] | [`gost-modes`] | [![crates.io](https://img.shields.io/crates/v/gost-modes.svg)](https://crates.io/crates/gost-modes) | [![Documentation](https://docs.rs/gost-modes/badge.svg)](https://docs.rs/gost-modes) | ![MSRV 1.81][msrv-1.81] |
-| [Infinite Garble Extension][IGE] | [`ige`] | [![crates.io](https://img.shields.io/crates/v/ige.svg)](https://crates.io/crates/ige) | [![Documentation](https://docs.rs/ige/badge.svg)](https://docs.rs/ige) |  ![MSRV 1.81][msrv-1.81] |
-| [Output Feedback][OFB] | [`ofb`] | [![crates.io](https://img.shields.io/crates/v/ofb.svg)](https://crates.io/crates/ofb) | [![Documentation](https://docs.rs/ofb/badge.svg)](https://docs.rs/ofb) |  ![MSRV 1.81][msrv-1.81] |
-| [Propagating Cipher Block Chaining][PCBC] | [`pcbc`] | [![crates.io](https://img.shields.io/crates/v/pcbc.svg)](https://crates.io/crates/pcbc) | [![Documentation](https://docs.rs/pcbc/badge.svg)](https://docs.rs/pcbc) |  ![MSRV 1.81][msrv-1.81] |
+| [BelT CTR] | [`belt-ctr`] |  [![crates.io](https://img.shields.io/crates/v/belt-ctr.svg)](https://crates.io/crates/belt-ctr) | [![Documentation](https://docs.rs/belt-ctr/badge.svg)](https://docs.rs/belt-ctr) |  ![MSRV 1.85][msrv-1.85] |
+| [Cipher Block Chaining][CBC] | [`cbc`] | [![crates.io](https://img.shields.io/crates/v/cbc.svg)](https://crates.io/crates/cbc) | [![Documentation](https://docs.rs/cbc/badge.svg)](https://docs.rs/cbc) |  ![MSRV 1.85][msrv-1.85] |
+| [8-bit Cipher Feedback][CFB-8] | [`cfb8`] | [![crates.io](https://img.shields.io/crates/v/cfb8.svg)](https://crates.io/crates/cfb8) | [![Documentation](https://docs.rs/cfb8/badge.svg)](https://docs.rs/cfb8) |  ![MSRV 1.85][msrv-1.85] |
+| [Full-block Cipher Feedback][CFB] | [`cfb-mode`] | [![crates.io](https://img.shields.io/crates/v/cfb-mode.svg)](https://crates.io/crates/cfb-mode) | [![Documentation](https://docs.rs/cfb-mode/badge.svg)](https://docs.rs/cfb-mode) |  ![MSRV 1.85][msrv-1.85] |
+| [Counter][CTR] | [`ctr`] | [![crates.io](https://img.shields.io/crates/v/ctr.svg)](https://crates.io/crates/ctr) | [![Documentation](https://docs.rs/ctr/badge.svg)](https://docs.rs/ctr) |  ![MSRV 1.85][msrv-1.85] |
+| [Ciphertext stealing][CTS] | [`cts`] | [![crates.io](https://img.shields.io/crates/v/cts.svg)](https://crates.io/crates/cts) | [![Documentation](https://docs.rs/cts/badge.svg)](https://docs.rs/cts) |  ![MSRV 1.85][msrv-1.85] |
+| [GOST R 34.13-2015] | [`gost-modes`] | [![crates.io](https://img.shields.io/crates/v/gost-modes.svg)](https://crates.io/crates/gost-modes) | [![Documentation](https://docs.rs/gost-modes/badge.svg)](https://docs.rs/gost-modes) | ![MSRV 1.85][msrv-1.85] |
+| [Infinite Garble Extension][IGE] | [`ige`] | [![crates.io](https://img.shields.io/crates/v/ige.svg)](https://crates.io/crates/ige) | [![Documentation](https://docs.rs/ige/badge.svg)](https://docs.rs/ige) |  ![MSRV 1.85][msrv-1.85] |
+| [Output Feedback][OFB] | [`ofb`] | [![crates.io](https://img.shields.io/crates/v/ofb.svg)](https://crates.io/crates/ofb) | [![Documentation](https://docs.rs/ofb/badge.svg)](https://docs.rs/ofb) |  ![MSRV 1.85][msrv-1.85] |
+| [Propagating Cipher Block Chaining][PCBC] | [`pcbc`] | [![crates.io](https://img.shields.io/crates/v/pcbc.svg)](https://crates.io/crates/pcbc) | [![Documentation](https://docs.rs/pcbc/badge.svg)](https://docs.rs/pcbc) |  ![MSRV 1.85][msrv-1.85] |
 
 ### Minimum Supported Rust Version (MSRV) Policy
 
@@ -58,8 +58,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [license-image]: https://img.shields.io/badge/license-Apache2.0/MIT-blue.svg
 [hazmat-image]: https://img.shields.io/badge/crypto-hazmat%E2%9A%A0-red.svg
 [hazmat-link]: https://github.com/RustCrypto/meta/blob/master/HAZMAT.md
-[aead-link]: https://github.com/RustCrypto/AEADs
-[msrv-1.81]: https://img.shields.io/badge/rustc-1.81.0+-blue.svg
+[msrv-1.85]: https://img.shields.io/badge/rustc-1.85.0+-blue.svg
 
 [//]: # (crates)
 
@@ -77,6 +76,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [//]: # (links)
 
 [block modes]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+[RustCrypto/AEADs]: https://github.com/RustCrypto/AEADs
 [BelT CTR]: https://apmi.bsu.by/assets/files/std/belt-spec371.pdf
 [CBC]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC)
 [CFB-8]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CFB-1,_CFB-8,_CFB-64,_CFB-128,_etc.
