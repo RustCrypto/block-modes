@@ -4,7 +4,7 @@ use cipher::{
     BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocks, ParBlocksSizeUser, StreamCipherBackend,
     StreamCipherClosure, StreamCipherCore, StreamCipherSeekCore,
     array::ArraySize,
-    common::{BlockSizes, InnerUser, IvSizeUser},
+    common::{InnerUser, IvSizeUser},
 };
 use core::fmt;
 
@@ -53,7 +53,7 @@ where
 
         impl<F, BS, SC> BlockSizeUser for Closure<'_, F, BS, SC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             F: CtrFlavor<BS>,
             SC: StreamCipherClosure<BlockSize = BS>,
         {
@@ -62,7 +62,7 @@ where
 
         impl<F, BS, SC> BlockCipherEncClosure for Closure<'_, F, BS, SC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             F: CtrFlavor<BS>,
             SC: StreamCipherClosure<BlockSize = BS>,
         {

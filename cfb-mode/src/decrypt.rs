@@ -2,7 +2,8 @@ use cipher::{
     AlgorithmName, Array, Block, BlockCipherDecrypt, BlockCipherEncBackend, BlockCipherEncClosure,
     BlockCipherEncrypt, BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser,
     InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks, ParBlocksSizeUser,
-    common::{BlockSizes, InnerUser},
+    array::ArraySize,
+    common::InnerUser,
     inout::{InOut, InOutBuf, NotEqualError},
     typenum::Unsigned,
 };
@@ -151,7 +152,7 @@ where
         /// create respective [`CbcDecryptBackend`] based on it.
         struct Closure<'a, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeDecClosure<BlockSize = BS>,
         {
             iv: &'a mut Array<u8, BS>,
@@ -160,7 +161,7 @@ where
 
         impl<BS, BC> BlockSizeUser for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeDecClosure<BlockSize = BS>,
         {
             type BlockSize = BS;
@@ -168,7 +169,7 @@ where
 
         impl<BS, BC> BlockCipherEncClosure for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeDecClosure<BlockSize = BS>,
         {
             #[inline(always)]
@@ -289,7 +290,7 @@ impl<C: BlockCipherEncrypt + ZeroizeOnDrop> ZeroizeOnDrop for Decryptor<C> {}
 
 struct CbcDecryptBackend<'a, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     iv: &'a mut Array<u8, BS>,
@@ -298,7 +299,7 @@ where
 
 impl<BS, BK> BlockSizeUser for CbcDecryptBackend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type BlockSize = BS;
@@ -306,7 +307,7 @@ where
 
 impl<BS, BK> ParBlocksSizeUser for CbcDecryptBackend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type ParBlocksSize = BK::ParBlocksSize;
@@ -314,7 +315,7 @@ where
 
 impl<BS, BK> BlockModeDecBackend for CbcDecryptBackend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     #[inline(always)]

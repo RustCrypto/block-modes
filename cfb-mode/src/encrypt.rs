@@ -2,8 +2,8 @@ use cipher::{
     AlgorithmName, Block, BlockCipherDecrypt, BlockCipherEncBackend, BlockCipherEncClosure,
     BlockCipherEncrypt, BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser,
     InnerIvInit, Iv, IvSizeUser, IvState, ParBlocksSizeUser,
-    array::Array,
-    common::{BlockSizes, InnerUser},
+    array::{Array, ArraySize},
+    common::InnerUser,
     consts::U1,
     inout::{InOut, InOutBuf, NotEqualError},
 };
@@ -40,7 +40,7 @@ where
         /// respective `Backend` based on it.
         struct Closure<'a, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             iv: &'a mut Array<u8, BS>,
@@ -49,7 +49,7 @@ where
 
         impl<BS, BC> BlockSizeUser for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             type BlockSize = BS;
@@ -57,7 +57,7 @@ where
 
         impl<BS, BC> BlockCipherEncClosure for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             #[inline(always)]
@@ -178,7 +178,7 @@ impl<C: BlockCipherEncrypt + ZeroizeOnDrop> ZeroizeOnDrop for Encryptor<C> {}
 
 struct CbcEncryptBackend<'a, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     iv: &'a mut Array<u8, BS>,
@@ -187,7 +187,7 @@ where
 
 impl<BS, BK> BlockSizeUser for CbcEncryptBackend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type BlockSize = BS;
@@ -195,7 +195,7 @@ where
 
 impl<BS, BK> ParBlocksSizeUser for CbcEncryptBackend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type ParBlocksSize = U1;
@@ -203,7 +203,7 @@ where
 
 impl<BS, BK> BlockModeEncBackend for CbcEncryptBackend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     #[inline(always)]

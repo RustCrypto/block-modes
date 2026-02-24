@@ -2,8 +2,8 @@ use crate::{Decrypt, Encrypt, Error, cbc_dec, cbc_enc, xor};
 use cipher::{
     Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
     BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, InnerIvInit, IvSizeUser,
-    array::Array,
-    common::{BlockSizes, InnerUser},
+    array::{Array, ArraySize},
+    common::InnerUser,
     inout::InOutBuf,
     typenum::Unsigned,
 };
@@ -53,16 +53,16 @@ impl<C: BlockCipherDecrypt> Decrypt for CbcCs2<C> {
     }
 }
 
-struct Closure<'a, BS: BlockSizes> {
+struct Closure<'a, BS: ArraySize> {
     iv: Array<u8, BS>,
     buf: InOutBuf<'a, 'a, u8>,
 }
 
-impl<BS: BlockSizes> BlockSizeUser for Closure<'_, BS> {
+impl<BS: ArraySize> BlockSizeUser for Closure<'_, BS> {
     type BlockSize = BS;
 }
 
-impl<BS: BlockSizes> BlockCipherEncClosure for Closure<'_, BS> {
+impl<BS: ArraySize> BlockCipherEncClosure for Closure<'_, BS> {
     fn call<B: BlockCipherEncBackend<BlockSize = BS>>(self, cipher: &B) {
         let Self { mut iv, mut buf } = self;
         let (mut blocks, mut tail) = buf.reborrow().into_chunks();
@@ -84,7 +84,7 @@ impl<BS: BlockSizes> BlockCipherEncClosure for Closure<'_, BS> {
     }
 }
 
-impl<BS: BlockSizes> BlockCipherDecClosure for Closure<'_, BS> {
+impl<BS: ArraySize> BlockCipherDecClosure for Closure<'_, BS> {
     fn call<B: BlockCipherDecBackend<BlockSize = BS>>(self, cipher: &B) {
         let Self { mut iv, mut buf } = self;
 
