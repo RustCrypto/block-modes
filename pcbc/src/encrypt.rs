@@ -3,8 +3,8 @@ use cipher::{
     AlgorithmName, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InnerIvInit, Iv,
     IvState, ParBlocksSizeUser,
-    array::Array,
-    common::{BlockSizes, InnerUser, IvSizeUser},
+    array::{Array, ArraySize},
+    common::{InnerUser, IvSizeUser},
     consts::U1,
     inout::InOut,
 };
@@ -38,7 +38,7 @@ where
         /// respective `Backend` based on it.
         struct Closure<'a, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             iv: &'a mut Array<u8, BS>,
@@ -47,7 +47,7 @@ where
 
         impl<BS, BC> BlockSizeUser for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             type BlockSize = BS;
@@ -55,7 +55,7 @@ where
 
         impl<BS, BC> BlockCipherEncClosure for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             #[inline(always)]
@@ -141,7 +141,7 @@ impl<C: BlockCipherEncrypt + ZeroizeOnDrop> ZeroizeOnDrop for Encryptor<C> {}
 
 struct Backend<'a, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     iv: &'a mut Array<u8, BS>,
@@ -150,7 +150,7 @@ where
 
 impl<BS, BK> BlockSizeUser for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type BlockSize = BS;
@@ -158,7 +158,7 @@ where
 
 impl<BS, BK> ParBlocksSizeUser for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type ParBlocksSize = U1;
@@ -166,7 +166,7 @@ where
 
 impl<BS, BK> BlockModeEncBackend for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     #[inline(always)]

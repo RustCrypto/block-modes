@@ -71,7 +71,8 @@ use cipher::{
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvState,
     ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
     StreamCipherCoreWrapper,
-    common::{BlockSizes, InnerUser, IvSizeUser},
+    array::ArraySize,
+    common::{InnerUser, IvSizeUser},
     consts::U1,
 };
 use core::fmt;
@@ -148,7 +149,7 @@ where
     fn process_with_backend(&mut self, f: impl StreamCipherClosure<BlockSize = Self::BlockSize>) {
         pub(crate) struct Closure<'a, BS, SC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             SC: StreamCipherClosure<BlockSize = BS>,
         {
             pub(crate) iv: &'a mut Array<u8, BS>,
@@ -157,7 +158,7 @@ where
 
         impl<BS, SC> BlockSizeUser for Closure<'_, BS, SC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             SC: StreamCipherClosure<BlockSize = BS>,
         {
             type BlockSize = BS;
@@ -165,7 +166,7 @@ where
 
         impl<BS, SC> BlockCipherEncClosure for Closure<'_, BS, SC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             SC: StreamCipherClosure<BlockSize = BS>,
         {
             #[inline(always)]
@@ -188,7 +189,7 @@ where
     fn encrypt_with_backend(&mut self, f: impl BlockModeEncClosure<BlockSize = Self::BlockSize>) {
         pub(crate) struct Closure<'a, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             pub(crate) iv: &'a mut Array<u8, BS>,
@@ -197,7 +198,7 @@ where
 
         impl<BS, BC> BlockSizeUser for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             type BlockSize = BS;
@@ -205,7 +206,7 @@ where
 
         impl<BS, BC> BlockCipherEncClosure for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeEncClosure<BlockSize = BS>,
         {
             #[inline(always)]
@@ -228,7 +229,7 @@ where
     fn decrypt_with_backend(&mut self, f: impl BlockModeDecClosure<BlockSize = Self::BlockSize>) {
         pub(crate) struct Closure<'a, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeDecClosure<BlockSize = BS>,
         {
             pub(crate) iv: &'a mut Array<u8, BS>,
@@ -237,7 +238,7 @@ where
 
         impl<BS, BC> BlockSizeUser for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeDecClosure<BlockSize = BS>,
         {
             type BlockSize = BS;
@@ -245,7 +246,7 @@ where
 
         impl<BS, BC> BlockCipherEncClosure for Closure<'_, BS, BC>
         where
-            BS: BlockSizes,
+            BS: ArraySize,
             BC: BlockModeDecClosure<BlockSize = BS>,
         {
             #[inline(always)]
@@ -294,7 +295,7 @@ impl<C: BlockCipherEncrypt + ZeroizeOnDrop> ZeroizeOnDrop for OfbCore<C> {}
 
 pub(crate) struct Backend<'a, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     pub iv: &'a mut Array<u8, BS>,
@@ -303,7 +304,7 @@ where
 
 impl<BS, BK> BlockSizeUser for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type BlockSize = BS;
@@ -311,7 +312,7 @@ where
 
 impl<BS, BK> ParBlocksSizeUser for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     type ParBlocksSize = U1;
@@ -319,7 +320,7 @@ where
 
 impl<BS, BK> StreamCipherBackend for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     #[inline(always)]
@@ -331,7 +332,7 @@ where
 
 impl<BS, BK> BlockModeEncBackend for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     #[inline(always)]
@@ -343,7 +344,7 @@ where
 
 impl<BS, BK> BlockModeDecBackend for Backend<'_, BS, BK>
 where
-    BS: BlockSizes,
+    BS: ArraySize,
     BK: BlockCipherEncBackend<BlockSize = BS>,
 {
     #[inline(always)]

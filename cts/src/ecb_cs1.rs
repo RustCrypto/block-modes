@@ -4,7 +4,8 @@ use crate::{Decrypt, Encrypt, Error, ecb_dec, ecb_enc};
 use cipher::{
     Block, BlockCipherDecBackend, BlockCipherDecClosure, BlockCipherDecrypt, BlockCipherEncBackend,
     BlockCipherEncClosure, BlockCipherEncrypt, BlockSizeUser, IvSizeUser,
-    common::{BlockSizes, InnerInit, InnerUser},
+    array::ArraySize,
+    common::{InnerInit, InnerUser},
     inout::InOutBuf,
     typenum::Unsigned,
 };
@@ -54,16 +55,16 @@ impl<C: BlockCipherDecrypt> Decrypt for EcbCs1<C> {
     }
 }
 
-struct Closure<'a, BS: BlockSizes> {
+struct Closure<'a, BS: ArraySize> {
     buf: InOutBuf<'a, 'a, u8>,
     _pd: PhantomData<BS>,
 }
 
-impl<BS: BlockSizes> BlockSizeUser for Closure<'_, BS> {
+impl<BS: ArraySize> BlockSizeUser for Closure<'_, BS> {
     type BlockSize = BS;
 }
 
-impl<BS: BlockSizes> BlockCipherEncClosure for Closure<'_, BS> {
+impl<BS: ArraySize> BlockCipherEncClosure for Closure<'_, BS> {
     fn call<B: BlockCipherEncBackend<BlockSize = BS>>(self, cipher: &B) {
         let mut buf = self.buf;
         let (mut blocks, tail) = buf.reborrow().into_chunks();
@@ -88,7 +89,7 @@ impl<BS: BlockSizes> BlockCipherEncClosure for Closure<'_, BS> {
     }
 }
 
-impl<BS: BlockSizes> BlockCipherDecClosure for Closure<'_, BS> {
+impl<BS: ArraySize> BlockCipherDecClosure for Closure<'_, BS> {
     fn call<B: BlockCipherDecBackend<BlockSize = BS>>(self, cipher: &B) {
         let mut buf = self.buf;
         let (mut blocks, tail) = buf.reborrow().into_chunks();
