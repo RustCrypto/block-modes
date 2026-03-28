@@ -100,7 +100,7 @@ where
         }
 
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend(Closure { iv, f })
+        cipher.encrypt_with_backend(Closure { iv, f });
     }
 }
 

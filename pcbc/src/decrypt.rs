@@ -69,7 +69,7 @@ where
         }
 
         let Self { cipher, iv } = self;
-        cipher.decrypt_with_backend(Closure { iv, f })
+        cipher.decrypt_with_backend(Closure { iv, f });
     }
 }
 

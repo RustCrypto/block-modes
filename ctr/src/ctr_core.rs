@@ -69,7 +69,7 @@ where
             #[inline(always)]
             fn call<B: BlockCipherEncBackend<BlockSize = BS>>(self, backend: &B) {
                 let Self { ctr_nonce, f } = self;
-                f.call(&mut Backend::<F, B> { ctr_nonce, backend })
+                f.call(&mut Backend::<F, B> { ctr_nonce, backend });
             }
         }
 

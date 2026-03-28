@@ -66,7 +66,7 @@ where
         }
 
         let Self { cipher, iv } = self;
-        cipher.decrypt_with_backend(Closure { iv, f })
+        cipher.decrypt_with_backend(Closure { iv, f });
     }
 }
 
@@ -188,7 +188,7 @@ where
         let n = t.len();
         xor(&mut t[0], self.iv);
         for i in 1..n {
-            xor(&mut t[i], &in_blocks[i - 1])
+            xor(&mut t[i], &in_blocks[i - 1]);
         }
         *blocks.get_out() = t;
         *self.iv = in_blocks[n - 1].clone();

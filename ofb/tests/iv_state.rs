@@ -1,3 +1,5 @@
+//! IV state tests.
+
 use aes::*;
 use cipher::iv_state_test;
 use ofb::OfbCore;

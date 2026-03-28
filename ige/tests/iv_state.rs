@@ -1,3 +1,5 @@
+//! IV state tests.
+
 use aes::Aes128;
 use cipher::iv_state_test;
 use ige::{Decryptor, Encryptor};

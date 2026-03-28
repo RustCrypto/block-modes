@@ -4,9 +4,7 @@
     html_logo_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg",
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"
 )]
-#![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![warn(missing_debug_implementations, missing_docs, rust_2018_idioms)]
 
 pub use cipher;
 
@@ -58,7 +56,7 @@ where
             #[inline(always)]
             fn call<B: BlockCipherEncBackend<BlockSize = U16>>(self, cipher_backend: &B) {
                 let Self { s, f } = self;
-                f.call(&mut Backend { s, cipher_backend })
+                f.call(&mut Backend { s, cipher_backend });
             }
         }
 
