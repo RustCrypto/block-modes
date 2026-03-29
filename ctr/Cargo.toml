@@ -27,6 +27,8 @@ alloc = ["cipher/alloc"]
 block-padding = ["cipher/block-padding"]
 zeroize = ["cipher/zeroize"]
 
+[lints]
+workspace = true
+
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs"]

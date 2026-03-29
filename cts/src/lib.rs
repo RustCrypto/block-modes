@@ -4,9 +4,8 @@
     html_logo_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg",
     html_favicon_url = "https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"
 )]
-#![deny(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![warn(missing_docs, rust_2018_idioms)]
+#![allow(clippy::unwrap_used, reason = "todo: convert to expect")]
 
 pub use cipher;
 
@@ -29,7 +28,7 @@ pub use ecb_cs3::EcbCs3;
 use cipher::{
     Block, BlockCipherDecBackend, BlockCipherEncBackend,
     array::{Array, ArraySize},
-    inout::{InOutBuf, NotEqualError},
+    inout::InOutBuf,
     typenum::Unsigned,
 };
 
@@ -40,17 +39,26 @@ pub struct Error;
 /// Encryption functionality of CTS modes.
 pub trait Encrypt: Sized {
     /// Encrypt `inout` buffer.
+    ///
+    /// # Errors
+    /// If encryption failed.
     fn encrypt_inout(self, buf: InOutBuf<'_, '_, u8>) -> Result<(), Error>;
 
     /// Encrypt data in-place.
+    ///
+    /// # Errors
+    /// If encryption failed.
     fn encrypt(self, buf: &mut [u8]) -> Result<(), Error> {
         self.encrypt_inout(buf.into())
     }
 
     /// Encrypt data buffer-to-buffer.
+    ///
+    /// # Errors
+    /// If encryption failed.
     fn encrypt_b2b(self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<(), Error> {
         InOutBuf::new(in_buf, out_buf)
-            .map_err(|NotEqualError| Error)
+            .map_err(|_| Error)
             .and_then(|buf| self.encrypt_inout(buf))
     }
 }
@@ -58,17 +66,26 @@ pub trait Encrypt: Sized {
 /// Decryption functionality of CTS modes.
 pub trait Decrypt: Sized {
     /// Decrypt `inout` buffer.
+    ///
+    /// # Errors
+    /// If decryption failed.
     fn decrypt_inout(self, buf: InOutBuf<'_, '_, u8>) -> Result<(), Error>;
 
     /// Decrypt data in-place.
+    ///
+    /// # Errors
+    /// If decryption failed.
     fn decrypt(self, buf: &mut [u8]) -> Result<(), Error> {
         self.decrypt_inout(buf.into())
     }
 
     /// Decrypt data buffer-to-buffer.
+    ///
+    /// # Errors
+    /// If decryption failed.
     fn decrypt_b2b(self, in_buf: &[u8], out_buf: &mut [u8]) -> Result<(), Error> {
         InOutBuf::new(in_buf, out_buf)
-            .map_err(|NotEqualError| Error)
+            .map_err(|_| Error)
             .and_then(|buf| self.decrypt_inout(buf))
     }
 }
@@ -130,7 +147,7 @@ fn cbc_dec<B: BlockCipherDecBackend>(
             let n = t.len();
             xor(&mut t[0], iv);
             for i in 1..n {
-                xor(&mut t[i], &in_blocks[i - 1])
+                xor(&mut t[i], &in_blocks[i - 1]);
             }
             *blocks.get_out() = t;
             *iv = in_blocks[n - 1].clone();

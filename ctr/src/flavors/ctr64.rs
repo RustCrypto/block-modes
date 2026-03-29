@@ -38,7 +38,7 @@ impl<N: ArraySize> Drop for CtrNonce64<N> {
 impl<N: ArraySize> cipher::zeroize::ZeroizeOnDrop for CtrNonce64<N> {}
 
 /// 64-bit big endian counter flavor.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Ctr64BE {}
 
 impl<B> CtrFlavor<B> for Ctr64BE
@@ -80,7 +80,9 @@ where
     fn from_nonce(block: &Array<u8, B>) -> Self::CtrNonce {
         let mut nonce = Array::<u64, Chunks<B>>::default();
         for i in 0..Chunks::<B>::USIZE {
-            let chunk = block[CS * i..][..CS].try_into().unwrap();
+            let chunk = block[CS * i..][..CS]
+                .try_into()
+                .expect("should be the correct size");
             nonce[i] = if i == Chunks::<B>::USIZE - 1 {
                 u64::from_be_bytes(chunk)
             } else {
@@ -103,7 +105,7 @@ where
 }
 
 /// 64-bit little endian counter flavor.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Ctr64LE {}
 
 impl<B> CtrFlavor<B> for Ctr64LE
@@ -145,7 +147,9 @@ where
     fn from_nonce(block: &Array<u8, B>) -> Self::CtrNonce {
         let mut nonce = Array::<u64, Chunks<B>>::default();
         for i in 0..Chunks::<B>::USIZE {
-            let chunk = block[CS * i..][..CS].try_into().unwrap();
+            let chunk = block[CS * i..][..CS]
+                .try_into()
+                .expect("should be the correct size");
             nonce[i] = if i == 0 {
                 u64::from_le_bytes(chunk)
             } else {

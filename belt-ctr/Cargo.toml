@@ -25,6 +25,8 @@ cipher = { version = "0.5", features = ["dev"] }
 alloc = ["cipher/alloc"]
 zeroize = ["cipher/zeroize"]
 
+[lints]
+workspace = true
+
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs"]

@@ -1,3 +1,5 @@
+//! IV state tests.
+
 use aes::*;
 use cfb_mode::{Decryptor, Encryptor};
 use cipher::iv_state_test;

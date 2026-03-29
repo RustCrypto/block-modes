@@ -1,3 +1,5 @@
+//! AES-128 round trip test.
+
 use aes::Aes128;
 use cts::{
     Decrypt, Encrypt,
@@ -8,6 +10,8 @@ const KEY: [u8; 16] = [0x42; 16];
 const IV: [u8; 16] = [0x24; 16];
 
 const N: usize = 256;
+
+#[allow(clippy::cast_possible_truncation, reason = "i is always < N i.e. 256")]
 const MSG: [u8; N] = {
     let mut res = [0u8; N];
     let mut i = 0;

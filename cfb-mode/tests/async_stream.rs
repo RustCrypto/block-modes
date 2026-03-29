@@ -12,7 +12,7 @@ fn aes128_cfb_async_test() {
     let iv = [24; 16];
     let mut pt = [0u8; 101];
     for (i, b) in pt.iter_mut().enumerate() {
-        *b = (i % 11) as u8;
+        *b = u8::try_from(i % 11).unwrap();
     }
     let enc = Enc::new_from_slices(&key, &iv).unwrap();
     let mut ct = pt;
@@ -41,7 +41,7 @@ fn aes128_cfb_buffered_test() {
     let iv = [24; 16];
     let mut pt = [0u8; 101];
     for (i, b) in pt.iter_mut().enumerate() {
-        *b = (i % 11) as u8;
+        *b = u8::try_from(i % 11).unwrap();
     }
 
     // unbuffered

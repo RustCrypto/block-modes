@@ -183,7 +183,7 @@ where
         }
 
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend(Closure { iv, f })
+        cipher.encrypt_with_backend(Closure { iv, f });
     }
 }
 
@@ -335,7 +335,7 @@ where
         let n = t.len();
         blocks.get(0).xor_in2out(self.iv);
         for i in 1..n {
-            blocks.get(i).xor_in2out(&t[i - 1])
+            blocks.get(i).xor_in2out(&t[i - 1]);
         }
         *self.iv = t[n - 1].clone();
     }

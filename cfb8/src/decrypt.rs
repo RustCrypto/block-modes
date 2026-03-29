@@ -63,7 +63,7 @@ where
         }
 
         let Self { cipher, iv } = self;
-        cipher.encrypt_with_backend(Closure { iv, f })
+        cipher.encrypt_with_backend(Closure { iv, f });
     }
 }
 
@@ -72,6 +72,7 @@ where
     C: BlockCipherEncrypt,
 {
     /// Decrypt data using `InOutBuf`.
+    #[allow(clippy::missing_panics_doc, reason = "tail is always empty")]
     pub fn decrypt_inout(&mut self, data: InOutBuf<'_, '_, u8>) {
         let (blocks, tail) = data.into_chunks();
         // Block size is equal to 1 byte, so the tail must be always empty
@@ -195,8 +196,8 @@ where
         let mut t = self.iv.clone();
         self.backend.encrypt_block((&mut t).into());
         let r = block.get(0).clone_in();
-        let k: &Array<u8, U1> = t[..1].try_into().unwrap();
-        block.xor_in2out(k);
+        let k = Array([t[0]]);
+        block.xor_in2out(&k);
         let n = self.iv.len();
         for i in 0..n - 1 {
             self.iv[i] = self.iv[i + 1];

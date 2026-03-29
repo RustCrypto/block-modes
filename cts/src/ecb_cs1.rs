@@ -11,6 +11,7 @@ use cipher::{
 };
 
 /// The ECB-CS-1 ciphertext stealing mode.
+#[derive(Debug)]
 pub struct EcbCs1<C: BlockSizeUser> {
     cipher: C,
 }

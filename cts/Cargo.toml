@@ -21,6 +21,8 @@ hex-literal = "1"
 aes = "0.9.0-rc.4"
 belt-block = "0.2.0-rc.3"
 
+[lints]
+workspace = true
+
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs"]

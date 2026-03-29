@@ -70,7 +70,7 @@ where
         }
 
         let Self { cipher, x, y } = self;
-        cipher.encrypt_with_backend(Closure { x, y, f })
+        cipher.encrypt_with_backend(Closure { x, y, f });
     }
 }
 
@@ -110,8 +110,8 @@ where
     #[inline]
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
         let n = C::BlockSize::USIZE;
-        let y = iv[..n].try_into().unwrap();
-        let x = iv[n..].try_into().unwrap();
+        let y = iv[..n].try_into().expect("should be the correct size");
+        let x = iv[n..].try_into().expect("should be the correct size");
         Self { cipher, x, y }
     }
 }
