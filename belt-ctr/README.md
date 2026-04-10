@@ -32,7 +32,7 @@ let ciphertext: &[u8; 34] = &hex!(
     "7D1B"
 );
 
-let mut cipher: BeltCtr = BeltCtr::new_from_slices(key, iv).unwrap();
+let mut cipher = BeltCtr::new_from_slices(key, iv).unwrap();
 
 // encrypt in-place
 let mut buf = plaintext.clone();

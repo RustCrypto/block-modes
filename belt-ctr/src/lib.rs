@@ -20,11 +20,16 @@ use core::fmt;
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
-/// Byte-level BelT CTR
-pub type BeltCtr<C = BeltBlock> = StreamCipherCoreWrapper<BeltCtrCore<C>>;
+/// Byte-level BelT CTR generic over block cipher implementation
+pub type GenericBeltCtr<C> = StreamCipherCoreWrapper<GenericBeltCtrCore<C>>;
 
+/// Byte-level BelT CTR
+pub type BeltCtr = GenericBeltCtr<BeltBlock>;
 /// Block-level BelT CTR
-pub struct BeltCtrCore<C = BeltBlock>
+pub type BeltCtrCore = GenericBeltCtrCore<BeltBlock>;
+
+/// Block-level BelT CTR generic over block cipher implementation
+pub struct GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
@@ -33,7 +38,7 @@ where
     s_init: u128,
 }
 
-impl<C> StreamCipherCore for BeltCtrCore<C>
+impl<C> StreamCipherCore for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
@@ -65,7 +70,7 @@ where
     }
 }
 
-impl<C> StreamCipherSeekCore for BeltCtrCore<C>
+impl<C> StreamCipherSeekCore for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
@@ -80,28 +85,28 @@ where
     }
 }
 
-impl<C> BlockSizeUser for BeltCtrCore<C>
+impl<C> BlockSizeUser for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     type BlockSize = C::BlockSize;
 }
 
-impl<C> IvSizeUser for BeltCtrCore<C>
+impl<C> IvSizeUser for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     type IvSize = C::BlockSize;
 }
 
-impl<C> InnerUser for BeltCtrCore<C>
+impl<C> InnerUser for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
     type Inner = C;
 }
 
-impl<C> InnerIvInit for BeltCtrCore<C>
+impl<C> InnerIvInit for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
@@ -118,7 +123,7 @@ where
     }
 }
 
-impl<C> IvState for BeltCtrCore<C>
+impl<C> IvState for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockCipherDecrypt + BlockSizeUser<BlockSize = U16>,
 {
@@ -129,7 +134,7 @@ where
     }
 }
 
-impl<C> AlgorithmName for BeltCtrCore<C>
+impl<C> AlgorithmName for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
 {
@@ -140,7 +145,7 @@ where
     }
 }
 
-impl<C> fmt::Debug for BeltCtrCore<C>
+impl<C> fmt::Debug for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
 {
@@ -152,7 +157,7 @@ where
     }
 }
 
-impl<C: BlockCipherEncrypt> Drop for BeltCtrCore<C>
+impl<C: BlockCipherEncrypt> Drop for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
@@ -166,7 +171,7 @@ where
 }
 
 #[cfg(feature = "zeroize")]
-impl<C> ZeroizeOnDrop for BeltCtrCore<C> where
+impl<C> ZeroizeOnDrop for GenericBeltCtrCore<C> where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + ZeroizeOnDrop
 {
 }
