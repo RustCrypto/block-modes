@@ -20,13 +20,12 @@ use core::fmt;
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 
-/// Byte-level BelT CTR generic over block cipher implementation
-pub type GenericBeltCtr<C> = StreamCipherCoreWrapper<GenericBeltCtrCore<C>>;
-
 /// Byte-level BelT CTR
 pub type BeltCtr = GenericBeltCtr<BeltBlock>;
 /// Block-level BelT CTR
 pub type BeltCtrCore = GenericBeltCtrCore<BeltBlock>;
+/// Byte-level BelT CTR generic over block cipher implementation
+pub type GenericBeltCtr<C> = StreamCipherCoreWrapper<GenericBeltCtrCore<C>>;
 
 /// Block-level BelT CTR generic over block cipher implementation
 pub struct GenericBeltCtrCore<C>
