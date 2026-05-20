@@ -1,16 +1,16 @@
 [package]
 name = "belt-ctr"
 version = "0.2.1"
-description = "CTR block mode of operation specified by the BelT standard"
 authors = ["RustCrypto Developers"]
-license = "MIT OR Apache-2.0"
 edition = "2024"
 rust-version = "1.85"
-readme = "README.md"
 documentation = "https://docs.rs/belt-ctr"
+readme = "README.md"
 repository = "https://github.com/RustCrypto/block-modes"
+license = "MIT OR Apache-2.0"
 keywords = ["crypto", "block-mode", "stream-cipher", "ciphers", "belt"]
 categories = ["cryptography", "no-std"]
+description = "CTR block mode of operation specified by the BelT standard"
 
 [dependencies]
 cipher = { version = "0.5.2", features = ["stream-wrapper"] }
