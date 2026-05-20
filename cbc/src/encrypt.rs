@@ -2,7 +2,8 @@ use crate::xor;
 use cipher::{
     AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit,
-    Iv, IvSizeUser, IvState, ParBlocksSizeUser, array::ArraySize, common::InnerUser, consts::U1,
+    Iv, IvSizeUser, IvState, ParBlocksSizeUser, SetIvState, array::ArraySize, common::InnerUser,
+    consts::U1,
 };
 use core::fmt;
 
@@ -59,6 +60,16 @@ where
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
         self.iv.clone()
+    }
+}
+
+impl<C> SetIvState for Encryptor<C>
+where
+    C: BlockCipherEncrypt,
+{
+    #[inline]
+    fn set_iv(&mut self, iv: &Iv<Self>) {
+        self.iv = iv.clone();
     }
 }
 

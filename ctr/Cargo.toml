@@ -13,14 +13,14 @@ keywords = ["crypto", "block-mode", "stream-cipher", "ciphers"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = { version = "0.5", features = ["stream-wrapper"] }
+cipher = { version = "0.5.2", features = ["stream-wrapper"] }
 
 [dev-dependencies]
+cipher = { version = "0.5.2", features = ["dev"] }
+hex-literal = "1"
 aes = "0.9"
 magma = "0.10"
 kuznyechik = "0.9"
-cipher = { version = "0.5", features = ["dev"] }
-hex-literal = "1"
 
 [features]
 alloc = ["cipher/alloc"]

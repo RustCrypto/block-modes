@@ -12,7 +12,7 @@ use belt_block::BeltBlock;
 use cipher::{
     AlgorithmName, Block, BlockCipherDecrypt, BlockCipherEncBackend, BlockCipherEncClosure,
     BlockCipherEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks,
-    ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
+    ParBlocksSizeUser, SetIvState, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
     StreamCipherCoreWrapper, StreamCipherSeekCore, array::Array, common::InnerUser, consts::U16,
 };
 use core::fmt;
@@ -41,11 +41,13 @@ impl<C> StreamCipherCore for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
+    #[inline]
     fn remaining_blocks(&self) -> Option<usize> {
         let used = self.s.wrapping_sub(self.s_init);
         (u128::MAX - used).try_into().ok()
     }
 
+    #[inline]
     fn process_with_backend(&mut self, f: impl StreamCipherClosure<BlockSize = Self::BlockSize>) {
         struct Closure<'a, C: StreamCipherClosure<BlockSize = U16>> {
             s: &'a mut u128,
@@ -75,10 +77,12 @@ where
 {
     type Counter = u128;
 
+    #[inline]
     fn get_block_pos(&self) -> Self::Counter {
         self.s.wrapping_sub(self.s_init)
     }
 
+    #[inline]
     fn set_block_pos(&mut self, pos: Self::Counter) {
         self.s = self.s_init.wrapping_add(pos);
     }
@@ -126,6 +130,7 @@ impl<C> IvState for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockCipherDecrypt + BlockSizeUser<BlockSize = U16>,
 {
+    #[inline]
     fn iv_state(&self) -> Iv<Self> {
         let mut t = self.s.to_le_bytes().into();
         self.cipher.decrypt_block(&mut t);
@@ -133,10 +138,23 @@ where
     }
 }
 
+impl<C> SetIvState for GenericBeltCtrCore<C>
+where
+    C: BlockCipherEncrypt + BlockCipherDecrypt + BlockSizeUser<BlockSize = U16>,
+{
+    #[inline]
+    fn set_iv(&mut self, iv: &Iv<Self>) {
+        let mut iv = *iv;
+        self.cipher.encrypt_block(&mut iv);
+        self.s = u128::from_le_bytes(iv.0);
+    }
+}
+
 impl<C> AlgorithmName for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16> + AlgorithmName,
 {
+    #[inline]
     fn write_alg_name(f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("BeltCtr<")?;
         <C as AlgorithmName>::write_alg_name(f)?;
@@ -160,6 +178,7 @@ impl<C: BlockCipherEncrypt> Drop for GenericBeltCtrCore<C>
 where
     C: BlockCipherEncrypt + BlockSizeUser<BlockSize = U16>,
 {
+    #[inline]
     fn drop(&mut self) {
         #[cfg(feature = "zeroize")]
         {

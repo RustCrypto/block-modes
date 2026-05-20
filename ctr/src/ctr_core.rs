@@ -1,8 +1,8 @@
 use crate::CtrFlavor;
 use cipher::{
     AlgorithmName, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
-    BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocks, ParBlocksSizeUser, StreamCipherBackend,
-    StreamCipherClosure, StreamCipherCore, StreamCipherSeekCore,
+    BlockSizeUser, InnerIvInit, Iv, IvState, ParBlocks, ParBlocksSizeUser, SetIvState,
+    StreamCipherBackend, StreamCipherClosure, StreamCipherCore, StreamCipherSeekCore,
     array::ArraySize,
     common::{InnerUser, IvSizeUser},
 };
@@ -134,6 +134,17 @@ where
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
         F::current_block(&self.ctr_nonce)
+    }
+}
+
+impl<C, F> SetIvState for CtrCore<C, F>
+where
+    C: BlockCipherEncrypt,
+    F: CtrFlavor<C::BlockSize>,
+{
+    #[inline]
+    fn set_iv(&mut self, iv: &Iv<Self>) {
+        self.ctr_nonce = F::from_nonce(iv);
     }
 }
 

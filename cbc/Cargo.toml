@@ -13,12 +13,12 @@ keywords = ["crypto", "block-mode", "ciphers"]
 categories = ["cryptography", "no-std"]
 
 [dependencies]
-cipher = "0.5"
+cipher = "0.5.2"
 
 [dev-dependencies]
-aes = "0.9"
-cipher = { version = "0.5", features = ["dev"] }
+cipher = { version = "0.5.2", features = ["dev"] }
 hex-literal = "1"
+aes = "0.9"
 
 [features]
 default = ["block-padding"]

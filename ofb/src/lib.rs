@@ -69,7 +69,7 @@ use cipher::{
     AlgorithmName, Array, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockModeEncBackend,
     BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InOut, InnerIvInit, Iv, IvState,
-    ParBlocksSizeUser, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
+    ParBlocksSizeUser, SetIvState, StreamCipherBackend, StreamCipherClosure, StreamCipherCore,
     StreamCipherCoreWrapper,
     array::ArraySize,
     common::{InnerUser, IvSizeUser},
@@ -135,6 +135,16 @@ where
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
         self.iv.clone()
+    }
+}
+
+impl<C> SetIvState for OfbCore<C>
+where
+    C: BlockCipherEncrypt,
+{
+    #[inline]
+    fn set_iv(&mut self, iv: &Iv<Self>) {
+        self.iv = iv.clone();
     }
 }
 

@@ -1,7 +1,7 @@
 use cipher::{
     AlgorithmName, Array, Block, BlockCipherDecrypt, BlockCipherEncBackend, BlockCipherEncClosure,
     BlockCipherEncrypt, BlockModeDecBackend, BlockModeDecClosure, BlockModeDecrypt, BlockSizeUser,
-    InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks, ParBlocksSizeUser,
+    InnerIvInit, Iv, IvSizeUser, IvState, ParBlocks, ParBlocksSizeUser, SetIvState,
     array::ArraySize,
     common::InnerUser,
     inout::{InOut, InOutBuf, NotEqualError},
@@ -253,6 +253,17 @@ where
         let mut res = self.iv.clone();
         self.cipher.decrypt_block(&mut res);
         res
+    }
+}
+
+impl<C> SetIvState for Decryptor<C>
+where
+    C: BlockCipherEncrypt + BlockCipherDecrypt,
+{
+    #[inline]
+    fn set_iv(&mut self, iv: &Iv<Self>) {
+        self.iv = iv.clone();
+        self.cipher.encrypt_block(&mut self.iv);
     }
 }
 
