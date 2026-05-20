@@ -1,24 +1,24 @@
 [package]
 name = "ige"
-version = "0.2.0"
-description = "Infinite Garble Extension (IGE) block cipher mode of operation"
+version = "0.2.1"
 authors = ["RustCrypto Developers"]
-license = "MIT OR Apache-2.0"
 edition = "2024"
 rust-version = "1.85"
-readme = "README.md"
 documentation = "https://docs.rs/ige"
+readme = "README.md"
 repository = "https://github.com/RustCrypto/block-modes"
+license = "MIT OR Apache-2.0"
 keywords = ["crypto", "block-mode", "ciphers"]
 categories = ["cryptography", "no-std"]
+description = "Infinite Garble Extension (IGE) block cipher mode of operation"
 
 [dependencies]
-cipher = "0.5"
+cipher = "0.5.2"
 
 [dev-dependencies]
-aes = "0.9"
-cipher = { version = "0.5", features = ["dev"] }
+cipher = { version = "0.5.2", features = ["dev"] }
 hex-literal = "1"
+aes = "0.9"
 
 [features]
 default = ["block-padding"]

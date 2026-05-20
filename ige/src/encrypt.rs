@@ -2,7 +2,7 @@ use crate::{IgeIvSize, xor};
 use cipher::{
     AlgorithmName, Block, BlockCipherEncBackend, BlockCipherEncClosure, BlockCipherEncrypt,
     BlockModeEncBackend, BlockModeEncClosure, BlockModeEncrypt, BlockSizeUser, InnerIvInit, Iv,
-    IvState, ParBlocksSizeUser,
+    IvState, ParBlocksSizeUser, SetIvState,
     array::{Array, ArraySize},
     common::{InnerUser, IvSizeUser},
     inout::InOut,
@@ -109,9 +109,9 @@ where
 {
     #[inline]
     fn inner_iv_init(cipher: C, iv: &Iv<Self>) -> Self {
-        let n = C::BlockSize::USIZE;
-        let y = iv[..n].try_into().expect("should be the correct size");
-        let x = iv[n..].try_into().expect("should be the correct size");
+        let (y, x) = iv.split_at(C::BlockSize::USIZE);
+        let x = x.try_into().expect("x has correct size");
+        let y = y.try_into().expect("y has correct size");
         Self { cipher, x, y }
     }
 }
@@ -125,6 +125,20 @@ where
     #[inline]
     fn iv_state(&self) -> Iv<Self> {
         self.y.clone().concat(self.x.clone())
+    }
+}
+
+impl<C> SetIvState for Encryptor<C>
+where
+    C: BlockCipherEncrypt,
+    C::BlockSize: Add,
+    IgeIvSize<C>: ArraySize,
+{
+    #[inline]
+    fn set_iv(&mut self, iv: &Iv<Self>) {
+        let (y, x) = iv.split_at(C::BlockSize::USIZE);
+        self.x = x.try_into().expect("x has correct size");
+        self.y = y.try_into().expect("y has correct size");
     }
 }
 
