@@ -33,7 +33,7 @@ Aes128CbcCs3::new(&key.into(), &iv.into())
 assert_eq!(&buf, msg);
 ```
 
-If you wan to encrypt many messages with one key, you can use a block cipher reference
+If you want to encrypt many messages with one key, you can use a block cipher reference
 to create CTS modes:
 ```rust
 use aes::Aes128;
