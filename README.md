@@ -27,6 +27,7 @@ less error-prone than manual integrity verification.
 | [Full-block Cipher Feedback][CFB] | [`cfb-mode`] | [![crates.io](https://img.shields.io/crates/v/cfb-mode.svg)](https://crates.io/crates/cfb-mode) | [![Documentation](https://docs.rs/cfb-mode/badge.svg)](https://docs.rs/cfb-mode) |  ![MSRV 1.85][msrv-1.85] |
 | [Counter][CTR] | [`ctr`] | [![crates.io](https://img.shields.io/crates/v/ctr.svg)](https://crates.io/crates/ctr) | [![Documentation](https://docs.rs/ctr/badge.svg)](https://docs.rs/ctr) |  ![MSRV 1.85][msrv-1.85] |
 | [Ciphertext stealing][CTS] | [`cts`] | [![crates.io](https://img.shields.io/crates/v/cts.svg)](https://crates.io/crates/cts) | [![Documentation](https://docs.rs/cts/badge.svg)](https://docs.rs/cts) |  ![MSRV 1.85][msrv-1.85] |
+| [Electronic codebook][ECB] | [`ecb`] | [![crates.io](https://img.shields.io/crates/v/ecb.svg)](https://crates.io/crates/ecb) | [![Documentation](https://docs.rs/ecb/badge.svg)](https://docs.rs/ecb) |  ![MSRV 1.85][msrv-1.85] |
 | [Infinite Garble Extension][IGE] | [`ige`] | [![crates.io](https://img.shields.io/crates/v/ige.svg)](https://crates.io/crates/ige) | [![Documentation](https://docs.rs/ige/badge.svg)](https://docs.rs/ige) |  ![MSRV 1.85][msrv-1.85] |
 | [Output Feedback][OFB] | [`ofb`] | [![crates.io](https://img.shields.io/crates/v/ofb.svg)](https://crates.io/crates/ofb) | [![Documentation](https://docs.rs/ofb/badge.svg)](https://docs.rs/ofb) |  ![MSRV 1.85][msrv-1.85] |
 | [Propagating Cipher Block Chaining][PCBC] | [`pcbc`] | [![crates.io](https://img.shields.io/crates/v/pcbc.svg)](https://crates.io/crates/pcbc) | [![Documentation](https://docs.rs/pcbc/badge.svg)](https://docs.rs/pcbc) |  ![MSRV 1.85][msrv-1.85] |
@@ -63,6 +64,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [`cfb-mode`]: ./cfb-mode
 [`ctr`]: ./ctr
 [`cts`]: ./cts
+[`ecb`]: ./ecb
 [`gost-modes`]: ./gost-modes
 [`ige`]: ./ige
 [`ofb`]: ./ofb
@@ -78,6 +80,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 [CFB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Full-block_CFB
 [CTR]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR)
 [CTS]: https://en.wikipedia.org/wiki/Ciphertext_stealing
+[ECB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_(ECB)
 [GOST R 34.13-2015]: https://tc26.ru/standard/gost/GOST_R_3413-2015.pdf
 [IGE]: https://www.links.org/files/openssl-ige.pdf
 [OFB]: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_(OFB)
