@@ -1,0 +1,33 @@
+[package]
+name = "ecb"
+version = "0.2.1"
+authors = ["RustCrypto Developers"]
+edition = "2024"
+rust-version = "1.85"
+documentation = "https://docs.rs/ecb"
+readme = "README.md"
+repository = "https://github.com/RustCrypto/block-modes"
+license = "MIT OR Apache-2.0"
+keywords = ["crypto", "block-mode", "ciphers"]
+categories = ["cryptography", "no-std"]
+description = "Generic implementation of the ECB (Electronic Codebook) block cipher mode of operation"
+
+[dependencies]
+cipher = "0.5"
+
+[dev-dependencies]
+cipher = { version = "0.5", features = ["dev"] }
+hex-literal = "1"
+aes = "0.9"
+
+[features]
+default = ["block-padding"]
+alloc = ["cipher/alloc"]
+block-padding = ["cipher/block-padding"]
+zeroize = ["cipher/zeroize"]
+
+[lints]
+workspace = true
+
+[package.metadata.docs.rs]
+all-features = true

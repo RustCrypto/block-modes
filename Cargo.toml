@@ -3,10 +3,11 @@ resolver = "3"
 members = [
     "belt-ctr",
     "cbc",
-    "cts",
-    "cfb8",
     "cfb-mode",
+    "cfb8",
     "ctr",
+    "cts",
+    "ecb",
     "ige",
     "ofb",
     "pcbc"
